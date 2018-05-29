@@ -26,6 +26,7 @@ public class OBjData {
 	public string type;
 	public float  rotation;
 	public float  x, y;
+	public GameObject gameObj;
 
 	public OBjData () { }
 
@@ -118,6 +119,8 @@ public class ABLevel
 	public List<BirdData>  birds;
 	public List<BlockData> blocks;
 	public List<PlatData>  platforms;
+
+	public float triggerX, triggerY;
 
 	public static readonly int BIRDS_MAX_AMOUNT = 5;
 

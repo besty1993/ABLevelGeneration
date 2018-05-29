@@ -1,4 +1,4 @@
-﻿﻿using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Collections;
@@ -11,39 +11,39 @@ public class LevelSimulator
 	}
 
 
-	public static void SetSubsetTrigger (ABSubset subset, float x, float y) {
+	public static void SetSubsetTrigger (ABLevel subset, float x, float y) {
 		subset.triggerX = x;
 		subset.triggerY = y;
 	}
 
 	//Change Subset's position into different position.
-	public static void ChangeSubsetPosition (ABSubset subset, float x, float y) {
+	public static void ChangeSubsetPosition (ABLevel subset, float x, float y) {
 		float tempX = subset.triggerX;
 		float tempY = subset.triggerY;
 		subset.triggerX = x;
 		subset.triggerY = y;
 		foreach (OBjData gameObj in subset.pigs) {
-			gameObj.x += x-subset.triggerX;
-			gameObj.y += y-subset.triggerY;
+			gameObj.x += x-tempX;
+			gameObj.y += y-tempY;
 		}
 
 		foreach(BlockData gameObj in subset.blocks) {
-			gameObj.x += x-subset.triggerX;
-			gameObj.y += y-subset.triggerY;
+			gameObj.x += x-tempX;
+			gameObj.y += y-tempY;
 		}
 
 		foreach(PlatData gameObj in subset.platforms) {
-			gameObj.x += x-subset.triggerX;
-			gameObj.y += y-subset.triggerY;
+			gameObj.x += x-tempX;
+			gameObj.y += y-tempY;
 		}
 
 		foreach(OBjData gameObj in subset.tnts) {
-			gameObj.x += x-subset.triggerX;
-			gameObj.y += y-subset.triggerY;
+			gameObj.x += x-tempX;
+			gameObj.y += y-tempY;
 		}
 	}
 
-	public static void GenerateSubset (ABSubset subset) {
+	public static void GenerateSubset (ABLevel subset) {
 		foreach (OBjData gameObj in subset.pigs) {
 
 			Vector2 pos = new Vector2 (gameObj.x, gameObj.y);
@@ -79,22 +79,21 @@ public class LevelSimulator
 		
 	}
 
-	public static void DestroySubset (ABSubset subset) {
+	public void DestroySubset (ABLevel subset) {
 		foreach (OBjData obj in subset.pigs) {
-			ABGameWorld.Instance.Destroy (obj.gameObj);
+			UnityEngine.Object.Destroy (obj.gameObj);
 		}
 
 		foreach(BlockData obj in subset.blocks) {
-			ABGameWorld.Instance.Destroy (obj.gameObj);
+			UnityEngine.Object.Destroy (obj.gameObj);
 		}
 
 		foreach(PlatData obj in subset.platforms) {
-			ABGameWorld.Instance.Destroy (obj.gameObj);
+			UnityEngine.Object.Destroy (obj.gameObj);
 		}
 
 		foreach(OBjData obj in subset.tnts) {
-			ABGameWorld.Instance.Destroy (obj.gameObj);
+			UnityEngine.Object.Destroy (obj.gameObj);
 		}
 	}
 }
-
