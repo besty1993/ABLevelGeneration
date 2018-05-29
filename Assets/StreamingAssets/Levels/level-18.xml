@@ -2,48 +2,18 @@
 <Level width ="2">
 <Camera x="0" y="2" minWidth="20" maxWidth="30">
 <Birds>
-<Bird type="BirdBlack"/>
 <Bird type="BirdRed"/>
+<Bird type="BirdBlack"/>
 </Birds>
 <Slingshot x="-8" y="-2.5">
 <GameObjects>
-<Block type="RectTiny" material="ice" x="3.0599932485" y="-0.6019471939" rotation="90" />
-<Block type="RectTiny" material="stone" x="3.6899932485" y="-0.6019471939" rotation="90" />
-<Block type="RectTiny" material="ice" x="3.9799932485" y="-0.6019471939" rotation="90" />
-<Block type="RectTiny" material="wood" x="4.6099932485" y="-0.6019471939" rotation="90" />
-<Block type="RectTiny" material="wood" x="4.8999932485" y="-0.6019471939" rotation="90" />
-<Block type="RectTiny" material="stone" x="5.5299932485" y="-0.6019471939" rotation="90" />
-<Block type="RectSmall" material="stone" x="3.3749932485" y="-0.2769471939" rotation="0" />
-<Block type="RectSmall" material="wood" x="4.2949932485" y="-0.2769471939" rotation="0" />
-<Block type="RectSmall" material="wood" x="5.2149932485" y="-0.2769471939" rotation="0" />
-<Block type="RectFat" material="ice" x="3.3749932485" y="0.2580528061" rotation="90" />
-<Block type="RectFat" material="wood" x="4.0049932485" y="0.2580528061" rotation="90" />
-<Block type="RectFat" material="stone" x="4.5849932485" y="0.2580528061" rotation="90" />
-<Block type="RectFat" material="ice" x="5.2149932485" y="0.2580528061" rotation="90" />
-<Block type="RectFat" material="wood" x="3.3749932485" y="1.1080528061" rotation="90" />
-<Block type="RectFat" material="stone" x="4.0049932485" y="1.1080528061" rotation="90" />
-<Block type="RectFat" material="stone" x="4.5849932485" y="1.1080528061" rotation="90" />
-<Block type="RectFat" material="ice" x="5.2149932485" y="1.1080528061" rotation="90" />
-<Block type="RectFat" material="stone" x="3.3749932485" y="1.9580528061" rotation="90" />
-<Block type="RectFat" material="ice" x="4.0049932485" y="1.9580528061" rotation="90" />
-<Block type="RectFat" material="stone" x="4.5849932485" y="1.9580528061" rotation="90" />
-<Block type="RectFat" material="wood" x="5.2149932485" y="1.9580528061" rotation="90" />
-<Block type="RectMedium" material="stone" x="3.3749932485" y="3.2230528061" rotation="90" />
-<Block type="RectMedium" material="ice" x="4.0049932485" y="3.2230528061" rotation="90" />
-<Block type="RectMedium" material="stone" x="4.5849932485" y="3.2230528061" rotation="90" />
-<Block type="RectMedium" material="ice" x="5.2149932485" y="3.2230528061" rotation="90" />
-<Block type="RectFat" material="wood" x="3.6899932485" y="4.2780528061" rotation="0" />
-<Block type="RectFat" material="ice" x="4.8999932485" y="4.2780528061" rotation="0" />
-<Block type="CircleSmall" material="wood" x="3.4066599152" y="4.7180528061" rotation="0" />
-<Pig type="BasicSmall" material="" x="4.6166599152" y="4.7430528061" rotation="0" />
-<Platform type="Platform" material="" x="2.43499324851" y="-1.1269471939" />
-<Platform type="Platform" material="" x="3.05499324851" y="-1.1269471939" />
-<Platform type="Platform" material="" x="3.67499324851" y="-1.1269471939" />
-<Platform type="Platform" material="" x="4.29499324851" y="-1.1269471939" />
-<Platform type="Platform" material="" x="4.91499324851" y="-1.1269471939" />
-<Platform type="Platform" material="" x="5.53499324851" y="-1.1269471939" />
-<Platform type="Platform" material="" x="6.15499324851" y="-1.1269471939" />
-<TNT type="" material="" x="5.1833265818" y="4.7430528061" rotation="0" />
-<TNT type="" material="" x="3.9733265818" y="4.7430528061" rotation="0" />
+<Block type="SquareTiny" material="stone" x="-0.8960408513" y="3.42" rotation="0" />
+<Block type="RectTiny" material="ice" x="-0.896040851318" y="3.745" rotation="90" />
+<Pig type="BasicSmall" material="" x="-0.8960408513" y="4.21" rotation="0" />
+<Platform type="Platform" material="" x="-2.69" y="3" />
+<Platform type="Platform" material="" x="-2.07" y="3" />
+<Platform type="Platform" material="" x="-1.45" y="3" />
+<Platform type="Platform" material="" x="-0.83" y="3" />
+<TNT type="" material="" x="-2.82" y="3.67" rotation="0" />
 </GameObjects>
 </Level>

@@ -2,24 +2,19 @@
 <Level width ="2">
 <Camera x="0" y="2" minWidth="20" maxWidth="30">
 <Birds>
+<Bird type="BirdRed"/>
 <Bird type="BirdBlue"/>
-<Bird type="BirdBlack"/>
 </Birds>
 <Slingshot x="-8" y="-2.5">
 <GameObjects>
-<Block type="SquareSmall" material="wood" x="4.2732076595" y="-0.6776443429" rotation="0" />
-<Block type="SquareSmall" material="stone" x="5.1932076595" y="-0.6776443429" rotation="0" />
-<Block type="SquareSmall" material="wood" x="6.1132076595" y="-0.6776443429" rotation="0" />
-<Block type="RectBig" material="stone" x="5.1932076595" y="-0.3526443429" rotation="0" />
-<Block type="RectBig" material="stone" x="5.1932076595" y="-0.1326443429" rotation="0" />
-<Block type="RectTiny" material="ice" x="4.5982076595" y="0.0873556571" rotation="0" />
-<Block type="RectTiny" material="ice" x="5.7882076595" y="0.0873556571" rotation="0" />
-<Block type="CircleSmall" material="wood" x="5.1932076595" y="0.2023556571" rotation="0" />
-<Block type="CircleSmall" material="stone" x="5.7882076595" y="0.4223556571" rotation="0" />
-<Pig type="BasicSmall" material="" x="4.5982076595" y="0.4473556571" rotation="0" />
-<Platform type="Platform" material="" x="4.26320765955" y="-1.20264434288" />
-<Platform type="Platform" material="" x="4.88320765955" y="-1.20264434288" />
-<Platform type="Platform" material="" x="5.50320765955" y="-1.20264434288" />
-<Platform type="Platform" material="" x="6.12320765955" y="-1.20264434288" />
+<Block type="RectMedium" material="ice" x="-2.34" y="4.15" rotation="90" />
+<Block type="RectMedium" material="wood" x="-1.76" y="4.15" rotation="90" />
+<Block type="RectMedium" material="ice" x="-1.18" y="4.15" rotation="90" />
+<Block type="TriangleHole" material="wood" x="-1.18" y="5.4" rotation="0" />
+<Pig type="BasicSmall" material="" x="-2.34" y="5.24" rotation="0" />
+<Platform type="Platform" material="" x="-2.69" y="3" />
+<Platform type="Platform" material="" x="-2.07" y="3" />
+<Platform type="Platform" material="" x="-1.45" y="3" />
+<Platform type="Platform" material="" x="-0.83" y="3" />
 </GameObjects>
 </Level>
