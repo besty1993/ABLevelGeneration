@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-16"?>
+<Level width ="2">
+<Camera x="0" y="2" minWidth="20" maxWidth="30">
+<Birds>
+<Bird type="BirdRed"/>
+<Bird type="BirdRed"/>
+</Birds>
+<Slingshot x="-8" y="-2.5">
+<GameObjects>
+<Block type="RectMedium" material="wood" x="2.4311589399" y="2.1790468081" rotation="90" />
+<Block type="RectMedium" material="wood" x="3.0611589399" y="2.1790468081" rotation="90" />
+<Block type="RectMedium" material="ice" x="3.3511589399" y="2.1790468081" rotation="90" />
+<Block type="RectMedium" material="wood" x="3.9811589399" y="2.1790468081" rotation="90" />
+<Block type="RectMedium" material="stone" x="4.2711589399" y="2.1790468081" rotation="90" />
+<Block type="RectMedium" material="wood" x="4.9011589399" y="2.1790468081" rotation="90" />
+<Block type="RectSmall" material="stone" x="2.7461589399" y="3.1290468081" rotation="0" />
+<Block type="RectSmall" material="ice" x="3.6661589399" y="3.1290468081" rotation="0" />
+<Block type="RectSmall" material="stone" x="4.5861589399" y="3.1290468081" rotation="0" />
+<Block type="RectBig" material="stone" x="3.6661589399" y="3.3490468081" rotation="0" />
+<Block type="RectFat" material="wood" x="2.9361589399" y="3.8840468081" rotation="90" />
+<Block type="RectFat" material="ice" x="3.6661589399" y="3.8840468081" rotation="90" />
+<Block type="RectFat" material="ice" x="4.3961589399" y="3.8840468081" rotation="90" />
+<Block type="RectMedium" material="wood" x="3.6661589399" y="4.4190468081" rotation="0" />
+<Block type="RectSmall" material="stone" x="3.66615893994" y="4.6390468081" rotation="0" />
+<Block type="TriangleHole" material="ice" x="3.6661589399" y="5.1590468081" rotation="0" />
+<Platform type="Platform" material="" x="2.42615893994" y="1.02904680809" />
+<Platform type="Platform" material="" x="3.04615893994" y="1.02904680809" />
+<Platform type="Platform" material="" x="3.66615893994" y="1.02904680809" />
+<Platform type="Platform" material="" x="4.28615893994" y="1.02904680809" />
+<Platform type="Platform" material="" x="4.90615893994" y="1.02904680809" />
+</GameObjects>
+</Level>
