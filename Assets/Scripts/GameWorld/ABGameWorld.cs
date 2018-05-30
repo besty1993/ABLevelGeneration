@@ -73,6 +73,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld> {
 
 	/// /// For Subset
 	public static float platformStartPoint = 999f;
+	public static float platformStartPointY = 999f;
 	public static int bulletPosition = 0;
 
 	void Awake() {
@@ -135,7 +136,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld> {
 		}
 
 		if (_isSimulation) {
-			Time.timeScale = 5;
+			Time.timeScale = 1;
 		}
 	}
 
@@ -250,6 +251,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld> {
 		foreach(PlatData gameObj in currentLevel.platforms) {
 			if (_isSimulation && platformStartPoint > gameObj.x) {
 				platformStartPoint = gameObj.x;
+				platformStartPointY = gameObj.y;
 			}
 			Vector2 pos = new Vector2 (gameObj.x, gameObj.y);
 			Quaternion rotation = Quaternion.Euler (0, 0, gameObj.rotation);
@@ -275,6 +277,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld> {
 		ManageBirds();
 		SubsetSimulation ();
 		//// Subset Simulator
+		CheckUseful();
 	}
 
 //	void UpdatePerFrame (int frame) {
@@ -692,32 +695,69 @@ public class ABGameWorld : ABSingleton<ABGameWorld> {
 //			alreadyDrop = false;
 //		}
 //	}
+// YANG
+//	public static bool alreadyDrop =false;
+//	private void SubsetSimulation () {
+//		if (!_isSimulation||!IsLevelStable())
+//			return;
+//		
+//		if (!alreadyDrop) {
+//			float x =  bulletPosition * 0.62f+platformStartPoint ;
+//			Vector2 pos = new Vector2 (X, 1);
+//			Vector2 force = new Vector2 (4, 1);
+//			Quaternion rotation = Quaternion.Euler (0, 0, 0);
+//
+//			GameObject block = AddBlock (ABWorldAssets.BLOCKS ["CircleSmall"], pos, rotation);
+//			block.GetComponent<Rigidbody2D> ().AddForce (force, ForceMode2D.Impulse);
+//
+//			MATERIALS material = (MATERIALS)System.Enum.Parse (typeof(MATERIALS), "stone");
+//			block.GetComponent<ABBlock> ().SetMaterial (material);
+//			bulletPosition++;
+//			if (bulletPosition == 7) {
+//				bulletPosition = 0;
+//				platformStartPoint = 999f;
+//				NextLevel ();
+//				return;
+//			}
+//			
+//			alreadyDrop = true;
+//		}
+//		else {
+//			initx ();
+//			alreadyDrop = false; 
+//		}
+//		//		if (IsLevelStable ()&&block.transform.position.y<5) {
+//		//			initx ();
+//		//		}
+//
+//	}
+
 
 	public static bool alreadyDrop =false;
 	private void SubsetSimulation () {
 		if (!_isSimulation||!IsLevelStable())
 			return;
-		
+
 		if (!alreadyDrop) {
-			float x = bulletPosition * 0.62f + platformStartPoint;
-			Vector2 pos = new Vector2 (x, 6);
-			Vector2 force = new Vector2 (0, -1);
+			float y =   bulletPosition * 0.5f + platformStartPointY+0.7f;
+			float x =   platformStartPoint-1;
+
+			Vector2 pos = new Vector2 (x, y);
+			Vector2 force = new Vector2 (1, 0);
 			Quaternion rotation = Quaternion.Euler (0, 0, 0);
 
 			GameObject block = AddBlock (ABWorldAssets.BLOCKS ["CircleSmall"], pos, rotation);
 			block.GetComponent<Rigidbody2D> ().AddForce (force, ForceMode2D.Impulse);
-
 			MATERIALS material = (MATERIALS)System.Enum.Parse (typeof(MATERIALS), "stone");
 			block.GetComponent<ABBlock> ().SetMaterial (material);
 			bulletPosition++;
-			if (bulletPosition == 7) {
+			if (bulletPosition == 5) {
 				bulletPosition = 0;
-				platformStartPoint = 999f;
 				NextLevel ();
 				return;
 			}
-			
 			alreadyDrop = true;
+			UsefulTag = false;
 		}
 		else {
 			initx ();
@@ -729,9 +769,16 @@ public class ABGameWorld : ABSingleton<ABGameWorld> {
 
 	}
 
-
-
-
-
-
+	public static bool UsefulTag =false;
+	public void CheckUseful(){
+		if (!UsefulTag) {
+			foreach (Transform b in _blocksTransform) {
+				b.GetComponent<ABBlock> ();
+				if (Vector2.Distance (b.position, new Vector2 (platformStartPoint, platformStartPointY)) > 3) {
+					print ("useful one");
+					UsefulTag = true;
+				}
+			}
+		}
+	}
 }
