@@ -4,8 +4,8 @@ Temp/*
 *.sln
 *.csproj
 *.userprefs
-*.userprefs
 *.DS_Store
+*.meta
 obj/*
 Assets/Experiments/* 
 Website/*
