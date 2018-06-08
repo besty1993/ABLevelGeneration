@@ -73,4 +73,16 @@ public class LevelList : ABSingleton<LevelList> {
 
 		return level;
 	}
+
+    // Use this for get another level
+    public ABLevel GetLevel(int index)
+    {
+
+        if (index < 0 || index >= _levels.Length)
+            return null;
+
+        ABLevel level = _levels[index];
+
+        return level;
+    }
 }

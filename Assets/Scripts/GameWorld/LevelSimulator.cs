@@ -4,10 +4,10 @@ using UnityEngine.SceneManagement;
 using System.Collections;
 using System.Collections.Generic;
 
-public class LevelSimulator
-{
-	public LevelSimulator ()
-	{
+public class LevelSimulator {
+    
+	public LevelSimulator () {
+        Debug.Log("in level..");
 	}
 
 
@@ -43,17 +43,16 @@ public class LevelSimulator
 		}
 	}
 
-	public static void GenerateSubset (ABLevel subset) {
+    public static void GenerateSubset (ABLevel subset, float x, float y) {
+        
 		foreach (OBjData gameObj in subset.pigs) {
-
-			Vector2 pos = new Vector2 (gameObj.x, gameObj.y);
+            Vector2 pos = new Vector2 (gameObj.x + x, gameObj.y + y);
 			Quaternion rotation = Quaternion.Euler (0, 0, gameObj.rotation);
 			ABGameWorld.Instance.AddPig(ABWorldAssets.PIGS[gameObj.type], pos, rotation);
 		}
 
 		foreach(BlockData gameObj in subset.blocks) {
-
-			Vector2 pos = new Vector2 (gameObj.x, gameObj.y);
+            Vector2 pos = new Vector2 (gameObj.x + x, gameObj.y + y);
 			Quaternion rotation = Quaternion.Euler (0, 0, gameObj.rotation);
 
 			GameObject block = ABGameWorld.Instance.AddBlock(ABWorldAssets.BLOCKS[gameObj.type], pos,  rotation);
@@ -63,19 +62,20 @@ public class LevelSimulator
 		}
 
 		foreach(PlatData gameObj in subset.platforms) {
-			Vector2 pos = new Vector2 (gameObj.x, gameObj.y);
+            //Debug.Log(subset.platforms.Count+" :Count");
+            Vector2 pos = new Vector2 (gameObj.x + x, gameObj.y + y);
 			Quaternion rotation = Quaternion.Euler (0, 0, gameObj.rotation);
-
-			ABGameWorld.Instance.AddPlatform(ABWorldAssets.PLATFORM, pos, rotation, gameObj.scaleX, gameObj.scaleY);
-		}
+            ABGameWorld.Instance.AddPlatform(ABWorldAssets.PLATFORM, pos, rotation, gameObj.scaleX, gameObj.scaleY);
+   		}
 
 		foreach(OBjData gameObj in subset.tnts) {
-
-			Vector2 pos = new Vector2 (gameObj.x, gameObj.y);
+            Vector2 pos = new Vector2 (gameObj.x + x, gameObj.y + y);
 			Quaternion rotation = Quaternion.Euler (0, 0, gameObj.rotation);
 
 			ABGameWorld.Instance.AddBlock(ABWorldAssets.TNT, pos, rotation);
 		}
+
+
 		
 	}
 

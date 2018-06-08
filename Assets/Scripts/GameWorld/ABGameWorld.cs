@@ -33,11 +33,14 @@ public class ABGameWorld : ABSingleton<ABGameWorld> {
 	private List<ABBird>     _birds;
 	private List<ABParticle> _birdTrajectory;
 
+
 	private ABBird     _lastThrownBird;
 	private Transform  _blocksTransform;
 	private Transform  _birdsTransform;
 	private Transform  _plaftformsTransform;
 	private Transform  _slingshotBaseTransform;
+
+    private LevelLoader _levelLoader;
 
 	private GameObject _slingshot;
 	public GameObject Slingshot() { return _slingshot; }
@@ -93,7 +96,6 @@ public class ABGameWorld : ABSingleton<ABGameWorld> {
 
 	// Use this for initialization
 	void Start () {
-		
 		_pigs = new List<ABPig>();
 		_birds = new List<ABBird>();
 		_birdTrajectory = new List<ABParticle>();
@@ -121,12 +123,17 @@ public class ABGameWorld : ABSingleton<ABGameWorld> {
 
 		} 
 		else {
-			print("start");
-			ABLevel currentLevel = LevelList.Instance.GetCurrentLevel ();
+            Debug.Log("Start Level");
 
+			ABLevel currentLevel = LevelList.Instance.GetCurrentLevel ();
+            ABLevel subsetNextLevel = LevelList.Instance.GetLevel(Random.Range(4,10));
 			if (currentLevel != null) {
 				
 				DecodeLevel (currentLevel);
+                LevelSimulator.GenerateSubset(subsetNextLevel,Random.Range(4, 8),Random.Range(-6, 2));
+
+                _levelLoader = new LevelLoader();
+                _levelLoader.SaveLevelOnScene();
 				AdaptCameraWidthToLevel ();
 
 				_levelTimesTried = 0;
@@ -165,6 +172,8 @@ public class ABGameWorld : ABSingleton<ABGameWorld> {
 			
 		ABLevel level = LevelList.Instance.GetCurrentLevel ();
 		DecodeLevel (level);
+        ABLevel subsetNextLevel = LevelList.Instance.GetLevel(Random.Range(4, 10));
+        LevelSimulator.GenerateSubset(subsetNextLevel, Random.Range(4, 8), Random.Range(-6, 2));
 
 		_slingshotBaseTransform = GameObject.Find ("slingshot_base").transform;
 		_blocksTransform = GameObject.Find ("Blocks").transform;
@@ -257,6 +266,11 @@ public class ABGameWorld : ABSingleton<ABGameWorld> {
 			Quaternion rotation = Quaternion.Euler (0, 0, gameObj.rotation);
 
 			AddPlatform(ABWorldAssets.PLATFORM, pos, rotation, gameObj.scaleX, gameObj.scaleY);
+
+
+            //Vector2 pos2 = new Vector2(gameObj.x+1, gameObj.y+2);
+            //AddPlatform(ABWorldAssets.PLATFORM, pos2, rotation, gameObj.scaleX, gameObj.scaleY);
+
 		}
 
 		foreach(OBjData gameObj in currentLevel.tnts) {
@@ -272,12 +286,12 @@ public class ABGameWorld : ABSingleton<ABGameWorld> {
 
 	// Update is called once per frame
 	void Update () {
-		
-		// Check if birds was trown, if it died and swap them when needed
+        //Debug.Log("Update");
+        // Check if birds was trown, if it died and swap them when needed
 		ManageBirds();
-		SubsetSimulation ();
+		//SubsetSimulation ();
 		//// Subset Simulator
-		CheckUseful();
+		//CheckUseful();
 	}
 
 //	void UpdatePerFrame (int frame) {
@@ -334,14 +348,17 @@ public class ABGameWorld : ABSingleton<ABGameWorld> {
 	public void ResetLevel() {
 		if (_isSimulation) {
 			//If it's simulation : uset initx
-			initx ();
+            initx();
+            _levelLoader.SaveLevelOnScene();
 			return;
 		}
 		
 		if(_levelFailedBanner.activeSelf)
 			_levelTimesTried++;
-
+        initx();
 		ABSceneManager.Instance.LoadScene(SceneManager.GetActiveScene().name);
+
+
 	}
 
 	public void AddTrajectoryParticle(ABParticle trajectoryParticle) {
@@ -417,7 +434,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld> {
 	}
 
 	public GameObject AddPlatform(GameObject original, Vector3 position, Quaternion rotation, float scaleX = 1f, float scaleY = 1f) {
-
+        //Debug.Log("add Platform");
 		GameObject platform = AddBlock (original, position, rotation, scaleX, scaleY);
 		platform.transform.parent = _plaftformsTransform;
 
@@ -564,13 +581,12 @@ public class ABGameWorld : ABSingleton<ABGameWorld> {
 		return totalVelocity;
 	}
 
-	public List<GameObject> BlocksInScene() {
+    public List<GameObject> ObjectsInScene() {
 
 		List<GameObject> objsInScene = new List<GameObject>();
 
 		foreach(Transform b in _blocksTransform)
-			objsInScene.Add(b.gameObject);
-
+            objsInScene.Add(b.gameObject.transform.gameObject);
 		return objsInScene;
 	}
 
@@ -621,6 +637,11 @@ public class ABGameWorld : ABSingleton<ABGameWorld> {
 
 		foreach(Transform b in _birdsTransform)
 			Destroy(b.gameObject);
+
+        foreach (Transform b in _plaftformsTransform)
+            Destroy(b.gameObject);
+
+
 
 		_birds.Clear();		
 	}
@@ -748,8 +769,8 @@ public class ABGameWorld : ABSingleton<ABGameWorld> {
 
 			GameObject block = AddBlock (ABWorldAssets.BLOCKS ["CircleSmall"], pos, rotation);
 			block.GetComponent<Rigidbody2D> ().AddForce (force, ForceMode2D.Impulse);
-			MATERIALS material = (MATERIALS)System.Enum.Parse (typeof(MATERIALS), "stone");
-			block.GetComponent<ABBlock> ().SetMaterial (material);
+			//MATERIALS material = (MATERIALS)System.Enum.Parse (typeof(MATERIALS), "stone");
+			//block.GetComponent<ABBlock> ().SetMaterial (material);
 			bulletPosition++;
 			if (bulletPosition == 5) {
 				bulletPosition = 0;
@@ -760,6 +781,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld> {
 			UsefulTag = false;
 		}
 		else {
+            
 			initx ();
 			alreadyDrop = false; 
 		}
@@ -775,9 +797,9 @@ public class ABGameWorld : ABSingleton<ABGameWorld> {
 			foreach (Transform b in _blocksTransform) {
 				b.GetComponent<ABBlock> ();
 				if (Vector2.Distance (b.position, new Vector2 (platformStartPoint, platformStartPointY)) > 3) {
-					print ("useful one");
-					UsefulTag = true;
-				}
+                    print ("useful one");
+                    UsefulTag = true;
+                }
 			}
 		}
 	}
