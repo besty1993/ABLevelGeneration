@@ -180,8 +180,7 @@ public class LevelLoader {
 
         string CombinePath = Path.Combine(path, "");
         path = Path.Combine(CombinePath, DateTime.Now.ToString("MMddyy-HHmmss")+".xml");
-        Debug.Log("Path to XML: " + path);
-
+        Debug.Log("Save XML: " + path);
 		using (XmlWriter writer = XmlWriter.Create(output, ws)) {
 			writer.WriteStartElement("Level");
 			writer.WriteAttributeString("width", level.width.ToString());
@@ -278,18 +277,15 @@ public class LevelLoader {
 		return resources;
 	}
 
-    public ABLevel EncodeLevel()
-    {
+    public ABLevel EncodeLevel() {
         ABLevel level = new ABLevel();
-
         level.width = LevelList.Instance.GetCurrentLevel().width;
         level.camera = LevelList.Instance.GetCurrentLevel().camera;
         level.slingshot = LevelList.Instance.GetCurrentLevel().slingshot;
         level.birds = LevelList.Instance.GetCurrentLevel().birds;
 
-        foreach (Transform child in GameObject.Find("Blocks").transform)
+        foreach (Transform child in GameObject.Find("Blocks").transform) 
         {
-
             string type = child.name;
             float x = child.transform.position.x;
             float y = child.transform.position.y;
@@ -303,37 +299,28 @@ public class LevelLoader {
             {
                 string material = child.GetComponent<ABBlock>()._material.ToString();
                 level.blocks.Add(new BlockData(type, rotation, x, y, material));
-            } 
-            else if (child.GetComponent<ABTNT>() != null) {
+            }
+            else if (child.GetComponent<ABTNT>() != null)
+            {
                 level.tnts.Add(new OBjData(type, rotation, x, y));
             }
         }
 
-        foreach (Transform child in GameObject.Find("Platforms").transform)
+        foreach (Transform child in GameObject.Find("Platforms").transform) 
         {
-            if (child.gameObject.active) {
-                PlatData obj = new PlatData();
-
-                obj.type = child.name;
-                obj.x = child.transform.position.x;
-                obj.y = child.transform.position.y;
-                obj.rotation = child.transform.rotation.eulerAngles.z;
-                obj.scaleX = child.transform.localScale.x;
-                obj.scaleY = child.transform.localScale.y;
-
-                level.platforms.Add(obj);
-            }
-
+            PlatData obj = new PlatData();
+            obj.type = child.name;
+            obj.x = child.transform.position.x;
+            obj.y = child.transform.position.y;
+            obj.rotation = child.transform.rotation.eulerAngles.z;
+            obj.scaleX = child.transform.localScale.x;
+            obj.scaleY = child.transform.localScale.y;
+            level.platforms.Add(obj);
         }
-
         return level;
     }
 
 	public void SaveLevelOnScene() {
-        // Not use this
-        //List<GameObject> objsInScene = ABGameWorld.Instance.ObjectsInScene();
-        //ABLevel level = LevelList.Instance.GetCurrentLevel();
-
         //Use this code to save objs into xml
         ABLevel level = EncodeLevel();
         SaveXmlLevel(level ,Application.dataPath + "/StreamingAssets/LevelGenerator");

@@ -40,6 +40,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld> {
 	private Transform  _plaftformsTransform;
 	private Transform  _slingshotBaseTransform;
 
+    private ABLevel _nextLevelSubset;
     private LevelLoader _levelLoader;
 
 	private GameObject _slingshot;
@@ -99,7 +100,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld> {
 		_pigs = new List<ABPig>();
 		_birds = new List<ABBird>();
 		_birdTrajectory = new List<ABParticle>();
-
+        _levelLoader = new LevelLoader();
 		_levelCleared = false;
 
 		if(!_isSimulation) {
@@ -123,21 +124,15 @@ public class ABGameWorld : ABSingleton<ABGameWorld> {
 
 		} 
 		else {
-            Debug.Log("Start Level");
-
 			ABLevel currentLevel = LevelList.Instance.GetCurrentLevel ();
-            ABLevel subsetNextLevel = LevelList.Instance.GetLevel(Random.Range(4,10));
 			if (currentLevel != null) {
-				
-				DecodeLevel (currentLevel);
-                LevelSimulator.GenerateSubset(subsetNextLevel,Random.Range(4, 8),Random.Range(-6, 2));
-
-                _levelLoader = new LevelLoader();
+				DecodeLevel(currentLevel);
+                _nextLevelSubset = LevelList.Instance.GetLevel(Random.Range(4, 10));
+                LevelSimulator.GenerateSubset(_nextLevelSubset,Random.Range(4, 8),Random.Range(-6, 2));
                 _levelLoader.SaveLevelOnScene();
+
 				AdaptCameraWidthToLevel ();
-
 				_levelTimesTried = 0;
-
 				_slingshotBaseTransform = GameObject.Find ("slingshot_base").transform;
 			}
 		}
@@ -172,8 +167,6 @@ public class ABGameWorld : ABSingleton<ABGameWorld> {
 			
 		ABLevel level = LevelList.Instance.GetCurrentLevel ();
 		DecodeLevel (level);
-        ABLevel subsetNextLevel = LevelList.Instance.GetLevel(Random.Range(4, 10));
-        LevelSimulator.GenerateSubset(subsetNextLevel, Random.Range(4, 8), Random.Range(-6, 2));
 
 		_slingshotBaseTransform = GameObject.Find ("slingshot_base").transform;
 		_blocksTransform = GameObject.Find ("Blocks").transform;
@@ -345,20 +338,10 @@ public class ABGameWorld : ABSingleton<ABGameWorld> {
 			ABSceneManager.Instance.LoadScene(SceneManager.GetActiveScene().name);
 	}
 
-	public void ResetLevel() {
-		if (_isSimulation) {
-			//If it's simulation : uset initx
-            initx();
-            _levelLoader.SaveLevelOnScene();
-			return;
-		}
-		
+	public void ResetLevel() {		
 		if(_levelFailedBanner.activeSelf)
 			_levelTimesTried++;
-        initx();
 		ABSceneManager.Instance.LoadScene(SceneManager.GetActiveScene().name);
-
-
 	}
 
 	public void AddTrajectoryParticle(ABParticle trajectoryParticle) {

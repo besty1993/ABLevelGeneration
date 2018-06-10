@@ -54,15 +54,12 @@ public class LevelSimulator {
 		foreach(BlockData gameObj in subset.blocks) {
             Vector2 pos = new Vector2 (gameObj.x + x, gameObj.y + y);
 			Quaternion rotation = Quaternion.Euler (0, 0, gameObj.rotation);
-
 			GameObject block = ABGameWorld.Instance.AddBlock(ABWorldAssets.BLOCKS[gameObj.type], pos,  rotation);
-
 			MATERIALS material = (MATERIALS)System.Enum.Parse(typeof(MATERIALS), gameObj.material);
 			block.GetComponent<ABBlock> ().SetMaterial (material);
 		}
 
 		foreach(PlatData gameObj in subset.platforms) {
-            //Debug.Log(subset.platforms.Count+" :Count");
             Vector2 pos = new Vector2 (gameObj.x + x, gameObj.y + y);
 			Quaternion rotation = Quaternion.Euler (0, 0, gameObj.rotation);
             ABGameWorld.Instance.AddPlatform(ABWorldAssets.PLATFORM, pos, rotation, gameObj.scaleX, gameObj.scaleY);
@@ -71,7 +68,6 @@ public class LevelSimulator {
 		foreach(OBjData gameObj in subset.tnts) {
             Vector2 pos = new Vector2 (gameObj.x + x, gameObj.y + y);
 			Quaternion rotation = Quaternion.Euler (0, 0, gameObj.rotation);
-
 			ABGameWorld.Instance.AddBlock(ABWorldAssets.TNT, pos, rotation);
 		}
 
@@ -79,21 +75,26 @@ public class LevelSimulator {
 		
 	}
 
-	public void DestroySubset (ABLevel subset) {
+    public static void DestroySubset (ABLevel subset) {
+        Debug.Log("call DestroySubset");
 		foreach (OBjData obj in subset.pigs) {
-			UnityEngine.Object.Destroy (obj.gameObj);
+            Debug.Log("pig: "+obj.gameObj);
+            Object.DestroyImmediate (obj.gameObj, true);
 		}
 
 		foreach(BlockData obj in subset.blocks) {
-			UnityEngine.Object.Destroy (obj.gameObj);
+            Debug.Log("block: " + obj.gameObj);
+            Object.DestroyImmediate (obj.gameObj, true);
 		}
 
 		foreach(PlatData obj in subset.platforms) {
-			UnityEngine.Object.Destroy (obj.gameObj);
+            Debug.Log("plat: " + obj.gameObj);
+            Object.DestroyImmediate (obj.gameObj, true);
 		}
 
 		foreach(OBjData obj in subset.tnts) {
-			UnityEngine.Object.Destroy (obj.gameObj);
+            Debug.Log("tnt: " + obj.gameObj);
+            Object.DestroyImmediate (obj.gameObj, true);
 		}
 	}
 }
