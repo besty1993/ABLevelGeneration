@@ -131,7 +131,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld> {
                 _nextLevelSubset = LevelList.Instance.GetLevel(Random.Range(4, 85));
 
                 //Want trigger point
-                LevelSimulator.ChangeSubsetPosition(_nextLevelSubset, Random.Range(3, 5), Random.Range(-3, 2));
+                LevelSimulator.ChangeSubsetPosition(_nextLevelSubset, Random.Range(4, 6), Random.Range(-3, 2));
                 LevelSimulator.GenerateSubset(_nextLevelSubset, _nextLevelSubset.triggerX, _nextLevelSubset.triggerY);
 
                 //Save generate level on scene to xml
