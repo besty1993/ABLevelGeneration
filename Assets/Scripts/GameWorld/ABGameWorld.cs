@@ -104,7 +104,6 @@ public class ABGameWorld : ABSingleton<ABGameWorld> {
 		_levelCleared = false;
 
 		if(!_isSimulation) {
-
 			GetComponent<AudioSource>().PlayOneShot(_clips[0]);
 			GetComponent<AudioSource>().PlayOneShot(_clips[1]);
 		}
@@ -127,9 +126,19 @@ public class ABGameWorld : ABSingleton<ABGameWorld> {
 			ABLevel currentLevel = LevelList.Instance.GetCurrentLevel ();
 			if (currentLevel != null) {
 				DecodeLevel(currentLevel);
-                _nextLevelSubset = LevelList.Instance.GetLevel(Random.Range(4, 10));
-                LevelSimulator.GenerateSubset(_nextLevelSubset,Random.Range(4, 8),Random.Range(-6, 2));
+
+                //Random subset for generate level
+                _nextLevelSubset = LevelList.Instance.GetLevel(Random.Range(4, 85));
+
+                //Want trigger point
+                LevelSimulator.ChangeSubsetPosition(_nextLevelSubset, Random.Range(3, 8), Random.Range(-3, 2));
+                LevelSimulator.GenerateSubset(_nextLevelSubset, _nextLevelSubset.triggerX, _nextLevelSubset.triggerY);
+
+                //Save generate level on scene to xml
                 _levelLoader.SaveLevelOnScene();
+
+                Debug.Log("Random level: " + Random.Range(4, 85));
+                Debug.Log("Trigger x: " + _nextLevelSubset.triggerX + " ,Trigger y: " + _nextLevelSubset.triggerY);
 
 				AdaptCameraWidthToLevel ();
 				_levelTimesTried = 0;

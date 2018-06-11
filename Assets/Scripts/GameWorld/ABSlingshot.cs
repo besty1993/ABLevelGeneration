@@ -32,7 +32,9 @@ public class ABSlingshot : MonoBehaviour {
         _lineRenderer = gameObject.GetComponent<LineRenderer>();
 
         _lineRenderer.material = new Material(Shader.Find("Custom/Solid Color"));
-        _lineRenderer.SetWidth(_width, _width);
+        //_lineRenderer.SetWidth(_width, _width);
+        _lineRenderer.startWidth = _width;
+        _lineRenderer.endWidth = _width;
 
 		_lineRenderer.SetPosition((int)SLINGSHOT_LINE_POS.SLING, transform.position + _positionOffset);
         _lineRenderer.enabled = false;

@@ -7,9 +7,7 @@ using System.Collections.Generic;
 public class LevelSimulator {
     
 	public LevelSimulator () {
-        Debug.Log("in level..");
 	}
-
 
 	public static void SetSubsetTrigger (ABLevel subset, float x, float y) {
 		subset.triggerX = x;
@@ -44,7 +42,6 @@ public class LevelSimulator {
 	}
 
     public static void GenerateSubset (ABLevel subset, float x, float y) {
-        
 		foreach (OBjData gameObj in subset.pigs) {
             Vector2 pos = new Vector2 (gameObj.x + x, gameObj.y + y);
 			Quaternion rotation = Quaternion.Euler (0, 0, gameObj.rotation);
@@ -70,31 +67,23 @@ public class LevelSimulator {
 			Quaternion rotation = Quaternion.Euler (0, 0, gameObj.rotation);
 			ABGameWorld.Instance.AddBlock(ABWorldAssets.TNT, pos, rotation);
 		}
-
-
-		
 	}
 
     public static void DestroySubset (ABLevel subset) {
-        Debug.Log("call DestroySubset");
 		foreach (OBjData obj in subset.pigs) {
-            Debug.Log("pig: "+obj.gameObj);
-            Object.DestroyImmediate (obj.gameObj, true);
+            Object.DestroyImmediate(obj.gameObj, true);
 		}
 
 		foreach(BlockData obj in subset.blocks) {
-            Debug.Log("block: " + obj.gameObj);
-            Object.DestroyImmediate (obj.gameObj, true);
+            Object.DestroyImmediate(obj.gameObj, true);
 		}
 
 		foreach(PlatData obj in subset.platforms) {
-            Debug.Log("plat: " + obj.gameObj);
-            Object.DestroyImmediate (obj.gameObj, true);
+            Object.DestroyImmediate(obj.gameObj, true);
 		}
 
 		foreach(OBjData obj in subset.tnts) {
-            Debug.Log("tnt: " + obj.gameObj);
-            Object.DestroyImmediate (obj.gameObj, true);
+            Object.DestroyImmediate(obj.gameObj, true);
 		}
 	}
 }
