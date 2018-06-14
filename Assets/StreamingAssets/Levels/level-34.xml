@@ -7,9 +7,9 @@
 </Birds>
 <Slingshot x="-8" y="-2.5">
 <GameObjects>
-<Block type="RectTiny" material="stone" x="-1.2587159066" y="3.42" rotation="0" />
-<Block type="RectFat" material="stone" x="-1.25871590659" y="3.955" rotation="90" />
-<Pig type="BasicSmall" material="" x="-1.2587159066" y="4.63" rotation="0" />
+<Block type="RectFat" material="ice" x="-1.8158483536" y="3.735" rotation="90" />
+<Block type="RectSmall" material="ice" x="-1.81584835359" y="4.585" rotation="90" />
+<Pig type="BasicSmall" material="" x="-1.8158483536" y="5.26" rotation="0" />
 <Platform type="Platform" material="" x="-2.69" y="3" />
 <Platform type="Platform" material="" x="-2.07" y="3" />
 <Platform type="Platform" material="" x="-1.45" y="3" />

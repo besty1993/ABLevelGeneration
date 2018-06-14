@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-16"?>
+<Level width="2">
+  <Camera x="0" y="2" minWidth="20" maxWidth="30" />
+  <Birds>
+    <Bird type="BirdYellow" />
+    <Bird type="BirdYellow" />
+</Birds>
+  <Slingshot x="-8" y="-2.5" />
+  <GameObjects>
+    <Block type="SquareSmall" material="wood" x="-1.06454" y="3.525" rotation="0" />
+    <Block type="RectTiny" material="stone" x="8.597537" y="-1.872336" rotation="90" />
+    <Block type="RectTiny" material="wood" x="9.327537" y="-1.872336" rotation="90" />
+    <Block type="RectTiny" material="wood" x="10.05754" y="-1.872336" rotation="90" />
+    <Block type="RectMedium" material="wood" x="9.327537" y="-1.547337" rotation="0" />
+    <Block type="SquareSmall" material="wood" x="9.017537" y="-1.222336" rotation="0" />
+    <Block type="SquareSmall" material="stone" x="9.637537" y="-1.222336" rotation="0" />
+    <Block type="SquareHole" material="wood" x="9.327537" y="-0.5873365" rotation="0" />
+    <Block type="SquareSmall" material="wood" x="9.327537" y="0.04766369" rotation="0" />
+    <Pig type="BasicSmall" x="-1.06454" y="3.99" rotation="0" />
+    <Pig type="BasicSmall" x="9.327537" y="0.5126634" rotation="0" />
+    <TNT type="TNT" x="-2.82" y="3.67" rotation="0" />
+    <TNT type="TNT" x="8.772447" y="-1.727336" rotation="0" />
+    <Platform type="Platform" x="-2.69" y="3" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="-2.07" y="3" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="-1.45" y="3" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="-0.83" y="3" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="8.902447" y="-2.397336" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="9.522447" y="-2.397336" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="10.14245" y="-2.397336" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="10.76245" y="-2.397336" rotation="0" scaleX="1" scaleY="1" />
+</GameObjects>
+</Level>

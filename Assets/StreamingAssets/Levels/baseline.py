@@ -1247,10 +1247,10 @@ while (checker != ""):
             number_platforms = randint(1,3)                             # number of platforms (reduced automatically if not enough space)
             number_pigs = randint(int(pig_range[0]),int(pig_range[1]))  # number of pigs (if set too large then can cause program to infinitely loop)
 
-            if (current_level+finished_levels+4) < 10:
-                level_name = "0"+str(current_level+finished_levels+4)
+            if (current_level+finished_levels+1) < 10:
+                level_name = "0"+str(current_level+finished_levels+1)
             else:
-                level_name = str(current_level+finished_levels+4)
+                level_name = str(current_level+finished_levels+1)
             
             number_ground_structures, complete_locations, final_pig_positions = 0,[],[]
             number_platforms, final_platforms, platform_centers = create_platforms(1,complete_locations,final_pig_positions)
