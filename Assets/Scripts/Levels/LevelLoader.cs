@@ -172,14 +172,16 @@ public class LevelLoader {
 		return level;
 	}
 
-	public static void SaveXmlLevel(ABLevel level, string path) {
-
+	public static void SaveXmlLevel(ABLevel level, string path) 
+    {
 		StringBuilder output = new StringBuilder();
 		XmlWriterSettings ws = new XmlWriterSettings();
 		ws.Indent = true;
 
-		using (XmlWriter writer = XmlWriter.Create(output, ws))
-		{
+        string CombinePath = Path.Combine(path, "");
+        path = Path.Combine(CombinePath, DateTime.Now.ToString("MMddyy-HHmmss")+".xml");
+        Debug.Log("Save XML: " + path);
+		using (XmlWriter writer = XmlWriter.Create(output, ws)) {
 			writer.WriteStartElement("Level");
 			writer.WriteAttributeString("width", level.width.ToString());
 
@@ -191,13 +193,13 @@ public class LevelLoader {
 			writer.WriteEndElement();
 
 			writer.WriteStartElement("Birds");
-
-			foreach(BirdData abBird in level.birds)
-			{
-				writer.WriteStartElement("Bird");
-				writer.WriteAttributeString("type", abBird.type.ToString());
-				writer.WriteEndElement();
-			}
+            foreach (BirdData abBird in level.birds) {
+                writer.WriteStartElement("Bird");
+                writer.WriteAttributeString("type", abBird.type.ToString());
+                writer.WriteEndElement();
+            }
+            writer.WriteString("\n");
+            writer.WriteEndElement();
 
 			writer.WriteStartElement("Slingshot");
 			writer.WriteAttributeString("x", level.slingshot.x.ToString());
@@ -206,10 +208,10 @@ public class LevelLoader {
 
 			writer.WriteStartElement("GameObjects");
 
-			foreach(BlockData abObj in level.blocks)
-			{
+			foreach(BlockData abObj in level.blocks) {
 				writer.WriteStartElement("Block");
-				writer.WriteAttributeString("type", abObj.type.ToString());
+                String[] indexType = abObj.type.ToString().Split('(');
+                writer.WriteAttributeString("type", indexType[0]);
 				writer.WriteAttributeString("material", abObj.material.ToString());
 				writer.WriteAttributeString("x", abObj.x.ToString());
 				writer.WriteAttributeString("y", abObj.y.ToString());
@@ -217,10 +219,10 @@ public class LevelLoader {
 				writer.WriteEndElement();
 			}
 
-			foreach(OBjData abObj in level.pigs)
-			{
+			foreach(OBjData abObj in level.pigs) {
 				writer.WriteStartElement("Pig");
-				writer.WriteAttributeString("type", abObj.type.ToString());
+                String[] indexType = abObj.type.ToString().Split('(');
+                writer.WriteAttributeString("type", indexType[0]);
 				writer.WriteAttributeString("x", abObj.x.ToString());
 				writer.WriteAttributeString("y", abObj.y.ToString());
 				writer.WriteAttributeString("rotation", abObj.rotation.ToString());
@@ -230,7 +232,8 @@ public class LevelLoader {
 			foreach(OBjData abObj in level.tnts)
 			{
 				writer.WriteStartElement("TNT");
-				writer.WriteAttributeString("type", abObj.type.ToString());
+                String[] indexType = abObj.type.ToString().Split('(');
+                writer.WriteAttributeString("type", indexType[0]);
 				writer.WriteAttributeString("x", abObj.x.ToString());
 				writer.WriteAttributeString("y", abObj.y.ToString());
 				writer.WriteAttributeString("rotation", abObj.rotation.ToString());
@@ -240,7 +243,8 @@ public class LevelLoader {
 			foreach(PlatData abObj in level.platforms)
 			{
 				writer.WriteStartElement("Platform");
-				writer.WriteAttributeString("type", abObj.type.ToString());
+                String[] indexType = abObj.type.ToString().Split('(');
+                writer.WriteAttributeString("type", indexType[0]);
 				writer.WriteAttributeString("x", abObj.x.ToString());
 				writer.WriteAttributeString("y", abObj.y.ToString());
 				writer.WriteAttributeString("rotation", abObj.rotation.ToString());
@@ -248,8 +252,10 @@ public class LevelLoader {
 				writer.WriteAttributeString("scaleY", abObj.scaleY.ToString());
 				writer.WriteEndElement();
 			}
+            writer.WriteString("\n");
+            writer.WriteEndElement();
 		}
-			
+		
 		StreamWriter streamWriter = new StreamWriter(path);
 		streamWriter.WriteLine(output.ToString());
 		streamWriter.Close();
@@ -271,13 +277,53 @@ public class LevelLoader {
 		return resources;
 	}
 
+    public ABLevel EncodeLevel() {
+        ABLevel level = new ABLevel();
+        level.width = LevelList.Instance.GetCurrentLevel().width;
+        level.camera = LevelList.Instance.GetCurrentLevel().camera;
+        level.slingshot = LevelList.Instance.GetCurrentLevel().slingshot;
+        level.birds = LevelList.Instance.GetCurrentLevel().birds;
+
+        foreach (Transform child in GameObject.Find("Blocks").transform) 
+        {
+            string type = child.name;
+            float x = child.transform.position.x;
+            float y = child.transform.position.y;
+            float rotation = child.transform.rotation.eulerAngles.z;
+
+            if (child.GetComponent<ABPig>() != null)
+            {
+                level.pigs.Add(new OBjData(type, rotation, x, y));
+            }
+            else if (child.GetComponent<ABBlock>() != null)
+            {
+                string material = child.GetComponent<ABBlock>()._material.ToString();
+                level.blocks.Add(new BlockData(type, rotation, x, y, material));
+            }
+            else if (child.GetComponent<ABTNT>() != null)
+            {
+                level.tnts.Add(new OBjData(type, rotation, x, y));
+            }
+        }
+
+        foreach (Transform child in GameObject.Find("Platforms").transform) 
+        {
+            PlatData obj = new PlatData();
+            obj.type = child.name;
+            obj.x = child.transform.position.x;
+            obj.y = child.transform.position.y;
+            obj.rotation = child.transform.rotation.eulerAngles.z;
+            obj.scaleX = child.transform.localScale.x;
+            obj.scaleY = child.transform.localScale.y;
+            level.platforms.Add(obj);
+        }
+        return level;
+    }
+
 	public void SaveLevelOnScene() {
-//
-//		Transform blocksInScene = ABGameWorld.Instance.BlocksInScene();
-//
-//		List<GameObject> objsInScene = ABGameWorld.Instance.BlocksInScene();
-//
-//		ABLevel level = ABLevelGenerator.GameObjectsToABLevel(objsInScene.ToArray());
-//		SaveXmlLevel(level);
+        //Use this code to save objs
+        ABLevel level = EncodeLevel();
+        //Save level to xml file
+        SaveXmlLevel(level ,Application.dataPath + "/StreamingAssets/LevelGenerator");
 	}
 }
