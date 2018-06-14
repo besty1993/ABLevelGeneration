@@ -21,6 +21,21 @@
 using System.Collections;
 
 public class ABMenu : MonoBehaviour {
+	/// <summary>
+	/// This Start() is activating GameWolrd Scene directly
+	/// Always start from level 1.
+	/// </summary>
+	void Start() {
+		if (UnityEngine.SceneManagement.SceneManager.GetActiveScene ().name != "GameWorld") {
+			try {
+				LevelList.Instance.SetLevel (1);
+				LoadNextScene ("GameWorld", false, null);
+			} catch {
+				LoadNextScene ("LevelSelectMenu", false, null);
+			}
+		}
+
+	}
 
 	public void LoadNextScene(string sceneName) {
 

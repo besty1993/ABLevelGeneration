@@ -73,6 +73,7 @@ ground_structure_height_limit = ((level_height_max - minimum_height_gap) - absol
 max_attempts = 100                          # number of times to attempt to place a platform before abandoning it
 
 simple_level = True
+simple_level_prob = 1.0
 
 
 
@@ -464,20 +465,26 @@ def make_simple_structure(absolute_ground, center_point, max_width):
     total_tree = []  # all blocks of structure (so far)
 
     final_TNT_positions = []
-    tnt_x = center_point - (max_width/2) + (tnt_width/2)
+    tnt_x = 0
+    if (uniform(0.0,1.0)<0.5) : tnt_x = center_point - (max_width/2) + (tnt_width/2)
+    else : tnt_x = center_point - (uniform(0.2,1.0)*(max_width/2)) +(tnt_width/2)
     final_TNT_positions.append([tnt_x,absolute_ground+tnt_width])
-
     max_height = 2.5
-    peak_point = tnt_x + (tnt_width/2) + (uniform(0.12,0.8)*(max_width))
-    max_width = (max_width/2) -  (peak_point - center_point)
+
+    peak_point = uniform(tnt_x+(tnt_width/2)+0.25,center_point+(max_width/2)-0.25)
+
+    max_width = min([peak_point-tnt_x,tnt_x+max_width-peak_point])
 
     # creates the first row (peaks) for the structure, ensuring that max_width restriction is satisfied
     current_tree_bottom = make_peaks(peak_point)
     if max_width > 0.0:
         while find_structure_width(current_tree_bottom) > max_width:
+            print(find_structure_width(current_tree_bottom))
+            print("max_width : ",max_width)
             current_tree_bottom = make_peaks(peak_point)
 
     total_tree.append(current_tree_bottom)
+
 
     # recursively add more rows of blocks to the level structure
     structure_width = find_structure_width(current_tree_bottom)
@@ -498,7 +505,6 @@ def make_simple_structure(absolute_ground, center_point, max_width):
                 total_tree = deepcopy(pre_total_tree)
             else:
                 pre_total_tree = deepcopy(total_tree)
-
     # make structure vertically correct (add y position to blocks)
     complete_locations = []
     ground = absolute_ground
@@ -566,6 +572,7 @@ def make_simple_structure(absolute_ground, center_point, max_width):
         if valid_pig == True:
             possible_pig_positions.append(test_position)
 
+
     # randomly choose a pig position and remove those that overlap it, repeat until no more valid positions
     final_pig_positions = []
     while len(possible_pig_positions) > 0:
@@ -581,7 +588,6 @@ def make_simple_structure(absolute_ground, center_point, max_width):
         possible_pig_positions = new_pig_positions
 
     print("Pig number:", len(final_pig_positions))  # number of pigs present in the structure
-    print("")
 
     return complete_locations, final_pig_positions, final_TNT_positions
 
@@ -635,7 +641,7 @@ def create_platforms(number_platforms, complete_locations, final_pig_positions):
     attempts = 0  # number of attempts so far to find space for platform
     final_platforms = []
     while len(final_platforms) < number_platforms:
-        platform_width = randint(4, 6)
+        platform_width = randint(4, 7)
         if (simple_level) : platform_width = 4
         platform_position = [level_width_min + ((platform_width * platform_size[0]) / 2.0), 3]
         temp_platform = []
@@ -1230,9 +1236,10 @@ while (checker != ""):
 
         for current_level in range(number_levels):
 
-            if (uniform(0.0, 1.0) > 0.4):
-                simple_level = False
-            else : simple_level = True
+            if (uniform(0.0, 1.0) < simple_level_prob):
+                simple_level = True
+
+            else : simple_level = False
 
             # simple_level = True
 
@@ -1247,14 +1254,11 @@ while (checker != ""):
             
             number_ground_structures, complete_locations, final_pig_positions = 0,[],[]
             number_platforms, final_platforms, platform_centers = create_platforms(1,complete_locations,final_pig_positions)
-
             complete_locations, final_pig_positions, final_TNT_positions = create_platform_structures(final_platforms, platform_centers, complete_locations, final_pig_positions)
-
             if (not simple_level) :
                 final_pig_positions, removed_pigs = remove_unnecessary_pigs(number_pigs)
                 final_pig_positions = add_necessary_pigs(number_pigs)
                 final_TNT_positions = add_TNT(removed_pigs)
-
             number_birds = choose_number_birds(final_pig_positions,number_ground_structures,number_platforms)
             possible_trihole_positions, possible_tri_positions, possible_cir_positions, possible_cirsmall_positions = find_additional_block_positions(complete_locations)
             selected_other = add_additional_blocks(possible_trihole_positions, possible_tri_positions, possible_cir_positions, possible_cirsmall_positions)

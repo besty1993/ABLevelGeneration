@@ -37,13 +37,16 @@ public class ABLevelSelect : ABMenu {
 
 	// Use this for initialization
 	void Start () {
-
+		print ("start");
 		// Load levels in the resources folder
 		TextAsset []levelsData = Resources.LoadAll<TextAsset>(ABConstants.DEFAULT_LEVELS_FOLDER);
 
 		string[] resourcesXml = new string[levelsData.Length];
 		for (int i = 0; i < levelsData.Length; i++)
 			resourcesXml [i] = levelsData[i].text;
+
+
+
 			
 
 #if UNITY_WEBGL && !UNITY_EDITOR
@@ -95,5 +98,11 @@ public class ABLevelSelect : ABMenu {
 			if ((i + 1) % _lines == 0)
 				j--;
 		}
+
+
+
+
+		LevelList.Instance.SetLevel(1);
+		LoadNextScene("GameWorld",false,null);
 	}
 }
