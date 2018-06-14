@@ -5,6 +5,9 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class LevelSimulator {
+
+	public static bool Generatelevel = false;
+	// False : Evaluate Subset	True : Generate Level
     
 	public LevelSimulator () {
 	}
