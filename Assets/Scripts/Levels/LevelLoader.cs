@@ -172,8 +172,8 @@ public class LevelLoader {
 		return level;
 	}
 
-	public static void SaveXmlLevel(ABLevel level, string path) {
-
+	public static void SaveXmlLevel(ABLevel level, string path) 
+    {
 		StringBuilder output = new StringBuilder();
 		XmlWriterSettings ws = new XmlWriterSettings();
 		ws.Indent = true;
@@ -321,8 +321,9 @@ public class LevelLoader {
     }
 
 	public void SaveLevelOnScene() {
-        //Use this code to save objs into xml
+        //Use this code to save objs
         ABLevel level = EncodeLevel();
+        //Save level to xml file
         SaveXmlLevel(level ,Application.dataPath + "/StreamingAssets/LevelGenerator");
 	}
 }
