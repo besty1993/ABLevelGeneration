@@ -160,7 +160,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld> {
 		}
 
 		if (_isSimulation) {
-			Time.timeScale = 100;
+			Time.timeScale = 2;
 		}
 	}
 
@@ -196,7 +196,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld> {
 		_plaftformsTransform = GameObject.Find ("Platforms").transform;
 
 		HUD.Instance.gameObject.SetActive (true);
-		if (LevelSimulator.Generatelevel = false) {
+		if (LevelSimulator.Generatelevel == false) {
 			UsefulTag = false;
 		}
 	}
@@ -363,12 +363,23 @@ public class ABGameWorld : ABSingleton<ABGameWorld> {
 	}
 
 	public void NextLevel() {
-		
-		if(LevelList.Instance.NextLevel() == null)
+        ABLevel addStrigger = LevelList.Instance.GetCurrentLevel();
+        if (addStrigger.triggers.Count == 0)
+        {
+            StreamWriter recordLevel = new StreamWriter(System.Environment.CurrentDirectory + "/levelcheck.txt", true);
+            recordLevel.WriteLine((LevelList.Instance.CurrentIndex).ToString());
+            recordLevel.Close();
+        }
 
-			ABSceneManager.Instance.LoadScene("MainMenu");
-		else
-			ABSceneManager.Instance.LoadScene(SceneManager.GetActiveScene().name,false,null);
+        if (LevelList.Instance.NextLevel() == null)
+
+            ABSceneManager.Instance.LoadScene("MainMenu");
+        else {
+
+            ABSceneManager.Instance.LoadScene(SceneManager.GetActiveScene().name);
+ 
+        }
+			
 	}
 
 	public void ResetLevel() {		
@@ -760,7 +771,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld> {
 			if (bulletPositionVertical == verticalTimes) {
 				bulletPositionVertical = 0;
 				HorizontalStart = false;
-				NextLevel();
+                NextLevel();
 				return;
 			}
 
@@ -793,9 +804,14 @@ public class ABGameWorld : ABSingleton<ABGameWorld> {
 	{
 		//print((LevelList.Instance.CurrentIndex + 1).ToString());
 		//print(blockPosition);
-		StreamWriter recordLevel = new StreamWriter(System.Environment.CurrentDirectory + "/levelcheck.txt", true);
-		recordLevel.WriteLine((LevelList.Instance.CurrentIndex + 1).ToString() + blockPosition.ToString());
-		recordLevel.Close();
+		//StreamWriter recordLevel = new StreamWriter(System.Environment.CurrentDirectory + "/levelcheck.txt", true);
+        ABLevel addStrigger = LevelList.Instance.GetCurrentLevel();
+        if(!addStrigger.triggers.Contains(blockPosition))
+        {
+            addStrigger.triggers.Add(blockPosition);
+        }
+        //recordLevel.WriteLine((LevelList.Instance.CurrentIndex + 1).ToString() + blockPosition.ToString());
+		//recordLevel.Close();
 		UsefulTag = true;
 	}
 }

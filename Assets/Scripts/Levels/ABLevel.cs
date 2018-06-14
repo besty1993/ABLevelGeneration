@@ -120,8 +120,10 @@ public class ABLevel
 	public List<BirdData>  birds;
 	public List<BlockData> blocks;
 	public List<PlatData>  platforms;
+    public List<Vector2> triggers;
 
-	public float triggerX, triggerY;
+    public float triggerX, triggerY;
+   
 
 	public static readonly int BIRDS_MAX_AMOUNT = 5;
 
@@ -134,6 +136,7 @@ public class ABLevel
 		blocks    = new List<BlockData>();
 		birds     = new List<BirdData>();
 		platforms = new List<PlatData>();
+        triggers = new List<Vector2>();
 	}
 
 }
