@@ -41,7 +41,6 @@ public class ABGameWorld : ABSingleton<ABGameWorld> {
 	private Transform  _plaftformsTransform;
 	private Transform  _slingshotBaseTransform;
 
-    private ABLevel _nextLevelSubset;
     private LevelLoader _levelLoader;
 
 	private GameObject _slingshot;
@@ -133,24 +132,22 @@ public class ABGameWorld : ABSingleton<ABGameWorld> {
 		} 
 		else {
 			ABLevel currentLevel = LevelList.Instance.GetCurrentLevel ();
+            LevelSimulator.ChangeSubsetPosition(currentLevel, Random.Range(-2, 2), Random.Range(-3, 2));
 			if (currentLevel != null) {
 				DecodeLevel(currentLevel);
-
-				/// Generate Level
-				if (LevelSimulator.Generatelevel) {
-					//Random subset for generate level
-					int selectedLevel = Random.Range(4,85);
-					_nextLevelSubset = LevelList.Instance.GetLevel (selectedLevel);
-
-					//Want trigger point
-					LevelSimulator.ChangeSubsetPosition (_nextLevelSubset, Random.Range (4f, 6f), Random.Range (-3f, 2f));
-					LevelSimulator.GenerateSubset (_nextLevelSubset, _nextLevelSubset.triggerX, _nextLevelSubset.triggerY);
-
-					//Save generate level on scene to xml
-					_levelLoader.SaveLevelOnScene ();
-
-					Debug.Log ("Random level: " + selectedLevel);
-					Debug.Log ("Trigger x: " + _nextLevelSubset.triggerX + " ,Trigger y: " + _nextLevelSubset.triggerY);
+                /// Generate Level
+                if (LevelSimulator.Generatelevel) {
+                    int round = Random.Range(2, 3);
+                    for (int i = 0; i < round; i++)
+                    {
+                        //Random subset for generate level
+                        int selectedLevel = Random.Range(4,85);
+                        ABLevel nextLevelSubset = LevelList.Instance.GetLevel (selectedLevel);
+                        LevelSimulator.ChangeSubsetPosition (nextLevelSubset, Random.Range (4f, 6f), Random.Range (-3f, 2f));
+                        LevelSimulator.GenerateSubset (nextLevelSubset, nextLevelSubset.triggerX, nextLevelSubset.triggerY);
+                    }
+                    //Save generate level on scene to xml
+                    _levelLoader.SaveLevelOnScene ();
 				}
 
 				AdaptCameraWidthToLevel ();
