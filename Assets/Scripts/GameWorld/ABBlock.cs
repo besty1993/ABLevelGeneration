@@ -81,33 +81,47 @@ public class ABBlock : ABGameObject {
 	}
 
 	public override void OnCollisionEnter2D(Collision2D collision)
-	{
-		if (collision.gameObject.tag == "Bird") {
+    {
+        
+        if (collision.gameObject.tag == "test")
+        {
+            ABLevel addStriggerXY = LevelList.Instance.GetCurrentLevel();
+            foreach (ContactPoint2D striggerPoint in collision.contacts) {
+                addStriggerXY.triggerX = striggerPoint.point.x;
+                addStriggerXY.triggerY = striggerPoint.point.y;
+                //if (!addStrigger.triggers.Contains(striggerPoint.point))
+                //{
+                //    addStrigger.triggers.Add(striggerPoint.point);
+                //}
+            }
+           
+        }
+        if (collision.gameObject.tag == "Bird") {
 
-			ABBird bird = collision.gameObject.GetComponent<ABBird> ();
-			float collisionMagnitude = collision.relativeVelocity.magnitude;
-			float birdDamage = 1f;
+            ABBird bird = collision.gameObject.GetComponent<ABBird>();
+            float collisionMagnitude = collision.relativeVelocity.magnitude;
+            float birdDamage = 1f;
 
-			switch (_material) {
+            switch (_material) {
 
-			case MATERIALS.wood:
-				birdDamage = bird._woodDamage;
-				break;
+                case MATERIALS.wood:
+                    birdDamage = bird._woodDamage;
+                    break;
 
-			case MATERIALS.stone:
-				birdDamage = bird._stoneDamage;
-				break;
+                case MATERIALS.stone:
+                    birdDamage = bird._stoneDamage;
+                    break;
 
-			case MATERIALS.ice:
-				birdDamage = bird._iceDamage;
-				break;
-			}
+                case MATERIALS.ice:
+                    birdDamage = bird._iceDamage;
+                    break;
+            }
 
-			DealDamage (collisionMagnitude * birdDamage);
-		} 
-		else {
+            DealDamage(collisionMagnitude * birdDamage);
+        }
+        else {
 
-			base.OnCollisionEnter2D (collision);
-		}
+            base.OnCollisionEnter2D(collision);
+        }
 	}
 }
