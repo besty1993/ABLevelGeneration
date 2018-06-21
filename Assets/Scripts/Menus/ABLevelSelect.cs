@@ -102,7 +102,7 @@ public class ABLevelSelect : ABMenu {
 
 
 
-		LevelList.Instance.SetLevel(1);
-		LoadNextScene("GameWorld",false,null);
+		//LevelList.Instance.SetLevel(1);
+		//LoadNextScene("GameWorld",false,null);
 	}
 }
