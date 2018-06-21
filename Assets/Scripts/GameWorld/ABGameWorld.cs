@@ -17,61 +17,62 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>
 //
 
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System;
 
-public class ABGameWorld : ABSingleton<ABGameWorld>
+
+public class ABGameWorld : ABSingleton<ABGameWorld> 
 {
 
-    static int _levelTimesTried;
+	static int _levelTimesTried;
 
-    private bool _levelCleared;
+	private bool _levelCleared;
 
-    private List<ABPig> _pigs;
-    private List<ABBird> _birds;
-    private List<ABParticle> _birdTrajectory;
+	private List<ABPig>      _pigs;
+	private List<ABBird>     _birds;
+	private List<ABParticle> _birdTrajectory;
 
 
-    private ABBird _lastThrownBird;
-    private Transform _blocksTransform;
-    private Transform _birdsTransform;
-    private Transform _plaftformsTransform;
-    private Transform _slingshotBaseTransform;
+	private ABBird     _lastThrownBird;
+	private Transform  _blocksTransform;
+	private Transform  _birdsTransform;
+	private Transform  _plaftformsTransform;
+	private Transform  _slingshotBaseTransform;
 
-    private LevelLoader _levelLoader;
+	private LevelLoader _levelLoader;
 
-    private GameObject _slingshot;
-    public GameObject Slingshot() { return _slingshot; }
+	private GameObject _slingshot;
+	public GameObject Slingshot() { return _slingshot; }
 
-    private GameObject _levelFailedBanner;
-    public bool LevelFailed() { return _levelFailedBanner.activeSelf; }
+	private GameObject _levelFailedBanner;
+	public bool LevelFailed() { return _levelFailedBanner.activeSelf; }
 
-    private GameObject _levelClearedBanner;
-    public bool LevelCleared() { return _levelClearedBanner.activeSelf; }
+	private GameObject _levelClearedBanner;
+	public bool LevelCleared() {  return _levelClearedBanner.activeSelf; }
 
-    private int _pigsAtStart;
-    public int PigsAtStart { get { return _pigsAtStart; } }
+	private int _pigsAtStart;
+	public int PigsAtStart {  get { return _pigsAtStart; } }
+	
+	private int _birdsAtStart;
+	public int BirdsAtStart { get { return _birdsAtStart; } }
 
-    private int _birdsAtStart;
-    public int BirdsAtStart { get { return _birdsAtStart; } }
+	private int _blocksAtStart;
+	public int BlocksAtStart { get { return _blocksAtStart; } }
 
-    private int _blocksAtStart;
-    public int BlocksAtStart { get { return _blocksAtStart; } }
-
-    public ABGameplayCamera GameplayCam { get; set; }
-    public float LevelWidth { get; set; }
-    public float LevelHeight { get; set; }
-
+	public ABGameplayCamera GameplayCam { get; set; }
+	public float LevelWidth  { get; set; }
+	public float LevelHeight { get; set; }
+		
     // Game world properties
     public bool _isSimulation;
     public int _timesToGiveUp;
     public float _timeToResetLevel = 1f;
     public int _birdsAmounInARow = 5;
+    private Vector2 _firstTNTPos;
 
     public AudioClip[] _clips;
 
@@ -94,701 +95,656 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
     public static int blockId;
     public Vector2 blockPosition;
 
-    void Awake()
-    {
+	void Awake() {
 
-        _blocksTransform = GameObject.Find("Blocks").transform;
-        _birdsTransform = GameObject.Find("Birds").transform;
-        _plaftformsTransform = GameObject.Find("Platforms").transform;
+		_blocksTransform = GameObject.Find ("Blocks").transform;
+		_birdsTransform  = GameObject.Find ("Birds").transform;
+		_plaftformsTransform = GameObject.Find ("Platforms").transform;
 
-        _levelFailedBanner = GameObject.Find("LevelFailedBanner").gameObject;
-        _levelFailedBanner.gameObject.SetActive(false);
+		_levelFailedBanner = GameObject.Find ("LevelFailedBanner").gameObject;
+		_levelFailedBanner.gameObject.SetActive (false);
 
-        _levelClearedBanner = GameObject.Find("LevelClearedBanner").gameObject;
-        _levelClearedBanner.gameObject.SetActive(false);
+		_levelClearedBanner = GameObject.Find ("LevelClearedBanner").gameObject;
+		_levelClearedBanner.gameObject.SetActive(false);
 
-        GameplayCam = GameObject.Find("Camera").GetComponent<ABGameplayCamera>();
-    }
+		GameplayCam = GameObject.Find ("Camera").GetComponent<ABGameplayCamera>();
+	}
 
-    // Use this for initialization
-    void Start()
-    {
-        _pigs = new List<ABPig>();
-        _birds = new List<ABBird>();
-        _birdTrajectory = new List<ABParticle>();
+	// Use this for initialization
+	void Start () {
+		_pigs = new List<ABPig>();
+		_birds = new List<ABBird>();
+		_birdTrajectory = new List<ABParticle>();
         _levelLoader = new LevelLoader();
-        _levelCleared = false;
+		_levelCleared = false;
 
-        if (!_isSimulation)
+		if(!_isSimulation) {
+			GetComponent<AudioSource>().PlayOneShot(_clips[0]);
+			GetComponent<AudioSource>().PlayOneShot(_clips[1]);
+		}
+
+		// If there are objects in the scene, use them to play
+		if (_blocksTransform.childCount > 0 || _birdsTransform.childCount > 0) {
+
+			foreach(Transform bird in _birdsTransform)
+				AddBird (bird.GetComponent<ABBird>());
+
+			foreach (Transform block in _blocksTransform) {
+
+				ABPig pig = block.GetComponent<ABPig>();
+				if(pig != null)
+					_pigs.Add(pig);
+			}
+
+		} 
+		else 
         {
-            GetComponent<AudioSource>().PlayOneShot(_clips[0]);
-            GetComponent<AudioSource>().PlayOneShot(_clips[1]);
-        }
+			ABLevel currentLevel = LevelList.Instance.GetCurrentLevel ();
+            int currentLevelPosX = Random.Range(-2, 2);
+            int currentLevelPosY = Random.Range(-3, 2);
+            LevelSimulator.ChangeSubsetPosition(currentLevel, currentLevelPosX, currentLevelPosY);
 
-        // If there are objects in the scene, use them to play
-        if (_blocksTransform.childCount > 0 || _birdsTransform.childCount > 0)
-        {
-
-            foreach (Transform bird in _birdsTransform)
-                AddBird(bird.GetComponent<ABBird>());
-
-            foreach (Transform block in _blocksTransform)
+            print("First subset position: "+currentLevelPosX+" , "+currentLevelPosY);
+			
+            if (currentLevel != null) 
             {
+				DecodeLevel(currentLevel);
+                LevelSimulator.Generatelevel = true;
 
-                ABPig pig = block.GetComponent<ABPig>();
-                if (pig != null)
-                    _pigs.Add(pig);
-            }
-
-        }
-        else
-        {
-            ABLevel currentLevel = LevelList.Instance.GetCurrentLevel();
-            LevelSimulator.ChangeSubsetPosition(currentLevel, UnityEngine.Random.Range(-2, 2), UnityEngine.Random.Range(-3, 2));
-            if (currentLevel != null)
-            {
-                DecodeLevel(currentLevel);
-                /// Generate Level
-                if (LevelSimulator.Generatelevel)
+				if (LevelSimulator.Generatelevel) 
                 {
-                    int round = UnityEngine.Random.Range(2, 3);
-                    for (int i = 0; i < round; i++)
-                    {
-                        //Random subset for generate level
-                        int selectedLevel = UnityEngine.Random.Range(4, 85);
-                        ABLevel nextLevelSubset = LevelList.Instance.GetLevel(selectedLevel);
-                        LevelSimulator.ChangeSubsetPosition(nextLevelSubset, UnityEngine.Random.Range(4f, 6f), UnityEngine.Random.Range(-3f, 2f));
-                        LevelSimulator.GenerateSubset(nextLevelSubset, nextLevelSubset.triggerX, nextLevelSubset.triggerY);
-                    }
-                    //Save generate level on scene to xml
-                    _levelLoader.SaveLevelOnScene();
-                }
+                    GenerateSubset();
+                    //SaveLevel();
+				}
 
-                AdaptCameraWidthToLevel();
-                _levelTimesTried = 0;
-                _slingshotBaseTransform = GameObject.Find("slingshot_base").transform;
-            }
-        }
+				AdaptCameraWidthToLevel ();
+				_levelTimesTried = 0;
+				_slingshotBaseTransform = GameObject.Find ("slingshot_base").transform;
+			}
+		}
 
-        if (_isSimulation)
+		if (_isSimulation) {
+			Time.timeScale = 1;
+		}
+	}
+
+    public void SaveLevel()
+    {
+        _levelLoader.SaveLevelOnScene();
+    }
+
+    public void GenerateSubset()
+    {
+        //int round = Random.Range(2, 3);
+        int round = 1;
+        for (int i = 0; i < round; i++)
         {
-            Time.timeScale = 1;
+            //Random subset for generate level
+            float[] subsetPosition = CalculateForGenerateSubset();
+            print("Second subset position: " + subsetPosition[0] + " , " + subsetPosition[1]);
+            int selectedLevel = Random.Range(4, 85);
+            ABLevel generateSubset = LevelList.Instance.GetLevel(selectedLevel);
+            LevelSimulator.ChangeSubsetPosition(generateSubset, subsetPosition[0], subsetPosition[1]);
+            LevelSimulator.GenerateSubset(generateSubset, generateSubset.triggerX, generateSubset.triggerY);
         }
     }
 
-    public void initx()
+
+    // You can change formula
+    public float[] CalculateForGenerateSubset()
     {
-        ClearWorld();
-
-        if (_levelFailedBanner.activeSelf)
-            _levelFailedBanner.SetActive(false);
-
-        if (_levelClearedBanner.activeSelf)
-            _levelClearedBanner.SetActive(false);
-
-        GameplayCam = GameObject.Find("Camera").GetComponent<ABGameplayCamera>();
-
-        _pigs = new List<ABPig>();
-        _birds = new List<ABBird>();
-        _birdTrajectory = new List<ABParticle>();
-        _levelCleared = false;
-
-        if (!_isSimulation)
-        {
-
-            GetComponent<AudioSource>().PlayOneShot(_clips[0]);
-            GetComponent<AudioSource>().PlayOneShot(_clips[1]);
-        }
-
-        ABLevel level = LevelList.Instance.GetCurrentLevel();
-        DecodeLevel(level);
-
-        _slingshotBaseTransform = GameObject.Find("slingshot_base").transform;
-        _blocksTransform = GameObject.Find("Blocks").transform;
-        _birdsTransform = GameObject.Find("Birds").transform;
-        _plaftformsTransform = GameObject.Find("Platforms").transform;
-
-        HUD.Instance.gameObject.SetActive(true);
-        if (LevelSimulator.Generatelevel == false)
-        {
-            UsefulTag = false;
-        }
+        float sy = _firstTNTPos.y; //height
+        float u = 2.5f; // speed
+        float g = 9.81f; // gravity
+        float t = 0; // time
+        t = Mathf.Sqrt(2 * (sy - (u * t)) / g);
+        float sx = u * t; //range
+        float[] positions = { sx + 1f, sy - 3.375015f };
+        return positions;
     }
 
-    public void DecodeLevel(ABLevel currentLevel)
+
+	public void initx ()
+	{
+		ClearWorld ();
+
+		if (_levelFailedBanner.activeSelf)
+			_levelFailedBanner.SetActive (false);
+
+		if (_levelClearedBanner.activeSelf)
+			_levelClearedBanner.SetActive (false);
+
+		GameplayCam = GameObject.Find ("Camera").GetComponent<ABGameplayCamera> ();
+
+		_pigs = new List<ABPig> ();
+		_birds = new List<ABBird> ();
+		_birdTrajectory = new List<ABParticle> ();
+		_levelCleared = false;
+
+		if (!_isSimulation) {
+
+			GetComponent<AudioSource> ().PlayOneShot (_clips [0]);
+			GetComponent<AudioSource> ().PlayOneShot (_clips [1]);
+		}
+			
+		ABLevel level = LevelList.Instance.GetCurrentLevel ();
+		DecodeLevel (level);
+
+		_slingshotBaseTransform = GameObject.Find ("slingshot_base").transform;
+		_blocksTransform = GameObject.Find ("Blocks").transform;
+		_birdsTransform = GameObject.Find ("Birds").transform;
+		_plaftformsTransform = GameObject.Find ("Platforms").transform;
+
+		HUD.Instance.gameObject.SetActive (true);
+        if (LevelSimulator.Generatelevel = true) {
+			UsefulTag = true;
+		}
+	}
+
+
+	public void DecodeLevel(ABLevel currentLevel)  
     {
+		
+		ClearWorld();
 
-        ClearWorld();
+		LevelHeight = ABConstants.LEVEL_ORIGINAL_SIZE.y;
+		LevelWidth = (float)currentLevel.width * ABConstants.LEVEL_ORIGINAL_SIZE.x;
 
-        LevelHeight = ABConstants.LEVEL_ORIGINAL_SIZE.y;
-        LevelWidth = (float)currentLevel.width * ABConstants.LEVEL_ORIGINAL_SIZE.x;
+		Vector3 cameraPos = GameplayCam.transform.position;
+		cameraPos.x = currentLevel.camera.x;
+		cameraPos.y = currentLevel.camera.y;
+		GameplayCam.transform.position = cameraPos;
 
-        Vector3 cameraPos = GameplayCam.transform.position;
-        cameraPos.x = currentLevel.camera.x;
-        cameraPos.y = currentLevel.camera.y;
-        GameplayCam.transform.position = cameraPos;
+		GameplayCam._minWidth = currentLevel.camera.minWidth;
+		GameplayCam._maxWidth = currentLevel.camera.maxWidth;
 
-        GameplayCam._minWidth = currentLevel.camera.minWidth;
-        GameplayCam._maxWidth = currentLevel.camera.maxWidth;
+		Vector3 landscapePos = ABWorldAssets.LANDSCAPE.transform.position;
+//		Vector3 backgroundPos = ABWorldAssets.BACKGROUND.transform.position;
 
-        Vector3 landscapePos = ABWorldAssets.LANDSCAPE.transform.position;
-        //		Vector3 backgroundPos = ABWorldAssets.BACKGROUND.transform.position;
+		if (currentLevel.width > 1) {
 
-        if (currentLevel.width > 1)
-        {
+			landscapePos.x -= LevelWidth / 4f;
+//			backgroundPos.x -= LevelWidth/ 4f;
+		}
 
-            landscapePos.x -= LevelWidth / 4f;
-            //			backgroundPos.x -= LevelWidth/ 4f;
-        }
+		for (int i = 0; i < currentLevel.width; i++) {
 
-        for (int i = 0; i < currentLevel.width; i++)
-        {
+			GameObject landscape = (GameObject)Instantiate(ABWorldAssets.LANDSCAPE, landscapePos, Quaternion.identity);
+			landscape.transform.parent = transform;
 
-            GameObject landscape = (GameObject)Instantiate(ABWorldAssets.LANDSCAPE, landscapePos, Quaternion.identity);
-            landscape.transform.parent = transform;
+			float screenRate = currentLevel.camera.maxWidth / LevelHeight;
+			if (screenRate > 2f) {
 
-            float screenRate = currentLevel.camera.maxWidth / LevelHeight;
-            if (screenRate > 2f)
-            {
+				for (int j = 0; j < (int)screenRate; j++) {
+					
+					Vector3 deltaPos = Vector3.down * (LevelHeight/1.5f + (j * 2f));
+					Instantiate(ABWorldAssets.GROUND_EXTENSION, landscapePos + deltaPos, Quaternion.identity);
+				}
+			}
 
-                for (int j = 0; j < (int)screenRate; j++)
-                {
+			landscapePos.x += ABConstants.LEVEL_ORIGINAL_SIZE.x - 0.01f;
+//
+//			GameObject background = (GameObject)Instantiate(ABWorldAssets.BACKGROUND, backgroundPos, Quaternion.identity);
+//			background.transform.parent = GameplayCam.transform;
+//			backgroundPos.x += ABConstants.LEVEL_ORIGINAL_SIZE.x - 0.01f;
+		}
 
-                    Vector3 deltaPos = Vector3.down * (LevelHeight / 1.5f + (j * 2f));
-                    Instantiate(ABWorldAssets.GROUND_EXTENSION, landscapePos + deltaPos, Quaternion.identity);
-                }
-            }
+		Vector2 slingshotPos = new Vector2 (currentLevel.slingshot.x, currentLevel.slingshot.y);
+		_slingshot = (GameObject)Instantiate(ABWorldAssets.SLINGSHOT, slingshotPos, Quaternion.identity);
+		_slingshot.name = "Slingshot";
+		_slingshot.transform.parent = transform;
 
-            landscapePos.x += ABConstants.LEVEL_ORIGINAL_SIZE.x - 0.01f;
-            //
-            //			GameObject background = (GameObject)Instantiate(ABWorldAssets.BACKGROUND, backgroundPos, Quaternion.identity);
-            //			background.transform.parent = GameplayCam.transform;
-            //			backgroundPos.x += ABConstants.LEVEL_ORIGINAL_SIZE.x - 0.01f;
-        }
+		foreach(BirdData gameObj in currentLevel.birds){
 
-        Vector2 slingshotPos = new Vector2(currentLevel.slingshot.x, currentLevel.slingshot.y);
-        _slingshot = (GameObject)Instantiate(ABWorldAssets.SLINGSHOT, slingshotPos, Quaternion.identity);
-        _slingshot.name = "Slingshot";
-        _slingshot.transform.parent = transform;
+			AddBird(ABWorldAssets.BIRDS[gameObj.type], ABWorldAssets.BIRDS[gameObj.type].transform.rotation);
+		}
 
-        foreach (BirdData gameObj in currentLevel.birds)
-        {
+		foreach (OBjData gameObj in currentLevel.pigs) {
 
-            AddBird(ABWorldAssets.BIRDS[gameObj.type], ABWorldAssets.BIRDS[gameObj.type].transform.rotation);
-        }
+			Vector2 pos = new Vector2 (gameObj.x, gameObj.y);
+			Quaternion rotation = Quaternion.Euler (0, 0, gameObj.rotation);
+			AddPig(ABWorldAssets.PIGS[gameObj.type], pos, rotation);
+		}
 
-        foreach (OBjData gameObj in currentLevel.pigs)
-        {
+		foreach(BlockData gameObj in currentLevel.blocks) {
 
-            Vector2 pos = new Vector2(gameObj.x, gameObj.y);
-            Quaternion rotation = Quaternion.Euler(0, 0, gameObj.rotation);
-            AddPig(ABWorldAssets.PIGS[gameObj.type], pos, rotation);
-        }
+			Vector2 pos = new Vector2 (gameObj.x, gameObj.y);
+			Quaternion rotation = Quaternion.Euler (0, 0, gameObj.rotation);
 
-        foreach (BlockData gameObj in currentLevel.blocks)
-        {
+			GameObject block = AddBlock(ABWorldAssets.BLOCKS[gameObj.type], pos,  rotation);
 
-            Vector2 pos = new Vector2(gameObj.x, gameObj.y);
-            Quaternion rotation = Quaternion.Euler(0, 0, gameObj.rotation);
+			MATERIALS material = (MATERIALS)System.Enum.Parse(typeof(MATERIALS), gameObj.material);
+			block.GetComponent<ABBlock> ().SetMaterial (material);
+		}
 
-            GameObject block = AddBlock(ABWorldAssets.BLOCKS[gameObj.type], pos, rotation);
+		foreach(PlatData gameObj in currentLevel.platforms) {
+			if (_isSimulation && platformStartPoint > gameObj.x) {
+				platformStartPoint = gameObj.x;
+				platformStartPointY = gameObj.y;
+			}
+			Vector2 pos = new Vector2 (gameObj.x, gameObj.y);
+			Quaternion rotation = Quaternion.Euler (0, 0, gameObj.rotation);
 
-            MATERIALS material = (MATERIALS)System.Enum.Parse(typeof(MATERIALS), gameObj.material);
-            block.GetComponent<ABBlock>().SetMaterial(material);
-        }
-
-        foreach (PlatData gameObj in currentLevel.platforms)
-        {
-            if (_isSimulation )//&& platformStartPoint > gameObj.x)
-            {
-                platformStartPoint = gameObj.x;
-                platformStartPointY = gameObj.y;
-            }
-            Vector2 pos = new Vector2(gameObj.x, gameObj.y);
-            Quaternion rotation = Quaternion.Euler(0, 0, gameObj.rotation);
-
-            AddPlatform(ABWorldAssets.PLATFORM, pos, rotation, gameObj.scaleX, gameObj.scaleY);
+			AddPlatform(ABWorldAssets.PLATFORM, pos, rotation, gameObj.scaleX, gameObj.scaleY);
 
 
             //Vector2 pos2 = new Vector2(gameObj.x+1, gameObj.y+2);
             //AddPlatform(ABWorldAssets.PLATFORM, pos2, rotation, gameObj.scaleX, gameObj.scaleY);
 
-        }
+		}
 
-        foreach (OBjData gameObj in currentLevel.tnts)
-        {
+		foreach(OBjData gameObj in currentLevel.tnts) {
 
-            Vector2 pos = new Vector2(gameObj.x, gameObj.y);
-            Quaternion rotation = Quaternion.Euler(0, 0, gameObj.rotation);
-            GameObject addTNT = AddBlock(ABWorldAssets.TNT, pos, rotation);
-            addTNT.tag = "test";
-        }
+			Vector2 pos = new Vector2 (gameObj.x, gameObj.y);
+			Quaternion rotation = Quaternion.Euler (0, 0, gameObj.rotation);
+            _firstTNTPos = pos;
+			AddBlock(ABWorldAssets.TNT, pos, rotation);
+		}
+		
+		StartWorld();
+	}
 
-        StartWorld();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
+	// Update is called once per frame
+	void Update () {
+		
         // Check if birds was trown, if it died and swap them when needed
-        ManageBirds();
+		ManageBirds();
 
-        //Evaluate Subsets
-        if (!LevelSimulator.Generatelevel)
-        {
-            if (!HorizontalStart)
-            {
-                SubsetSimulationHorizontal();
-            }
-            else
-            {
-                SubsetSimulationVertical();
-            }
-            //check useful levels
-            CheckUseful();
-        }
-    }
+		//Evaluate Subsets
+		if (LevelSimulator.Generatelevel) {
+			//if (!HorizontalStart) {
+			//	SubsetSimulationHorizontal();
+			//}
+			//check useful levels
+			CheckUseful();
+		}
+	}
 
-    //	void UpdatePerFrame (int frame) {
-    //		if ()
-    //	}
+//	void UpdatePerFrame (int frame) {
+//		if ()
+//	}
+	
+	public bool IsObjectOutOfWorld(Transform abGameObject, Collider2D abCollider) {
+		
+		Vector2 halfSize = abCollider.bounds.size/2f;
+	
+		if(abGameObject.position.x - halfSize.x > LevelWidth/2f ||
+		   abGameObject.position.x + halfSize.x < -LevelWidth/2f)
 
-    public bool IsObjectOutOfWorld(Transform abGameObject, Collider2D abCollider)
-    {
+			   return true;
+		
+		return false;
+	}
 
-        Vector2 halfSize = abCollider.bounds.size / 2f;
+	void ManageBirds() {
+		
+		if(_birds.Count == 0)
+			return;
+		
+		// Move next bird to the slingshot
+		if(_birds[0].JumpToSlingshot)
+			_birds[0].SetBirdOnSlingshot();
 
-        if (abGameObject.position.x - halfSize.x > LevelWidth / 2f ||
-           abGameObject.position.x + halfSize.x < -LevelWidth / 2f)
+//		int birdsLayer = LayerMask.NameToLayer("Birds");
+//		int blocksLayer = LayerMask.NameToLayer("Blocks");
+//		if(_birds[0].IsFlying || _birds[0].IsDying)
+//			
+//			Physics2D.IgnoreLayerCollision(birdsLayer, blocksLayer, false);
+//		else 
+//			Physics2D.IgnoreLayerCollision(birdsLayer, blocksLayer, true);
+	}
 
-            return true;
+	public ABBird GetCurrentBird() {
+		
+		if(_birds.Count > 0)
+			return _birds[0];
+		
+		return null;
+	}
 
-        return false;
-    }
+	public void NextLevel() {
+		
+		if(LevelList.Instance.NextLevel() == null)
 
-    void ManageBirds()
-    {
+			ABSceneManager.Instance.LoadScene("MainMenu");
+		else
+			ABSceneManager.Instance.LoadScene(SceneManager.GetActiveScene().name,false,null);
+	}
 
-        if (_birds.Count == 0)
-            return;
+	public void ResetLevel() {		
+		if(_levelFailedBanner.activeSelf)
+			_levelTimesTried++;
+        horizontalTimes = 3;
 
-        // Move next bird to the slingshot
-        if (_birds[0].JumpToSlingshot)
-            _birds[0].SetBirdOnSlingshot();
-
-        //		int birdsLayer = LayerMask.NameToLayer("Birds");
-        //		int blocksLayer = LayerMask.NameToLayer("Blocks");
-        //		if(_birds[0].IsFlying || _birds[0].IsDying)
-        //			
-        //			Physics2D.IgnoreLayerCollision(birdsLayer, blocksLayer, false);
-        //		else 
-        //			Physics2D.IgnoreLayerCollision(birdsLayer, blocksLayer, true);
-    }
-
-    public ABBird GetCurrentBird()
-    {
-
-        if (_birds.Count > 0)
-            return _birds[0];
-
-        return null;
-    }
-
-    public void NextLevel()
-    {
-        if (!UsefulTag)
-        {
-            StreamWriter recordLevel = new StreamWriter(System.Environment.CurrentDirectory + "/Assets/StreamingAssets/Levels/levelcheck.txt", true);
-            recordLevel.WriteLine((LevelList.Instance.CurrentIndex).ToString());
-            recordLevel.Close();
-        }
-        bulletPositionHorizonal = 0;
-        bulletPositionVertical = 0;
-        if (LevelList.Instance.NextLevel() == null)
-
-            ABSceneManager.Instance.LoadScene("MainMenu");
-        else
-        {
-
-            ABSceneManager.Instance.LoadScene(SceneManager.GetActiveScene().name);
-
-        }
-
-    }
-
-    public void ResetLevel()
-    {
-        if (_levelFailedBanner.activeSelf)
-            _levelTimesTried++;
+        HorizontalStart = false;
+        initx();
         ABSceneManager.Instance.LoadScene(SceneManager.GetActiveScene().name);
-    }
+	}
 
-    public void AddTrajectoryParticle(ABParticle trajectoryParticle)
-    {
+	public void AddTrajectoryParticle(ABParticle trajectoryParticle) {
 
-        _birdTrajectory.Add(trajectoryParticle);
-    }
+		_birdTrajectory.Add (trajectoryParticle);
+	}
 
-    public void RemoveLastTrajectoryParticle()
-    {
+	public void RemoveLastTrajectoryParticle() {
 
-        foreach (ABParticle part in _birdTrajectory)
-            part.Kill();
-    }
+		foreach (ABParticle part in _birdTrajectory)
+			part.Kill ();
+	}
 
-    public void AddBird(ABBird readyBird)
-    {
+	public void AddBird(ABBird readyBird) {
+		
+		if(_birds.Count == 0)
+			readyBird.GetComponent<Rigidbody2D>().gravityScale = 0f;
 
-        if (_birds.Count == 0)
-            readyBird.GetComponent<Rigidbody2D>().gravityScale = 0f;
+		if(readyBird != null)
+			_birds.Add(readyBird);
+	}
+	
+	public GameObject AddBird(GameObject original, Quaternion rotation) {
+		
+		Vector3 birdsPos = _slingshot.transform.position - ABConstants.SLING_SELECT_POS;
 
-        if (readyBird != null)
-            _birds.Add(readyBird);
-    }
+		if(_birds.Count >= 1) {
+			
+			birdsPos.y = _slingshot.transform.position.y;
 
-    public GameObject AddBird(GameObject original, Quaternion rotation)
-    {
+			for (int i = 0; i < _birds.Count; i++) {
 
-        Vector3 birdsPos = _slingshot.transform.position - ABConstants.SLING_SELECT_POS;
+				if ((i + 1) % _birdsAmounInARow == 0) {
 
-        if (_birds.Count >= 1)
-        {
+					float coin = (Random.value < 0.5f ? 1f : -1);
+					birdsPos.x = _slingshot.transform.position.x + (Random.value * 0.5f * coin);
+				}
+					
+				birdsPos.x -= ABWorldAssets.BIRDS [original.name].GetComponent<SpriteRenderer> ().bounds.size.x * 1.75f;
+			}
+		}
 
-            birdsPos.y = _slingshot.transform.position.y;
+		GameObject newGameObject = (GameObject)Instantiate(original, birdsPos, rotation);
+		Vector3 scale = newGameObject.transform.localScale;
+		scale.x = original.transform.localScale.x;
+		scale.y = original.transform.localScale.y;
+		newGameObject.transform.localScale = scale;
 
-            for (int i = 0; i < _birds.Count; i++)
-            {
+		newGameObject.transform.parent = _birdsTransform;
+		newGameObject.name = "bird_" + _birds.Count;
 
-                if ((i + 1) % _birdsAmounInARow == 0)
-                {
+		ABBird bird = newGameObject.GetComponent<ABBird>();
+		bird.SendMessage ("InitSpecialPower", SendMessageOptions.DontRequireReceiver);
 
-                    float coin = (UnityEngine.Random.value < 0.5f ? 1f : -1);
-                    birdsPos.x = _slingshot.transform.position.x + (UnityEngine.Random.value * 0.5f * coin);
-                }
+		if(_birds.Count == 0)
+			bird.GetComponent<Rigidbody2D>().gravityScale = 0f;
 
-                birdsPos.x -= ABWorldAssets.BIRDS[original.name].GetComponent<SpriteRenderer>().bounds.size.x * 1.75f;
-            }
-        }
+		if(bird != null)
+			_birds.Add(bird);
 
-        GameObject newGameObject = (GameObject)Instantiate(original, birdsPos, rotation);
-        Vector3 scale = newGameObject.transform.localScale;
-        scale.x = original.transform.localScale.x;
-        scale.y = original.transform.localScale.y;
-        newGameObject.transform.localScale = scale;
+		return newGameObject;
+	}
 
-        newGameObject.transform.parent = _birdsTransform;
-        newGameObject.name = "bird_" + _birds.Count;
+	public GameObject AddPig(GameObject original, Vector3 position, Quaternion rotation, float scale = 1f) {
+		
+		GameObject newGameObject = AddBlock(original, position, rotation, scale);
 
-        ABBird bird = newGameObject.GetComponent<ABBird>();
-        bird.SendMessage("InitSpecialPower", SendMessageOptions.DontRequireReceiver);
+		ABPig pig = newGameObject.GetComponent<ABPig>();
+		if(pig != null)
+			_pigs.Add(pig);
 
-        if (_birds.Count == 0)
-            bird.GetComponent<Rigidbody2D>().gravityScale = 0f;
+		return newGameObject;
+	}
 
-        if (bird != null)
-            _birds.Add(bird);
-
-        return newGameObject;
-    }
-
-    public GameObject AddPig(GameObject original, Vector3 position, Quaternion rotation, float scale = 1f)
-    {
-
-        GameObject newGameObject = AddBlock(original, position, rotation, scale);
-
-        ABPig pig = newGameObject.GetComponent<ABPig>();
-        if (pig != null)
-            _pigs.Add(pig);
-
-        return newGameObject;
-    }
-
-    public GameObject AddPlatform(GameObject original, Vector3 position, Quaternion rotation, float scaleX = 1f, float scaleY = 1f)
-    {
+	public GameObject AddPlatform(GameObject original, Vector3 position, Quaternion rotation, float scaleX = 1f, float scaleY = 1f) {
         //Debug.Log("add Platform");
-        GameObject platform = AddBlock(original, position, rotation, scaleX, scaleY);
-        platform.transform.parent = _plaftformsTransform;
+		GameObject platform = AddBlock (original, position, rotation, scaleX, scaleY);
+		platform.transform.parent = _plaftformsTransform;
 
-        return platform;
-    }
+		return platform;
+	}
 
-    public GameObject AddBlock(GameObject original, Vector3 position, Quaternion rotation, float scaleX = 1f, float scaleY = 1f)
-    {
+	public GameObject AddBlock(GameObject original, Vector3 position, Quaternion rotation, float scaleX = 1f, float scaleY = 1f) {
+		
+		GameObject newGameObject = (GameObject)Instantiate(original, position, rotation);
+		newGameObject.transform.parent = _blocksTransform;
 
-        GameObject newGameObject = (GameObject)Instantiate(original, position, rotation);
-        newGameObject.transform.parent = _blocksTransform;
+		Vector3 newScale = newGameObject.transform.localScale;
+		newScale.x = scaleX;
+		newScale.y = scaleY;
+		newGameObject.transform.localScale = newScale;
 
-        Vector3 newScale = newGameObject.transform.localScale;
-        newScale.x = scaleX;
-        newScale.y = scaleY;
-        newGameObject.transform.localScale = newScale;
+		return newGameObject;
+	}
 
-        return newGameObject;
-    }
+	private void ShowLevelFailedBanner()  {
+		
+		if(_levelCleared)
+			return;
 
-    private void ShowLevelFailedBanner()
-    {
+		if(!IsLevelStable()) {
 
-        if (_levelCleared)
-            return;
+			Invoke("ShowLevelFailedBanner", 1f);
+		}
+		else {
+			
+			// Player lost the game
+			HUD.Instance.gameObject.SetActive(false);
 
-        if (!IsLevelStable())
-        {
+			if (_levelTimesTried < _timesToGiveUp - 1) {
 
-            Invoke("ShowLevelFailedBanner", 1f);
-        }
-        else
-        {
+				_levelFailedBanner.SetActive (true);
+			}
+			else {
+				
+				_levelClearedBanner.SetActive(true);
+				_levelClearedBanner.GetComponentInChildren<Text>().text = "Level Failed!";
+			}
+		}
+	}
 
-            // Player lost the game
-            HUD.Instance.gameObject.SetActive(false);
+	private void ShowLevelClearedBanner() 
+	{
+		if(!IsLevelStable()) {
 
-            if (_levelTimesTried < _timesToGiveUp - 1)
-            {
+			Invoke("ShowLevelClearedBanner", 1f);
+		}
+		else {
+			
+			// Player won the game
+			HUD.Instance.gameObject.SetActive(false);
 
-                _levelFailedBanner.SetActive(true);
-            }
-            else
-            {
+			_levelClearedBanner.SetActive(true);
+			_levelClearedBanner.GetComponentInChildren<Text>().text = "Level Cleared!";
+		}
+	}
 
-                _levelClearedBanner.SetActive(true);
-                _levelClearedBanner.GetComponentInChildren<Text>().text = "Level Failed!";
-            }
-        }
-    }
+	public void KillPig(ABPig pig) {
+		
+		_pigs.Remove(pig);
+		
+		if(_pigs.Count == 0) {
+			
+			// Check if player won the game
+			if(!_isSimulation) {
 
-    private void ShowLevelClearedBanner()
-    {
-        if (!IsLevelStable())
-        {
+				_levelCleared = true;
+				Invoke("ShowLevelClearedBanner", _timeToResetLevel);
+			}
+			
+			return;
+		}
+	}
+	
+	public void KillBird(ABBird bird) {
 
-            Invoke("ShowLevelClearedBanner", 1f);
-        }
-        else
-        {
+		if (!_birds.Contains (bird))
+			return;
+		
+		_birds.Remove(bird);
+		
+		if(_birds.Count == 0) {
+			
+			// Check if player lost the game
+			if(!_isSimulation)
+				Invoke("ShowLevelFailedBanner", _timeToResetLevel);
 
-            // Player won the game
-            HUD.Instance.gameObject.SetActive(false);
+			return;
+		}
+		
+		_birds[0].GetComponent<Rigidbody2D>().gravityScale = 0f;
+		_birds[0].JumpToSlingshot = true;
+	}
 
-            _levelClearedBanner.SetActive(true);
-            _levelClearedBanner.GetComponentInChildren<Text>().text = "Level Cleared!";
-        }
-    }
+	public int GetPigsAvailableAmount() {
+		
+		return _pigs.Count;
+	}
+	
+	public int GetBirdsAvailableAmount() {
+		
+		return _birds.Count;
+	}
 
-    public void KillPig(ABPig pig)
-    {
+	public int GetBlocksAvailableAmount() {
+		
+		int blocksAmount = 0;
 
-        _pigs.Remove(pig);
+		foreach(Transform b in _blocksTransform) {
+			
+			if(b.GetComponent<ABPig>() == null)
+			
+				for(int i = 0; i < b.GetComponentsInChildren<Rigidbody2D>().Length; i++)
+					blocksAmount++;
+		}
 
-        if (_pigs.Count == 0)
-        {
+		return blocksAmount;
+	}
 
-            // Check if player won the game
-            if (!_isSimulation)
-            {
+	public bool IsLevelStable() {
+		
+		return GetLevelStability() == 0f;
+	}
 
-                _levelCleared = true;
-                Invoke("ShowLevelClearedBanner", _timeToResetLevel);
-            }
+	public float GetLevelStability() {
+		
+		float totalVelocity = 0f;
 
-            return;
-        }
-    }
+		foreach(Transform b in _blocksTransform) {
+			
+			Rigidbody2D []bodies = b.GetComponentsInChildren<Rigidbody2D>();
 
-    public void KillBird(ABBird bird)
-    {
+			foreach(Rigidbody2D body in bodies) {
+				
+				if(!IsObjectOutOfWorld(body.transform, body.GetComponent<Collider2D>()))
+					totalVelocity += body.velocity.magnitude;
+			}
+		}
 
-        if (!_birds.Contains(bird))
-            return;
+		return totalVelocity;
+	}
 
-        _birds.Remove(bird);
+    public List<GameObject> ObjectsInScene() {
 
-        if (_birds.Count == 0)
-        {
+		List<GameObject> objsInScene = new List<GameObject>();
 
-            // Check if player lost the game
-            if (!_isSimulation)
-                Invoke("ShowLevelFailedBanner", _timeToResetLevel);
-
-            return;
-        }
-
-        _birds[0].GetComponent<Rigidbody2D>().gravityScale = 0f;
-        _birds[0].JumpToSlingshot = true;
-    }
-
-    public int GetPigsAvailableAmount()
-    {
-
-        return _pigs.Count;
-    }
-
-    public int GetBirdsAvailableAmount()
-    {
-
-        return _birds.Count;
-    }
-
-    public int GetBlocksAvailableAmount()
-    {
-
-        int blocksAmount = 0;
-
-        foreach (Transform b in _blocksTransform)
-        {
-
-            if (b.GetComponent<ABPig>() == null)
-
-                for (int i = 0; i < b.GetComponentsInChildren<Rigidbody2D>().Length; i++)
-                    blocksAmount++;
-        }
-
-        return blocksAmount;
-    }
-
-    public bool IsLevelStable()
-    {
-
-        return GetLevelStability() == 0f;
-    }
-
-    public float GetLevelStability()
-    {
-
-        float totalVelocity = 0f;
-
-        foreach (Transform b in _blocksTransform)
-        {
-
-            Rigidbody2D[] bodies = b.GetComponentsInChildren<Rigidbody2D>();
-
-            foreach (Rigidbody2D body in bodies)
-            {
-
-                if (!IsObjectOutOfWorld(body.transform, body.GetComponent<Collider2D>()))
-                    totalVelocity += body.velocity.magnitude;
-            }
-        }
-
-        return totalVelocity;
-    }
-
-    public List<GameObject> ObjectsInScene()
-    {
-
-        List<GameObject> objsInScene = new List<GameObject>();
-
-        foreach (Transform b in _blocksTransform)
+		foreach(Transform b in _blocksTransform)
             objsInScene.Add(b.gameObject.transform.gameObject);
-        return objsInScene;
-    }
+		return objsInScene;
+	}
 
-    public Vector3 DragDistance()
-    {
+	public Vector3 DragDistance() {
 
-        Vector3 selectPos = (_slingshot.transform.position - ABConstants.SLING_SELECT_POS);
-        return _slingshotBaseTransform.transform.position - selectPos;
-    }
+		Vector3 selectPos = (_slingshot.transform.position - ABConstants.SLING_SELECT_POS);
+		return _slingshotBaseTransform.transform.position - selectPos;
+	}
 
-    public void SetSlingshotBaseActive(bool isActive)
-    {
+	public void SetSlingshotBaseActive(bool isActive) {
 
-        _slingshotBaseTransform.gameObject.SetActive(isActive);
-    }
+		_slingshotBaseTransform.gameObject.SetActive(isActive);
+	}
 
-    public void ChangeSlingshotBasePosition(Vector3 position)
-    {
+	public void ChangeSlingshotBasePosition(Vector3 position) {
 
-        _slingshotBaseTransform.transform.position = position;
-    }
+		_slingshotBaseTransform.transform.position = position;
+	}
 
-    public void ChangeSlingshotBaseRotation(Quaternion rotation)
-    {
+	public void ChangeSlingshotBaseRotation(Quaternion rotation) {
 
-        _slingshotBaseTransform.transform.rotation = rotation;
-    }
+		_slingshotBaseTransform.transform.rotation = rotation;
+	}
 
-    public bool IsSlingshotBaseActive()
-    {
+	public bool IsSlingshotBaseActive() {
 
-        return _slingshotBaseTransform.gameObject.activeSelf;
-    }
+		return _slingshotBaseTransform.gameObject.activeSelf;
+	}
 
-    public Vector3 GetSlingshotBasePosition()
-    {
+	public Vector3 GetSlingshotBasePosition() {
 
-        return _slingshotBaseTransform.transform.position;
-    }
+		return _slingshotBaseTransform.transform.position;
+	}
 
-    public void StartWorld()
-    {
+	public void StartWorld() {
+		
+		_pigsAtStart = GetPigsAvailableAmount();
+		_birdsAtStart = GetBirdsAvailableAmount();
+		_blocksAtStart = GetBlocksAvailableAmount();
+	}
 
-        _pigsAtStart = GetPigsAvailableAmount();
-        _birdsAtStart = GetBirdsAvailableAmount();
-        _blocksAtStart = GetBlocksAvailableAmount();
-    }
+	public void ClearWorld() {
+		
+		foreach(Transform b in _blocksTransform)
+			Destroy(b.gameObject);
 
-    public void ClearWorld()
-    {
+		_pigs.Clear();
 
-        foreach (Transform b in _blocksTransform)
-            Destroy(b.gameObject);
-
-        _pigs.Clear();
-
-        foreach (Transform b in _birdsTransform)
-            Destroy(b.gameObject);
+		foreach(Transform b in _birdsTransform)
+			Destroy(b.gameObject);
 
         foreach (Transform b in _plaftformsTransform)
             Destroy(b.gameObject);
 
 
 
-        _birds.Clear();
-    }
+		_birds.Clear();		
+	}
 
-    private void AdaptCameraWidthToLevel()
-    {
+	private void AdaptCameraWidthToLevel() {
 
-        Collider2D[] bodies = _blocksTransform.GetComponentsInChildren<Collider2D>();
+		Collider2D []bodies = _blocksTransform.GetComponentsInChildren<Collider2D>();
 
-        if (bodies.Length == 0)
-            return;
+		if(bodies.Length == 0)
+			return;
+		
+		// Adapt the camera to show all the blocks		
+		float levelLeftBound = -LevelWidth/2f;
+		float groundSurfacePos = LevelHeight/2f;
+				
+		float minPosX = Mathf.Infinity;
+		float maxPosX = -Mathf.Infinity; 
+		float maxPosY = -Mathf.Infinity;
 
-        // Adapt the camera to show all the blocks		
-        float levelLeftBound = -LevelWidth / 2f;
-        float groundSurfacePos = LevelHeight / 2f;
+		// Get position of first non-empty stack
+		for(int i = 0; i < bodies.Length; i++)
+		{
+			float minPosXCandidate = bodies[i].transform.position.x - bodies[i].bounds.size.x/2f;
+			if(minPosXCandidate < minPosX)
+				minPosX = minPosXCandidate;
 
-        float minPosX = Mathf.Infinity;
-        float maxPosX = -Mathf.Infinity;
-        float maxPosY = -Mathf.Infinity;
+			float maxPosXCandidate = bodies[i].transform.position.x + bodies[i].bounds.size.x/2f;
+			if(maxPosXCandidate > maxPosX)
+				maxPosX = maxPosXCandidate;
 
-        // Get position of first non-empty stack
-        for (int i = 0; i < bodies.Length; i++)
-        {
-            float minPosXCandidate = bodies[i].transform.position.x - bodies[i].bounds.size.x / 2f;
-            if (minPosXCandidate < minPosX)
-                minPosX = minPosXCandidate;
+			float maxPosYCandidate = bodies[i].transform.position.y + bodies[i].bounds.size.y/2f;
+			if(maxPosYCandidate > maxPosY)
+				maxPosY = maxPosYCandidate;
+		}
 
-            float maxPosXCandidate = bodies[i].transform.position.x + bodies[i].bounds.size.x / 2f;
-            if (maxPosXCandidate > maxPosX)
-                maxPosX = maxPosXCandidate;
+		float cameraWidth = Mathf.Abs(minPosX - levelLeftBound) + 
+			Mathf.Max(Mathf.Abs(maxPosX - minPosX), Mathf.Abs(maxPosY - groundSurfacePos)) + 0.5f;
 
-            float maxPosYCandidate = bodies[i].transform.position.y + bodies[i].bounds.size.y / 2f;
-            if (maxPosYCandidate > maxPosY)
-                maxPosY = maxPosYCandidate;
-        }
-
-        float cameraWidth = Mathf.Abs(minPosX - levelLeftBound) +
-            Mathf.Max(Mathf.Abs(maxPosX - minPosX), Mathf.Abs(maxPosY - groundSurfacePos)) + 0.5f;
-
-        GameplayCam.SetCameraWidth(cameraWidth);
-    }
+		GameplayCam.SetCameraWidth(cameraWidth);		
+	}
 
 
-    //////////////////////////////////////Original Code////////////////////////////
-
+	//////////////////////////////////////Original Code////////////////////////////
 
     private void SubsetSimulationHorizontal()
     {
@@ -813,7 +769,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
 
             //blockId = block.GetInstanceID();
             block.tag = "test";
-            
+
 
 
             if (bulletPositionHorizonal > horizontalTimes)
@@ -869,9 +825,9 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
             initx();
             alreadyDrop = false;
         }
-        //		if (IsLevelStable ()&&block.transform.position.y<5) {
-        //			initx ();
-        //		}
+        //      if (IsLevelStable ()&&block.transform.position.y<5) {
+        //          initx ();
+        //      }
 
     }
 
@@ -885,20 +841,20 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
             {
                 recordTrace(b, addCircle);
                 //(Vector2.Distance(b.position, new Vector2(platformStartPoint, platformStartPointY)) > usefulDistance)
-                if ((b.tag!="test") && (b.position.y < -2.6))
+                if ((b.tag != "test") && (b.position.y < -2.6))
                 {
                     UsefulTag = true;
                     //print("useful one");
-                    NextLevel();
+                    //NextLevel();
                 }
             }
         }
-        
+
     }
 
-    public void recordTrace(Transform traceXY,ABLevel addCircle)
+    public void recordTrace(Transform traceXY, ABLevel addCircle)
     {
-        
+
         if ((Vector2.Distance(traceXY.position, new Vector2(platformStartPoint, platformStartPointY)) > minicircle) && (Vector2.Distance(traceXY.position, new Vector2(platformStartPoint, platformStartPointY)) < maxcircle))
         {
             if (!addCircle.triggers.Contains(traceXY.position))
