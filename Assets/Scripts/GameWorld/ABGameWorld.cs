@@ -89,7 +89,6 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
     public static double maxcircle = 2;
     public static bool alreadyDropHorizontal = false;
     public static bool HorizontalStart = false;
-    //public static bool VerticalStart =true;
     public static bool alreadyDropVertical = false;
     public static int blockId;
     public Vector2 blockPosition;
@@ -212,6 +211,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
         if (LevelSimulator.Generatelevel == false)
         {
             UsefulTag = false;
+            CheckTag = false;
         }
     }
 
@@ -321,7 +321,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
             Vector2 pos = new Vector2(gameObj.x, gameObj.y);
             Quaternion rotation = Quaternion.Euler(0, 0, gameObj.rotation);
             GameObject addTNT = AddBlock(ABWorldAssets.TNT, pos, rotation);
-            addTNT.tag = "test";
+            addTNT.tag = "TNT";
         }
 
         StartWorld();
@@ -333,20 +333,26 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
 
         // Check if birds was trown, if it died and swap them when needed
         ManageBirds();
-
+        CheckUseful();
         //Evaluate Subsets
         if (!LevelSimulator.Generatelevel)
         {
-            if (!HorizontalStart)
+            if (CheckTNT())
             {
-                SubsetSimulationHorizontal();
+                NextLevel();
             }
-            else
-            {
-                SubsetSimulationVertical();
+            else {
+                if (!HorizontalStart)
+                {
+                    SubsetSimulationHorizontal();
+                }
+                else
+                {
+                    SubsetSimulationVertical();
+                }
+                //check useful levels
+                CheckUseful();
             }
-            //check useful levels
-            CheckUseful();
         }
     }
 
@@ -876,36 +882,62 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
     }
 
     public static bool UsefulTag = false;
+    public static bool CheckTag = false;
     public void CheckUseful()
     {
         if (!UsefulTag)
         {
-            ABLevel addCircle = LevelList.Instance.GetCurrentLevel();
+            //ABLevel addCircle = LevelList.Instance.GetCurrentLevel();
             foreach (Transform b in _blocksTransform)
             {
-                recordTrace(b, addCircle);
+                //recordTrace(b, addCircle);
                 //(Vector2.Distance(b.position, new Vector2(platformStartPoint, platformStartPointY)) > usefulDistance)
-                if ((b.tag!="test") && (b.position.y < -2.6))
+                if ((b.tag!="test") && (b.position.y < platformStartPointY))
                 {
-                    UsefulTag = true;
-                    //print("useful one");
-                    NextLevel();
+                    CheckTag = true;
+                    if (b.position.y < -2.7)
+                    {
+                        ABLevel Grounds = LevelList.Instance.GetCurrentLevel();
+                        if (!Grounds.grounds.Contains(b.position.x))
+                        {
+                            Grounds.grounds.Add(b.position.x);
+                        }
+                        UsefulTag = true;
+                        //print("useful one");
+                        NextLevel();
+                    }
                 }
             }
         }
         
     }
 
-    public void recordTrace(Transform traceXY,ABLevel addCircle)
-    {
-        
-        if ((Vector2.Distance(traceXY.position, new Vector2(platformStartPoint, platformStartPointY)) > minicircle) && (Vector2.Distance(traceXY.position, new Vector2(platformStartPoint, platformStartPointY)) < maxcircle))
+    public bool CheckTNT() {
+        ABLevel TNT = LevelList.Instance.GetCurrentLevel();
+        if (TNT.tnts.Count != 0)
         {
-            if (!addCircle.triggers.Contains(traceXY.position))
-            {
-                addCircle.triggers.Add(traceXY.position);
-            }
+
+            TNT.triggerX = GameObject.FindGameObjectWithTag("TNT").transform.position.x;
+            TNT.triggerY = GameObject.FindGameObjectWithTag("TNT").transform.position.y;
+            return true;
         }
+        else {
+            return false;
+        }
+    }
+
+
+
+    //public void recordTrace(Transform traceXY,ABLevel addCircle)
+    //{
+        
+    //    if ((Vector2.Distance(traceXY.position, new Vector2(platformStartPoint, platformStartPointY)) > minicircle) && (Vector2.Distance(traceXY.position, new Vector2(platformStartPoint, platformStartPointY)) < maxcircle))
+    //    {
+    //        if (!addCircle.triggers.Contains(traceXY.position))
+    //        {
+    //            addCircle.triggers.Add(traceXY.position);
+    //        }
+    //    }
         //print((LevelList.Instance.CurrentIndex + 1).ToString());
         //print(blockPosition);
         //StreamWriter recordLevel = new StreamWriter(System.Environment.CurrentDirectory + "/levelcheck.txt", true);
@@ -917,5 +949,5 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
         //recordLevel.WriteLine((LevelList.Instance.CurrentIndex + 1).ToString() + blockPosition.ToString());
         //recordLevel.Close();
         //UsefulTag = true;
-    }
+    //}
 }
