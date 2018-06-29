@@ -333,26 +333,30 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
 
         // Check if birds was trown, if it died and swap them when needed
         ManageBirds();
-        CheckUseful();
         //Evaluate Subsets
         if (!LevelSimulator.Generatelevel)
         {
-            if (CheckTNT())
+            if (!_isSimulation || !IsLevelStable())
             {
-                NextLevel();
-            }
-            else {
-                if (!HorizontalStart)
+                if(CheckTNT())
                 {
-                    SubsetSimulationHorizontal();
+                    NextLevel();
                 }
                 else
                 {
-                    SubsetSimulationVertical();
+                        if (!HorizontalStart)
+                        {
+                            SubsetSimulationHorizontal();
+                        }
+                        else
+                        {
+                            SubsetSimulationVertical();
+                        }
+                        //check useful levels
+                        CheckUseful();
                 }
-                //check useful levels
-                CheckUseful();
             }
+           
         }
     }
 
