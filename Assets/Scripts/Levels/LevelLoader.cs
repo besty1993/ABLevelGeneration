@@ -277,7 +277,7 @@ public class LevelLoader {
 		return resources;
 	}
 
-    public ABLevel EncodeLevel() {
+    public static ABLevel EncodeLevel() {
         ABLevel level = new ABLevel();
         level.width = LevelList.Instance.GetCurrentLevel().width;
         level.camera = LevelList.Instance.GetCurrentLevel().camera;
@@ -320,7 +320,7 @@ public class LevelLoader {
         return level;
     }
 
-	public void SaveLevelOnScene() {
+	public static void SaveLevelOnScene() {
         //Use this code to save objs
         ABLevel level = EncodeLevel();
         //Save level to xml file

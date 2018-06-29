@@ -121,7 +121,7 @@ public class ABLevel
 	public List<BlockData> blocks;
 	public List<PlatData>  platforms;
     public List<Vector2> triggers;
-
+    public List<float> grounds;
     public float triggerX, triggerY;
    
 
@@ -137,6 +137,7 @@ public class ABLevel
 		birds     = new List<BirdData>();
 		platforms = new List<PlatData>();
         triggers = new List<Vector2>();
+        grounds = new List<float>();
 	}
 
 }

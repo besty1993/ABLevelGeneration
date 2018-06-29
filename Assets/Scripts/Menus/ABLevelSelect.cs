@@ -37,7 +37,6 @@ public class ABLevelSelect : ABMenu {
 
 	// Use this for initialization
 	void Start () {
-		print ("start");
 		// Load levels in the resources folder
 		TextAsset []levelsData = Resources.LoadAll<TextAsset>(ABConstants.DEFAULT_LEVELS_FOLDER);
 
@@ -102,7 +101,7 @@ public class ABLevelSelect : ABMenu {
 
 
 
-		//LevelList.Instance.SetLevel(1);
-		//LoadNextScene("GameWorld",false,null);
+		LevelList.Instance.SetLevel(1);
+		LoadNextScene("GameWorld",false,null);
 	}
 }

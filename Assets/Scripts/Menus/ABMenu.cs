@@ -28,10 +28,10 @@ public class ABMenu : MonoBehaviour {
 	void Start() {
 		if (UnityEngine.SceneManagement.SceneManager.GetActiveScene ().name != "GameWorld") {
 			try {
-				//LevelList.Instance.SetLevel (1);
-				//LoadNextScene ("GameWorld", false, null);
+				LevelList.Instance.SetLevel (1);
+				LoadNextScene ("GameWorld", false, null);
 			} catch {
-				//LoadNextScene ("LevelSelectMenu", false, null);
+				LoadNextScene ("LevelSelectMenu", false, null);
 			}
 		}
 
