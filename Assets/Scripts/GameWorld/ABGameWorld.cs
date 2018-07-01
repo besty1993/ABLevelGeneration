@@ -313,10 +313,13 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
     {
         // Check if birds was trown, if it died and swap them when needed
         ManageBirds();
-
         //Evaluate Subsets
-        if (LevelSimulator.Generatelevel)
-        {
+        //if (CheckTNT())
+        //{
+        //    NextLevel();
+        //}
+        //else
+        //{
             if (!HorizontalStart)
             {
                 SubsetSimulationHorizontal();
@@ -325,10 +328,10 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
             {
                 SubsetSimulationVertical();
             }
-            //check useful levels
-            CheckUseful();
-            UpdateEveryNFrames(10); //10
-        }
+            CheckUseful(); //check useful levels
+            UpdateEveryNFrames(10);
+        //}
+            
     }
 
     //	void UpdatePerFrame (int frame) {
@@ -845,45 +848,80 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
             initx();
             alreadyDrop = false;
         }
+        //      if (IsLevelStable ()&&block.transform.position.y<5) {
+        //          initx ();
+        //      }
     }
 
     public static bool UsefulTag = false;
+    public static bool CheckTag = false;
+
     public void CheckUseful()
     {
         if (!UsefulTag)
         {
-            ABLevel addCircle = LevelList.Instance.GetCurrentLevel();
+            //ABLevel addCircle = LevelList.Instance.GetCurrentLevel();
             foreach (Transform b in _blocksTransform)
             {
-                recordTrace(b, addCircle);
+                //recordTrace(b, addCircle);
                 //(Vector2.Distance(b.position, new Vector2(platformStartPoint, platformStartPointY)) > usefulDistance)
-                if ((b.tag!="test") && (b.position.y < -2.6))
+                if ((b.tag != "test") && (b.position.y < platformStartPointY))
                 {
-                    UsefulTag = true;
-                    print("useful one");
-                    initx();
-                    GenerateSubset();
-                    positionList.Clear();
-                    AdaptCameraWidthToLevel();
-                    LevelLoader.SaveLevelOnScene();
-                    NextLevel();
+                    CheckTag = true;
+                    if (b.position.y < -2.7)
+                    {
+                        ABLevel Grounds = LevelList.Instance.GetCurrentLevel();
+                        if (!Grounds.grounds.Contains(b.position))
+                        {
+                            Grounds.grounds.Add(new Vector2(b.position.x,-6f));
+     
+                        }
+                        UsefulTag = true;
+                        print("useful one");
 
-                    UsefulTag = false;
+                        initx();
+                        GenerateSubset(positionList[positionList.Count - 1]);
+                        foreach (Vector2 groundsPosition in Grounds.grounds) 
+                        {
+                            GenerateSubset(groundsPosition);
+
+                        }
+                        positionList.Clear();
+                        AdaptCameraWidthToLevel();
+                        LevelLoader.SaveLevelOnScene();
+                        NextLevel();
+
+                        UsefulTag = false;
+                    }
+
                 }
             }
         }
     }
 
-    public void recordTrace(Transform traceXY,ABLevel addCircle)
-    {
-        
-        if ((Vector2.Distance(traceXY.position, new Vector2(platformStartPoint, platformStartPointY)) > minicircle) && (Vector2.Distance(traceXY.position, new Vector2(platformStartPoint, platformStartPointY)) < maxcircle))
+    public bool CheckTNT() {
+        ABLevel TNT = LevelList.Instance.GetCurrentLevel();
+        if (TNT.tnts.Count != 0)
         {
-            if (!addCircle.triggers.Contains(traceXY.position))
-            {
-                addCircle.triggers.Add(traceXY.position);
-            }
+            TNT.triggerX = GameObject.FindGameObjectWithTag("TNT").transform.position.x;
+            TNT.triggerY = GameObject.FindGameObjectWithTag("TNT").transform.position.y;
+            return true;
         }
+        else {
+            return false;
+        }
+    }
+
+    //public void recordTrace(Transform traceXY,ABLevel addCircle)
+    //{
+        
+        //if ((Vector2.Distance(traceXY.position, new Vector2(platformStartPoint, platformStartPointY)) > minicircle) && (Vector2.Distance(traceXY.position, new Vector2(platformStartPoint, platformStartPointY)) < maxcircle))
+        //{
+        //    if (!addCircle.triggers.Contains(traceXY.position))
+        //    {
+        //        addCircle.triggers.Add(traceXY.position);
+        //    }
+        //}
         //print((LevelList.Instance.CurrentIndex + 1).ToString());
         //print(blockPosition);
         //StreamWriter recordLevel = new StreamWriter(System.Environment.CurrentDirectory + "/levelcheck.txt", true);
@@ -895,7 +933,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
         //recordLevel.WriteLine((LevelList.Instance.CurrentIndex + 1).ToString() + blockPosition.ToString());
         //recordLevel.Close();
         //UsefulTag = true;
-    }
+    //}
 
     public void UpdateEveryNFrames(int repeatRate)
     {
@@ -903,27 +941,27 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
             return;
         }
         if (true) {
+            //the method body that is supposed to run at a fixed frame rate
             foreach (Transform trans in GameObject.Find("Blocks").transform)
             {
                 var objVel = trans.GetComponent<Rigidbody2D>().velocity;
                 if (objVel.x > velocityLimitation && objVel.y < 4)
                 {
-                    positionList.Add((Vector2)trans.position);
-                    //print("|-pos "+(Vector2)trans.position);
+                    positionList.Add(trans.position);
+                    //print("pos "+trans.position);
                 }
             }
-            //the method body that is supposed to run at a fixed frame rate
         }
     }
 
-    public void GenerateSubset()
+    public void GenerateSubset(Vector2 position)
     {
         print("GenerateSubset");
         ABLevel abLevel = LevelList.Instance.GetCurrentLevel();
         int selectedLevel = Random.Range(4, 85);
         ABLevel generateSubset = LevelList.Instance.GetLevel(selectedLevel);
-        LevelSimulator.GenerateSubset(generateSubset, positionList[positionList.Count - 1].x, positionList[positionList.Count - 1].y);
-        print("-pos "+positionList[positionList.Count - 1].x+" , "+positionList[positionList.Count - 1].y);
+        LevelSimulator.GenerateSubset(generateSubset, position.x, position.y);
+        print("pos-gs "+position.x+" , "+position.y);
     }
 
 }
