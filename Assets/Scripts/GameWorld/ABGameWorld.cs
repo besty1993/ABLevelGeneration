@@ -336,15 +336,14 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
         //Evaluate Subsets
         if (!LevelSimulator.Generatelevel)
         {
-            if (!_isSimulation || !IsLevelStable())
-            {
-                if(CheckTNT())
+           
+                if(IsLevelStable() && CheckTNT())
                 {
                     NextLevel();
                 }
                 else
                 {
-                        if (!HorizontalStart)
+                if (!HorizontalStart)
                         {
                             SubsetSimulationHorizontal();
                         }
@@ -355,9 +354,9 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
                         //check useful levels
                         CheckUseful();
                 }
-            }
+         }
            
-        }
+        
     }
 
     //	void UpdatePerFrame (int frame) {
@@ -820,11 +819,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
             block.GetComponent<ABBlock>().SetMaterial(material);
             block.GetComponent<Rigidbody2D>().AddForce(force, ForceMode2D.Impulse);
             bulletPositionHorizonal++;
-
-            //blockId = block.GetInstanceID();
             block.tag = "test";
-            
-
 
             if (bulletPositionHorizonal > horizontalTimes)
             {
@@ -884,31 +879,27 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
         //		}
 
     }
-
+    public ABLevel Check = LevelList.Instance.GetCurrentLevel();
     public static bool UsefulTag = false;
     public static bool CheckTag = false;
     public void CheckUseful()
     {
+        
         if (!UsefulTag)
         {
-            //ABLevel addCircle = LevelList.Instance.GetCurrentLevel();
+            
             foreach (Transform b in _blocksTransform)
             {
-                //recordTrace(b, addCircle);
-                //(Vector2.Distance(b.position, new Vector2(platformStartPoint, platformStartPointY)) > usefulDistance)
+                
                 if ((b.tag!="test") && (b.position.y < platformStartPointY))
                 {
                     CheckTag = true;
-                    if (b.position.y < -2.7)
+                    if (Check.grounds.Count>0)
                     {
-                        ABLevel Grounds = LevelList.Instance.GetCurrentLevel();
-                        if (!Grounds.grounds.Contains(b.position.x))
-                        {
-                            Grounds.grounds.Add(b.position.x);
-                        }
+                        print("usefule one");
                         UsefulTag = true;
-                        //print("useful one");
-                        NextLevel();
+                        if(IsLevelStable())
+                            NextLevel();
                     }
                 }
             }
@@ -917,12 +908,11 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
     }
 
     public bool CheckTNT() {
-        ABLevel TNT = LevelList.Instance.GetCurrentLevel();
-        if (TNT.tnts.Count != 0)
+        if (Check.tnts.Count != 0)
         {
 
-            TNT.triggerX = GameObject.FindGameObjectWithTag("TNT").transform.position.x;
-            TNT.triggerY = GameObject.FindGameObjectWithTag("TNT").transform.position.y;
+            Check.triggerX = GameObject.FindGameObjectWithTag("TNT").transform.position.x;
+            Check.triggerY = GameObject.FindGameObjectWithTag("TNT").transform.position.y;
             return true;
         }
         else {

@@ -79,22 +79,27 @@ public class ABBlock : ABGameObject {
 
 		_spriteRenderer.sprite = _sprites [0];
 	}
-
-	public override void OnCollisionEnter2D(Collision2D collision)
+    
+    public override void OnCollisionEnter2D(Collision2D collision)
     {
         
         if (collision.gameObject.tag == "test")
         {
-            ABLevel addStriggerXY = LevelList.Instance.GetCurrentLevel();
+            ABLevel addPoints = LevelList.Instance.GetCurrentLevel();
             foreach (ContactPoint2D striggerPoint in collision.contacts) {
-                addStriggerXY.triggerX = striggerPoint.point.x;
-                addStriggerXY.triggerY = striggerPoint.point.y;
-                //if (!addStrigger.triggers.Contains(striggerPoint.point))
-                //{
-                //    addStrigger.triggers.Add(striggerPoint.point);
-                //}
+                addPoints.triggerX = striggerPoint.point.x;
+                addPoints.triggerY = striggerPoint.point.y;
             }
            
+        }
+        if (collision.gameObject.name =="Ground")
+        {
+            ABLevel addPoints = LevelList.Instance.GetCurrentLevel();
+            foreach (ContactPoint2D groundPoint in collision.contacts) {
+                if (!addPoints.grounds.Contains(groundPoint.point.x)&& groundPoint.point.x<=5) {
+                    addPoints.grounds.Add(groundPoint.point.x);
+                }
+            }
         }
         if (collision.gameObject.tag == "Bird") {
 
