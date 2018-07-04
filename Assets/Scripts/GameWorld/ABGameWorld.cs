@@ -23,7 +23,8 @@ using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 using System.IO;
 
-public class ABGameWorld : ABSingleton<ABGameWorld>
+
+public class ABGameWorld : ABSingleton<ABGameWorld> 
 {
 
     static int _levelTimesTried;
@@ -89,10 +90,11 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
     public static bool alreadyDropVertical = false;
     public static int blockId;
     public Vector2 blockPosition;
-    public static int velocityLimitation = 1; ///This is V0 in the whiteboard. This might be used as static value at the top of ABGameWorld.
-    public static List<Vector2> positionList; ///This must be public static
+    public static int velocityLimitation = 0; ///This is V0 in the whiteboard. This might be used as static value at the top of ABGameWorld.
+    public static List<List<Vector2>> positions; ///This must be public static
     public static float subsetStartPointX;
     public static float subsetStartPointY;
+    public static int velocityCount = 0;
 
     void Awake()
     {
@@ -117,7 +119,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
         _birds = new List<ABBird>();
         _birdTrajectory = new List<ABParticle>();
         _levelCleared = false;
-        positionList = new List<Vector2>();
+        positions = new List<List<Vector2>>();
 
         if (!_isSimulation)
         {
@@ -765,7 +767,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
         float cameraWidth = Mathf.Abs(minPosX - levelLeftBound) +
             Mathf.Max(Mathf.Abs(maxPosX - minPosX), Mathf.Abs(maxPosY - groundSurfacePos)) + 0.5f;
 
-        GameplayCam.SetCameraWidth(cameraWidth);
+        GameplayCam.SetCameraWidth(cameraWidth+15f);
     }
 
 
@@ -786,14 +788,11 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
             Vector2 force = new Vector2(1, 0);
             blockPosition = pos;
             Quaternion rotation = Quaternion.Euler(0, 0, 0);
-
             GameObject block = AddBlock(ABWorldAssets.BLOCKS["CircleSmall"], pos, rotation);
             MATERIALS material = (MATERIALS)System.Enum.Parse(typeof(MATERIALS), "stone");
             block.GetComponent<ABBlock>().SetMaterial(material);
             block.GetComponent<Rigidbody2D>().AddForce(force, ForceMode2D.Impulse);
             bulletPositionHorizonal++;
-
-            //blockId = block.GetInstanceID();
             block.tag = "test";
 
             if (bulletPositionHorizonal > horizontalTimes)
@@ -837,6 +836,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
             {
                 bulletPositionVertical = 0;
                 HorizontalStart = false;
+                velocityCount = 0;
                 NextLevel();
                 return;
             }
@@ -848,9 +848,6 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
             initx();
             alreadyDrop = false;
         }
-        //      if (IsLevelStable ()&&block.transform.position.y<5) {
-        //          initx ();
-        //      }
     }
 
     public static bool UsefulTag = false;
@@ -860,38 +857,36 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
     {
         if (!UsefulTag)
         {
-            //ABLevel addCircle = LevelList.Instance.GetCurrentLevel();
             foreach (Transform b in _blocksTransform)
             {
-                //recordTrace(b, addCircle);
-                //(Vector2.Distance(b.position, new Vector2(platformStartPoint, platformStartPointY)) > usefulDistance)
                 if ((b.tag != "test") && (b.position.y < platformStartPointY))
                 {
                     CheckTag = true;
                     if (b.position.y < -2.7)
                     {
-                        ABLevel Grounds = LevelList.Instance.GetCurrentLevel();
-                        if (!Grounds.grounds.Contains(b.position))
-                        {
-                            Grounds.grounds.Add(new Vector2(b.position.x,-6f));
-     
-                        }
-                        UsefulTag = true;
-                        print("useful one");
+                        
+                        print("useful one "+positions.Count);
 
-                        initx();
-                        GenerateSubset(positionList[positionList.Count - 1]);
-                        foreach (Vector2 groundsPosition in Grounds.grounds) 
-                        {
-                            GenerateSubset(groundsPosition);
 
+                        if (positions.Count != 0) {
+                            initx();
+                            UsefulTag = true;
+                            for (int i = 0; i < positions.Count;i++ ) {
+                                if (positions[i].Count > 0) {
+                                    GenerateSubset(positions[i][positions[i].Count - 1]);
+                                }
+                            }
+                            positions.Clear();
+                            velocityCount = 0;
                         }
-                        positionList.Clear();
                         AdaptCameraWidthToLevel();
                         LevelLoader.SaveLevelOnScene();
-                        NextLevel();
-
                         UsefulTag = false;
+                        NextLevel();
+                        if (UsefulTag) {
+                            return;
+                        }
+
                     }
 
                 }
@@ -912,43 +907,31 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
         }
     }
 
-    //public void recordTrace(Transform traceXY,ABLevel addCircle)
-    //{
-        
-        //if ((Vector2.Distance(traceXY.position, new Vector2(platformStartPoint, platformStartPointY)) > minicircle) && (Vector2.Distance(traceXY.position, new Vector2(platformStartPoint, platformStartPointY)) < maxcircle))
-        //{
-        //    if (!addCircle.triggers.Contains(traceXY.position))
-        //    {
-        //        addCircle.triggers.Add(traceXY.position);
-        //    }
-        //}
-        //print((LevelList.Instance.CurrentIndex + 1).ToString());
-        //print(blockPosition);
-        //StreamWriter recordLevel = new StreamWriter(System.Environment.CurrentDirectory + "/levelcheck.txt", true);
-        //ABLevel addStrigger = LevelList.Instance.GetCurrentLevel();
-        //if (!addStrigger.triggers.Contains(blockPosition))
-        //{
-        //    addStrigger.triggers.Add(blockPosition);
-        //}
-        //recordLevel.WriteLine((LevelList.Instance.CurrentIndex + 1).ToString() + blockPosition.ToString());
-        //recordLevel.Close();
-        //UsefulTag = true;
-    //}
-
     public void UpdateEveryNFrames(int repeatRate)
     {
         if (Time.frameCount % repeatRate != 0) {
             return;
         }
         if (true) {
-            //the method body that is supposed to run at a fixed frame rate
             foreach (Transform trans in GameObject.Find("Blocks").transform)
             {
+
                 var objVel = trans.GetComponent<Rigidbody2D>().velocity;
-                if (objVel.x > velocityLimitation && objVel.y < 4)
+                if (objVel.x > velocityLimitation && trans.position.x > -2.8) 
                 {
-                    positionList.Add(trans.position);
-                    //print("pos "+trans.position);
+                    if (positions.Count == 0) {
+                        for (int i = 0; i < 2 ; i++)
+                        {
+                            positions.Add(new List<Vector2>());
+                            print("D");
+                        }
+                    } else {
+                        if (trans.GetSiblingIndex()<2) {
+                            print(trans.GetSiblingIndex() + " POS " + trans.position + " " + trans.tag);
+                            positions[trans.GetSiblingIndex()].Add(trans.position);
+                        }
+                    }
+
                 }
             }
         }
@@ -961,7 +944,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
         int selectedLevel = Random.Range(4, 85);
         ABLevel generateSubset = LevelList.Instance.GetLevel(selectedLevel);
         LevelSimulator.GenerateSubset(generateSubset, position.x, position.y);
-        print("pos-gs "+position.x+" , "+position.y);
+        //print("pos-gs "+position.x+" , "+position.y);
     }
 
 }

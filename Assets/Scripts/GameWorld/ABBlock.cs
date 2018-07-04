@@ -30,6 +30,7 @@ public class ABBlock : ABGameObject {
 	public Sprite []_stoneSprites;
 	public Sprite []_iceSprites;
 
+
 	protected override void Awake() {
 
 		base.Awake();

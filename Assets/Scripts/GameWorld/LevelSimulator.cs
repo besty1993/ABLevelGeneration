@@ -7,10 +7,11 @@ using System.Collections.Generic;
 public class LevelSimulator {
 
     public static bool Generatelevel = true;
+    public static float platformSize = 0.62f;
+    public static int platformCount = 0;
+    public static float firstplatformX;
+    public static float firstplatformY;
 	// False : Evaluate Subset	True : Generate Level
-    
-	public LevelSimulator () {
-	}
 
 	public static void SetSubsetTrigger (ABLevel subset, float x, float y) {
 		subset.triggerX = x;
@@ -45,31 +46,44 @@ public class LevelSimulator {
 	}
 
     public static void GenerateSubset (ABLevel subset, float x, float y) {
+        
+        foreach (PlatData gameObj in subset.platforms)
+        {
+            if (platformCount == 0)
+            {
+                firstplatformX = gameObj.x;
+                firstplatformY = gameObj.y;
+            }
+            //Debug.Log(gameObj.x + ", " + gameObj.y + ", " + x + ", " + y);
+            Vector2 pos = new Vector2(Mathf.Abs((Mathf.Abs(firstplatformX) - Mathf.Abs(gameObj.x))) + x, (Mathf.Abs(Mathf.Abs(firstplatformY) - Mathf.Abs(gameObj.y)) + y));
+            Quaternion rotation = Quaternion.Euler(0, 0, gameObj.rotation);
+            ABGameWorld.Instance.AddPlatform(ABWorldAssets.PLATFORM, pos, rotation, gameObj.scaleX, gameObj.scaleY);
+            platformCount++;
+        }
+
 		foreach (OBjData gameObj in subset.pigs) {
-            Vector2 pos = new Vector2 (gameObj.x + x, gameObj.y + y);
+            Vector2 pos = new Vector2(Mathf.Abs((Mathf.Abs(firstplatformX) - Mathf.Abs(gameObj.x))) + x, (Mathf.Abs(Mathf.Abs(firstplatformY) - Mathf.Abs(gameObj.y)) + y));
+            //Debug.Log(gameObj.type+", "+pos+", "+gameObj.x+", "+x+", "+gameObj.y+", "+y);
 			Quaternion rotation = Quaternion.Euler (0, 0, gameObj.rotation);
 			ABGameWorld.Instance.AddPig(ABWorldAssets.PIGS[gameObj.type], pos, rotation);
 		}
 
 		foreach(BlockData gameObj in subset.blocks) {
-            Vector2 pos = new Vector2 (gameObj.x + x, gameObj.y + y);
+            Vector2 pos = new Vector2(Mathf.Abs((Mathf.Abs(firstplatformX) - Mathf.Abs(gameObj.x))) + x, (Mathf.Abs(Mathf.Abs(firstplatformY) - Mathf.Abs(gameObj.y)) + y));
+            //Debug.Log(gameObj.type + ", " + pos + ", " + gameObj.x + ", " + x + ", " + gameObj.y + ", " + y);
 			Quaternion rotation = Quaternion.Euler (0, 0, gameObj.rotation);
 			GameObject block = ABGameWorld.Instance.AddBlock(ABWorldAssets.BLOCKS[gameObj.type], pos,  rotation);
 			MATERIALS material = (MATERIALS)System.Enum.Parse(typeof(MATERIALS), gameObj.material);
 			block.GetComponent<ABBlock> ().SetMaterial (material);
 		}
 
-		foreach(PlatData gameObj in subset.platforms) {
-            Vector2 pos = new Vector2 (gameObj.x + x, gameObj.y + y);
-			Quaternion rotation = Quaternion.Euler (0, 0, gameObj.rotation);
-            ABGameWorld.Instance.AddPlatform(ABWorldAssets.PLATFORM, pos, rotation, gameObj.scaleX, gameObj.scaleY);
-   		}
-
 		foreach(OBjData gameObj in subset.tnts) {
-            Vector2 pos = new Vector2 (gameObj.x + x, gameObj.y + y);
+            Vector2 pos = new Vector2(Mathf.Abs((Mathf.Abs(firstplatformX) - Mathf.Abs(gameObj.x))) + x, (Mathf.Abs(Mathf.Abs(firstplatformY) - Mathf.Abs(gameObj.y)) + y));
+            //Debug.Log(gameObj.type + ", " + pos + ", " + gameObj.x + ", " + x + ", " + gameObj.y + ", " + y);
 			Quaternion rotation = Quaternion.Euler (0, 0, gameObj.rotation);
 			ABGameWorld.Instance.AddBlock(ABWorldAssets.TNT, pos, rotation);
 		}
+        platformCount = 0;
 	}
 
     public static void DestroySubset (ABLevel subset) {
