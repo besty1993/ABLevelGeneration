@@ -86,23 +86,23 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
     public static double maxcircle = 2;
     public static bool alreadyDropHorizontal = false;
     public static bool HorizontalStart = false;
-    //public static bool VerticalStart =true;
+    //public static bool VerticalStart = true;
     public static bool alreadyDropVertical = false;
     public static int blockId;
     public Vector2 blockPosition;
-    public static int velocityLimitation = 0; ///This is V0 in the whiteboard. This might be used as static value at the top of ABGameWorld.
-    public static List<List<Vector2>> positions; ///This must be public static
+    public static int velocityLimitation = 0;
+    public static List<List<Vector2>> positions;
     public static float subsetStartPointX;
     public static float subsetStartPointY;
     public static int velocityCount = 0;
+    public static bool isGenerateSubset = false;
+    public static bool isGenerateGround = false;
 
     void Awake()
     {
-
         _blocksTransform = GameObject.Find("Blocks").transform;
         _birdsTransform = GameObject.Find("Birds").transform;
         _plaftformsTransform = GameObject.Find("Platforms").transform;
-
         _levelFailedBanner = GameObject.Find("LevelFailedBanner").gameObject;
         _levelFailedBanner.gameObject.SetActive(false);
 
@@ -166,6 +166,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
 
     public void initx()
     {
+        print("initx");
         ClearWorld();
 
         if (_levelFailedBanner.activeSelf)
@@ -314,6 +315,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
     void Update()
     {
         // Check if birds was trown, if it died and swap them when needed
+
         ManageBirds();
         //Evaluate Subsets
         //if (CheckTNT())
@@ -322,6 +324,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
         //}
         //else
         //{
+        if (!UsefulTag) {
             if (!HorizontalStart)
             {
                 SubsetSimulationHorizontal();
@@ -332,13 +335,16 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
             }
             CheckUseful(); //check useful levels
             UpdateEveryNFrames(10);
+        } else {
+            if (Time.frameCount % 120 == 0) {
+                UsefulTag = false;
+                isGenerateSubset = false;
+                NextLevel();
+            }
+        }
         //}
             
     }
-
-    //	void UpdatePerFrame (int frame) {
-    //		if ()
-    //	}
 
     public bool IsObjectOutOfWorld(Transform abGameObject, Collider2D abCollider)
     {
@@ -393,11 +399,9 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
         bulletPositionHorizonal = 0;
         bulletPositionVertical = 0;
         if (LevelList.Instance.NextLevel() == null)
-
             ABSceneManager.Instance.LoadScene("MainMenu");
         else
         {
-
             ABSceneManager.Instance.LoadScene(SceneManager.GetActiveScene().name);
 
         }
@@ -719,15 +723,18 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
 
     public void ClearWorld()
     {
-        foreach (Transform b in _blocksTransform)
+        foreach (Transform b in _blocksTransform) {
             DestroyImmediate(b.gameObject);
-        
-        foreach (Transform b in _birdsTransform)
-            Destroy(b.gameObject);
+        }
 
-        foreach (Transform b in _plaftformsTransform)
+        foreach (Transform b in _birdsTransform) {
+            DestroyImmediate(b.gameObject);
+        }
+
+        foreach (Transform b in _plaftformsTransform) {
             Destroy(b.gameObject);
-        
+        }
+
         _pigs.Clear();
         _birds.Clear();
     }
@@ -783,7 +790,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
         {
             float y = bulletPositionHorizonal * 0.62f + platformStartPointY + 0.4f;
             float x = platformStartPoint - 2f;
-
+            initx();
             Vector2 pos = new Vector2(x, y);
             Vector2 force = new Vector2(1, 0);
             blockPosition = pos;
@@ -821,12 +828,12 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
         {
             float x = bulletPositionVertical * 0.62f + platformStartPoint - 2f;
             float y = platformStartPointY + 4f;
+            initx();
             Vector2 pos = new Vector2(x, y);
             blockPosition = pos;
             Vector2 force = new Vector2(0, -0.5f);
             Quaternion rotation = Quaternion.Euler(0, 0, 0);
             GameObject block = AddBlock(ABWorldAssets.BLOCKS["CircleSmall"], pos, rotation);
-            //blockId = block.GetInstanceID();
             block.tag = "test";
             block.GetComponent<Rigidbody2D>().AddForce(force, ForceMode2D.Impulse);
             MATERIALS material = (MATERIALS)System.Enum.Parse(typeof(MATERIALS), "stone");
@@ -861,31 +868,51 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
             {
                 if ((b.tag != "test") && (b.position.y < platformStartPointY))
                 {
-                    CheckTag = true;
                     if (b.position.y < -2.7)
                     {
-                        
-                        print("useful one "+positions.Count);
+                        CheckTag = true;
+                        UsefulTag = true;
+                        print("useful one ");
+                        print("-pos count "+ positions.Count);
+                        foreach (List<Vector2> pos in positions) {
+                            if (pos.Count != 0)
+                            {
+                                initx();
 
+                                for (int i = 0; i < positions.Count; i++)
+                                {
+                                    if (positions[i].Count > 0)
+                                    {
+                                        GenerateSubset(positions[i][positions[i].Count - 1]);
+                                        isGenerateSubset = true;
 
-                        if (positions.Count != 0) {
-                            initx();
-                            UsefulTag = true;
-                            for (int i = 0; i < positions.Count;i++ ) {
-                                if (positions[i].Count > 0) {
-                                    GenerateSubset(positions[i][positions[i].Count - 1]);
+                                    }
                                 }
                             }
-                            positions.Clear();
-                            velocityCount = 0;
                         }
+
+                        positions.Clear();
+                        velocityCount = 0;
                         AdaptCameraWidthToLevel();
-                        LevelLoader.SaveLevelOnScene();
-                        UsefulTag = false;
-                        NextLevel();
-                        if (UsefulTag) {
-                            return;
+
+
+                        if (isGenerateSubset) {
+                            print("SAVE.");
+                            LevelLoader.SaveLevelOnScene();
+                            ABLevel ground = LevelList.Instance.GetCurrentLevel();
+                            for (int i = 0; i < ground.grounds.Count;i++) {
+                                print("gggg " + ground.grounds[i]);
+                            }
+                            //if () {
+                            //    isGenerateGround = true;
+                            //}
+
+
+                            //
                         }
+                        //if (UsefulTag) {
+                        //    UsefulTag = false;
+                        //}
 
                     }
 
@@ -912,7 +939,8 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
         if (Time.frameCount % repeatRate != 0) {
             return;
         }
-        if (true) {
+        if (true)
+        {
             foreach (Transform trans in GameObject.Find("Blocks").transform)
             {
 
@@ -926,12 +954,25 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
                             print("D");
                         }
                     } else {
-                        if (trans.GetSiblingIndex()<2) {
-                            print(trans.GetSiblingIndex() + " POS " + trans.position + " " + trans.tag);
-                            positions[trans.GetSiblingIndex()].Add(trans.position);
+                        if ((trans.GetSiblingIndex() < 2)  && (trans.position.x > 1) && (trans.position.y < 12))
+                        {
+                            if (trans.GetSiblingIndex() == 0) {
+                                positions[trans.GetSiblingIndex()].Add(trans.position);
+                            } else {
+                                for (int i = 0; i < positions.Count; i++)
+                                {
+                                    for (int j = 0; j < positions[i].Count; j++)
+                                    {
+                                        if ((trans.GetSiblingIndex() != i) && (trans.position.x > positions[i][j].x + 2.0f || trans.position.x < positions[i][j].x + 2.0f) && (trans.position.y > positions[i][j].y + 2.0f || trans.position.y < positions[i][j].y + 2.0f))
+                                        {
+                                            positions[trans.GetSiblingIndex()].Add(trans.position);
+                                            print(trans.GetSiblingIndex() + " POS " + trans.position + " " + trans.tag);
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
-
                 }
             }
         }
@@ -943,8 +984,8 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
         ABLevel abLevel = LevelList.Instance.GetCurrentLevel();
         int selectedLevel = Random.Range(4, 85);
         ABLevel generateSubset = LevelList.Instance.GetLevel(selectedLevel);
-        LevelSimulator.GenerateSubset(generateSubset, position.x, position.y);
-        //print("pos-gs "+position.x+" , "+position.y);
+        LevelSimulator.GenerateSubset(generateSubset, position.x - 1f, position.y);
+        print("pos-gs "+position.x+" , "+position.y);
     }
 
 }

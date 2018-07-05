@@ -97,6 +97,17 @@ public class ABBlock : ABGameObject {
             }
            
         }
+        if (collision.gameObject.name == "Ground")
+        {
+            ABLevel addPoints = LevelList.Instance.GetCurrentLevel();
+            foreach (ContactPoint2D groundPoint in collision.contacts)
+            {
+                if (!addPoints.grounds.Contains(groundPoint.point.x) && groundPoint.point.x <= 5)
+                {
+                    addPoints.grounds.Add(groundPoint.point.x);
+                }
+            }
+        }
         if (collision.gameObject.tag == "Bird") {
 
             ABBird bird = collision.gameObject.GetComponent<ABBird>();
