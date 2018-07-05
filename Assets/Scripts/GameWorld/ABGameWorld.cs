@@ -208,11 +208,10 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
         _plaftformsTransform = GameObject.Find("Platforms").transform;
 
         HUD.Instance.gameObject.SetActive(true);
-        if (LevelSimulator.Generatelevel == false)
-        {
-            UsefulTag = false;
-            CheckTag = false;
-        }
+        //if (LevelSimulator.Generatelevel == false)
+        //{
+        //    UsefulTag = false;
+        //}
     }
 
     public void DecodeLevel(ABLevel currentLevel)
@@ -355,8 +354,6 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
                         CheckUseful();
                 }
          }
-           
-        
     }
 
     //	void UpdatePerFrame (int frame) {
@@ -406,12 +403,12 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
 
     public void NextLevel()
     {
-        if (!UsefulTag)
-        {
-            StreamWriter recordLevel = new StreamWriter(System.Environment.CurrentDirectory + "/Assets/StreamingAssets/Levels/levelcheck.txt", true);
-            recordLevel.WriteLine((LevelList.Instance.CurrentIndex).ToString());
-            recordLevel.Close();
-        }
+        //if (!UsefulTag)
+        //{
+        //    StreamWriter recordLevel = new StreamWriter(System.Environment.CurrentDirectory + "/Assets/StreamingAssets/Levels/levelcheck.txt", true);
+        //    recordLevel.WriteLine((LevelList.Instance.CurrentIndex).ToString());
+        //    recordLevel.Close();
+        //}
         bulletPositionHorizonal = 0;
         bulletPositionVertical = 0;
         if (LevelList.Instance.NextLevel() == null)
@@ -880,12 +877,10 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
 
     }
     public ABLevel Check = LevelList.Instance.GetCurrentLevel();
-    public static bool UsefulTag = false;
-    public static bool CheckTag = false;
     public void CheckUseful()
     {
         
-        if (!UsefulTag)
+        if (!Check.usefulLevel)
         {
             
             foreach (Transform b in _blocksTransform)
@@ -893,11 +888,12 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
                 
                 if ((b.tag!="test") && (b.position.y < platformStartPointY))
                 {
-                    CheckTag = true;
+                    Check.horizontalCheck = true;
                     if (Check.grounds.Count>0)
                     {
                         print("usefule one");
-                        UsefulTag = true;
+                        Check.usefulLevel = true;
+                        //UsefulTag = true;
                         if(IsLevelStable())
                             NextLevel();
                     }

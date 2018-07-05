@@ -121,8 +121,9 @@ public class ABLevel
 	public List<BlockData> blocks;
 	public List<PlatData>  platforms;
     public List<float> grounds;
-
     public float triggerX, triggerY;
+    public bool usefulLevel;
+    public bool horizontalCheck;
    
 
 	public static readonly int BIRDS_MAX_AMOUNT = 5;
@@ -130,7 +131,8 @@ public class ABLevel
 	public ABLevel() {
 
 		width = 1;
-
+        usefulLevel = false;
+        horizontalCheck = false;
 		pigs      = new List<OBjData>();
 		tnts      = new List<OBjData>();
 		blocks    = new List<BlockData>();
