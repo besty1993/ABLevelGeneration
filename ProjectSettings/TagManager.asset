@@ -15,6 +15,7 @@ TagManager:
   - Question
   - Triangle
   - test
+  - TNT
   layers:
   - Default
   - TransparentFX

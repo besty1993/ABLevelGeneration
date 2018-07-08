@@ -73,7 +73,7 @@ ground_structure_height_limit = ((level_height_max - minimum_height_gap) - absol
 max_attempts = 100                          # number of times to attempt to place a platform before abandoning it
 
 simple_level = True
-simple_level_prob = 1.0
+simple_level_prob = 0.3
 
 
 

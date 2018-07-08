@@ -847,12 +847,12 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
             float y = platformStartPointY + 4f;
             Vector2 pos = new Vector2(x, y);
             blockPosition = pos;
-            Vector2 force = new Vector2(0, -0.5f);
+            Vector2 force = new Vector2(0, -1f);
             Quaternion rotation = Quaternion.Euler(0, 0, 0);
             GameObject block = AddBlock(ABWorldAssets.BLOCKS["CircleSmall"], pos, rotation);
             //blockId = block.GetInstanceID();
             block.tag = "test";
-            block.GetComponent<Rigidbody2D>().AddForce(force, ForceMode2D.Impulse);
+			block.GetComponent<Rigidbody2D>().AddForce(force, ForceMode2D.Impulse);
             MATERIALS material = (MATERIALS)System.Enum.Parse(typeof(MATERIALS), "stone");
             block.GetComponent<ABBlock>().SetMaterial(material);
             bulletPositionVertical++;

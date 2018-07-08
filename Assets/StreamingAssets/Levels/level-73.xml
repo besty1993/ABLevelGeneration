@@ -2,22 +2,27 @@
 <Level width ="2">
 <Camera x="0" y="2" minWidth="20" maxWidth="30">
 <Birds>
-<Bird type="BirdRed"/>
-<Bird type="BirdRed"/>
+<Bird type="BirdWhite"/>
+<Bird type="BirdBlue"/>
 </Birds>
 <Slingshot x="-8" y="-2.5">
 <GameObjects>
-<Block type="RectSmall" material="ice" x="-1.3805715023" y="3.42" rotation="0" />
-<Block type="RectTiny" material="stone" x="-1.3805715023" y="3.64" rotation="0" />
-<Block type="SquareSmall" material="stone" x="-1.3805715023" y="3.965" rotation="0" />
-<Block type="RectTiny" material="wood" x="-1.3805715023" y="4.29" rotation="0" />
-<Block type="RectFat" material="stone" x="-1.3805715023" y="4.825" rotation="90" />
-<Block type="RectTiny" material="wood" x="-1.38057150232" y="5.465" rotation="90" />
-<Pig type="BasicSmall" material="" x="-1.3805715023" y="5.93" rotation="0" />
+<Block type="RectMedium" material="stone" x="-2.23" y="4.15" rotation="90" />
+<Block type="RectMedium" material="stone" x="-1.53" y="4.15" rotation="90" />
+<Block type="RectMedium" material="stone" x="-0.83" y="4.15" rotation="90" />
+<Block type="RectMedium" material="wood" x="-0.13" y="4.15" rotation="90" />
+<Block type="RectMedium" material="ice" x="0.57" y="4.15" rotation="90" />
+<Block type="TriangleHole" material="stone" x="-2.23" y="5.4" rotation="0" />
+<Block type="TriangleHole" material="ice" x="-0.13" y="5.4" rotation="0" />
+<Block type="CircleSmall" material="wood" x="0.57" y="5.215" rotation="0" />
+<Block type="CircleSmall" material="stone" x="-0.83" y="5.215" rotation="0" />
 <Platform type="Platform" material="" x="-2.69" y="3" />
 <Platform type="Platform" material="" x="-2.07" y="3" />
 <Platform type="Platform" material="" x="-1.45" y="3" />
 <Platform type="Platform" material="" x="-0.83" y="3" />
-<TNT type="" material="" x="-2.82" y="3.67" rotation="0" />
+<Platform type="Platform" material="" x="-0.21" y="3" />
+<Platform type="Platform" material="" x="0.41" y="3" />
+<Platform type="Platform" material="" x="1.03" y="3" />
+<TNT type="" material="" x="-1.53" y="5.24" rotation="0" />
 </GameObjects>
 </Level>

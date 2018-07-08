@@ -7,12 +7,29 @@
 </Birds>
 <Slingshot x="-8" y="-2.5">
 <GameObjects>
-<Block type="RectTiny" material="stone" x="-2.3467653274" y="3.42" rotation="0" />
-<Pig type="BasicSmall" material="" x="-2.3467653274" y="3.78" rotation="0" />
+<Block type="RectSmall" material="stone" x="-2.795" y="3.735" rotation="90" />
+<Block type="RectSmall" material="wood" x="-2.165" y="3.735" rotation="90" />
+<Block type="RectSmall" material="ice" x="-1.765" y="3.735" rotation="90" />
+<Block type="RectSmall" material="ice" x="-1.135" y="3.735" rotation="90" />
+<Block type="RectSmall" material="stone" x="-0.735" y="3.735" rotation="90" />
+<Block type="RectSmall" material="wood" x="-0.105" y="3.735" rotation="90" />
+<Block type="RectTiny" material="stone" x="-2.795" y="4.375" rotation="90" />
+<Block type="RectTiny" material="stone" x="-2.165" y="4.375" rotation="90" />
+<Block type="RectTiny" material="ice" x="-1.765" y="4.375" rotation="90" />
+<Block type="RectTiny" material="stone" x="-1.135" y="4.375" rotation="90" />
+<Block type="RectTiny" material="stone" x="-0.735" y="4.375" rotation="90" />
+<Block type="RectTiny" material="ice" x="-0.105" y="4.375" rotation="90" />
+<Block type="RectSmall" material="stone" x="-2.48" y="4.7" rotation="0" />
+<Block type="RectSmall" material="wood" x="-1.45" y="4.7" rotation="0" />
+<Block type="RectSmall" material="wood" x="-0.42" y="4.7" rotation="0" />
+<Block type="CircleSmall" material="stone" x="-2.7633333333" y="5.035" rotation="0" />
+<Pig type="BasicSmall" material="" x="-0.7033333333" y="5.06" rotation="0" />
 <Platform type="Platform" material="" x="-2.69" y="3" />
 <Platform type="Platform" material="" x="-2.07" y="3" />
 <Platform type="Platform" material="" x="-1.45" y="3" />
 <Platform type="Platform" material="" x="-0.83" y="3" />
-<TNT type="" material="" x="-2.82" y="3.67" rotation="0" />
+<Platform type="Platform" material="" x="-0.21" y="3" />
+<TNT type="" material="" x="-0.1366666667" y="5.06" rotation="0" />
+<TNT type="" material="" x="-1.7333333333" y="5.06" rotation="0" />
 </GameObjects>
 </Level>
