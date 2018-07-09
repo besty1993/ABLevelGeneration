@@ -124,6 +124,7 @@ public class ABLevel
     public float triggerX, triggerY;
     public bool usefulLevel;
     public bool horizontalCheck;
+    public bool levelShaking;
    
 
 	public static readonly int BIRDS_MAX_AMOUNT = 5;
@@ -131,8 +132,8 @@ public class ABLevel
 	public ABLevel() {
 
 		width = 1;
-        usefulLevel = false;
         horizontalCheck = false;
+        levelShaking = false;
 		pigs      = new List<OBjData>();
 		tnts      = new List<OBjData>();
 		blocks    = new List<BlockData>();
