@@ -78,11 +78,12 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
 
 
     /// /// For Subset
-    public static float platformStartPoint;
+    ABLevel Check = LevelList.Instance.GetCurrentLevel();
+    public static float platformStartPoint = 999f;
     public static float platformStartPointY;
     public static int bulletPositionVertical = 0;
     public static int bulletPositionHorizonal = 0;
-    public static int verticalTimes = 5;
+    public int verticalTimes;
     public static int horizontalTimes = 5;
     public static double usefulDistance = 3;
     public static double minicircle = 1;
@@ -92,6 +93,9 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
     public static bool alreadyDropVertical = false;
     public static int blockId;
     public Vector2 blockPosition;
+    public int PlatformCount;
+    public float LevelMaxSpeed = 0f;
+
 
     void Awake()
     {
@@ -117,6 +121,8 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
         _birdTrajectory = new List<ABParticle>();
         _levelLoader = new LevelLoader();
         _levelCleared = false;
+
+
 
         if (!_isSimulation)
         {
@@ -172,6 +178,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
         if (_isSimulation)
         {
             Time.timeScale = 1;
+            PlatformCount = Check.platforms.Count;
         }
     }
 
@@ -298,7 +305,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
 
         foreach (PlatData gameObj in currentLevel.platforms)
         {
-            if (_isSimulation )//&& platformStartPoint > gameObj.x)
+            if ((_isSimulation) && platformStartPoint > gameObj.x)
             {
                 platformStartPoint = gameObj.x;
                 platformStartPointY = gameObj.y;
@@ -327,6 +334,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
     }
 
     // Update is called once per frame
+    bool PreLevelCheck = false;
     void Update()
     {
 
@@ -335,30 +343,34 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
         //Evaluate Subsets
         if (!LevelSimulator.Generatelevel)
         {
-           
-                if(IsLevelStable() && CheckTNT())
+            if (!PreLevelCheck)
+            {
+                LevelShaking();   
+                if (IsLevelStable())
                 {
-                    NextLevel();
+                    if(CheckTNT() || Check.levelShaking)
+                        NextLevel();
+                    PreLevelCheck = true;
+                }
+                
+            }
+            else
+            {
+                if (!HorizontalStart)
+                {
+                    SubsetSimulationHorizontal();
                 }
                 else
                 {
-                if (!HorizontalStart)
-                        {
-                            SubsetSimulationHorizontal();
-                        }
-                        else
-                        {
-                            SubsetSimulationVertical();
-                        }
-                        //check useful levels
-                        CheckUseful();
+                    SubsetSimulationVertical();
                 }
-         }
+                //check useful levels
+                CheckUseful();
+            }
+        }
     }
 
-    //	void UpdatePerFrame (int frame) {
-    //		if ()
-    //	}
+
 
     public bool IsObjectOutOfWorld(Transform abGameObject, Collider2D abCollider)
     {
@@ -411,6 +423,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
         //}
         bulletPositionHorizonal = 0;
         bulletPositionVertical = 0;
+        platformStartPoint = 999f;
         if (LevelList.Instance.NextLevel() == null)
 
             ABSceneManager.Instance.LoadScene("MainMenu");
@@ -803,12 +816,11 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
 
         if (!alreadyDropHorizontal)
         {
-            float y = bulletPositionHorizonal * 0.62f + platformStartPointY + 0.4f;
-            float x = platformStartPoint - 2f;
+            float y = bulletPositionHorizonal * 0.62f + platformStartPointY + 0.5f;
+            float x = platformStartPoint - 0.62f;
 
             Vector2 pos = new Vector2(x, y);
             Vector2 force = new Vector2(1, 0);
-            blockPosition = pos;
             Quaternion rotation = Quaternion.Euler(0, 0, 0);
 
             GameObject block = AddBlock(ABWorldAssets.BLOCKS["CircleSmall"], pos, rotation);
@@ -835,22 +847,20 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
 
     }
 
-    public static bool alreadyDrop = false;
     private void SubsetSimulationVertical()
     {
         if (!_isSimulation || !IsLevelStable())
             return;
 
-        if (!alreadyDrop)
+        if (!alreadyDropVertical)
         {
-            float x = bulletPositionVertical * 0.62f + platformStartPoint - 2f;
-            float y = platformStartPointY + 4f;
+            verticalTimes = Check.platforms.Count + 1;
+            float x = bulletPositionVertical * 0.62f + platformStartPoint - 0.32f;
+            float y = platformStartPointY + 5f;
             Vector2 pos = new Vector2(x, y);
-            blockPosition = pos;
-            Vector2 force = new Vector2(0, -0.5f);
+            Vector2 force = new Vector2(0, -2f);
             Quaternion rotation = Quaternion.Euler(0, 0, 0);
             GameObject block = AddBlock(ABWorldAssets.BLOCKS["CircleSmall"], pos, rotation);
-            //blockId = block.GetInstanceID();
             block.tag = "test";
             block.GetComponent<Rigidbody2D>().AddForce(force, ForceMode2D.Impulse);
             MATERIALS material = (MATERIALS)System.Enum.Parse(typeof(MATERIALS), "stone");
@@ -864,46 +874,40 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
                 return;
             }
 
-            alreadyDrop = true;
+            alreadyDropVertical = true;
         }
         else
         {
             initx();
-            alreadyDrop = false;
+            alreadyDropVertical = false;
         }
         //		if (IsLevelStable ()&&block.transform.position.y<5) {
         //			initx ();
         //		}
 
     }
-    public ABLevel Check = LevelList.Instance.GetCurrentLevel();
+
     public void CheckUseful()
     {
-        
-        if (!Check.usefulLevel)
-        {
-            
             foreach (Transform b in _blocksTransform)
             {
-                
-                if ((b.tag!="test") && (b.position.y < platformStartPointY))
+
+                if ((b.tag != "test") && (b.position.y < platformStartPointY))
                 {
                     Check.horizontalCheck = true;
-                    if (Check.grounds.Count>0)
+                    if (Check.grounds.Count > 0)
                     {
-                        print("usefule one");
+                        //print("usefule one");
                         Check.usefulLevel = true;
-                        //UsefulTag = true;
-                        if(IsLevelStable())
+                        if (IsLevelStable())
                             NextLevel();
                     }
                 }
             }
-        }
-        
     }
 
-    public bool CheckTNT() {
+    public bool CheckTNT()
+    {
         if (Check.tnts.Count != 0)
         {
 
@@ -911,33 +915,41 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
             Check.triggerY = GameObject.FindGameObjectWithTag("TNT").transform.position.y;
             return true;
         }
-        else {
+        else
+        {
             return false;
         }
     }
 
 
+    public void LevelShaking() {
+        foreach (Transform block in _blocksTransform)
+        {
+            if (block.GetComponent<Rigidbody2D>().velocity.magnitude > 0.2f)
+            {
+                Check.levelShaking = true;
+                Check.usefulLevel = false;
+            }
+                
+        }
+    }
 
-    //public void recordTrace(Transform traceXY,ABLevel addCircle)
+
+
+    //CheckShaking();
+    //if (IsLevelStable())
     //{
-        
-    //    if ((Vector2.Distance(traceXY.position, new Vector2(platformStartPoint, platformStartPointY)) > minicircle) && (Vector2.Distance(traceXY.position, new Vector2(platformStartPoint, platformStartPointY)) < maxcircle))
-    //    {
-    //        if (!addCircle.triggers.Contains(traceXY.position))
-    //        {
-    //            addCircle.triggers.Add(traceXY.position);
-    //        }
-    //    }
-        //print((LevelList.Instance.CurrentIndex + 1).ToString());
-        //print(blockPosition);
-        //StreamWriter recordLevel = new StreamWriter(System.Environment.CurrentDirectory + "/levelcheck.txt", true);
-        //ABLevel addStrigger = LevelList.Instance.GetCurrentLevel();
-        //if (!addStrigger.triggers.Contains(blockPosition))
-        //{
-        //    addStrigger.triggers.Add(blockPosition);
-        //}
-        //recordLevel.WriteLine((LevelList.Instance.CurrentIndex + 1).ToString() + blockPosition.ToString());
-        //recordLevel.Close();
-        //UsefulTag = true;
+    //    NextLevel();
     //}
+    //public void CheckShaking()
+    //{
+    //    foreach (Transform block in _blocksTransform) {
+    //        if (block.GetComponent<Rigidbody2D>().velocity.magnitude > LevelMaxSpeed)
+    //            LevelMaxSpeed = block.GetComponent<Rigidbody2D>().velocity.magnitude;
+    //    }
+    //    StreamWriter recordLevel = new StreamWriter(System.Environment.CurrentDirectory + "/Assets/StreamingAssets/Levels/levelcheck.txt", true);
+    //    recordLevel.WriteLine((LevelList.Instance.CurrentIndex).ToString()+":"+LevelMaxSpeed);
+    //    recordLevel.Close();
+    //}
+
 }
