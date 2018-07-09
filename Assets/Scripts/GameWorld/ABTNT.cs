@@ -36,6 +36,13 @@ public class ABTNT : ABGameObject {
 				
 				coll.attachedRigidbody.AddForce (direction * (explosionPower / (distance * 2f)), ForceMode2D.Impulse);
 			}
+
+            if (coll.gameObject.name == "TNT(Clone)" && coll.gameObject.tag=="Untagged")
+            {
+                ABLevel abLevel = LevelList.Instance.GetCurrentLevel();
+                abLevel.isTNTExplode = true;
+                //print("TNT: " + coll.gameObject.tag);
+            }
 		}
 
 	}

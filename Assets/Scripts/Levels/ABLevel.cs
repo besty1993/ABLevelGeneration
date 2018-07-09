@@ -123,6 +123,7 @@ public class ABLevel
     public List<Vector2> triggers;
     public List<float> grounds;
     public float triggerX, triggerY;
+    public bool isTNTExplode;
    
 
 	public static readonly int BIRDS_MAX_AMOUNT = 5;
@@ -130,7 +131,7 @@ public class ABLevel
 	public ABLevel() {
 
 		width = 1;
-
+        isTNTExplode = false;
 		pigs      = new List<OBjData>();
 		tnts      = new List<OBjData>();
 		blocks    = new List<BlockData>();

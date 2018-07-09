@@ -83,9 +83,9 @@ public class ABBlock : ABGameObject {
 
 	public override void OnCollisionEnter2D(Collision2D collision)
     {
-        
         if (collision.gameObject.tag == "test")
         {
+            //print("Test: ");
             ABLevel addStriggerXY = LevelList.Instance.GetCurrentLevel();
             foreach (ContactPoint2D striggerPoint in collision.contacts) {
                 addStriggerXY.triggerX = striggerPoint.point.x;
@@ -97,17 +97,25 @@ public class ABBlock : ABGameObject {
             }
            
         }
-        if (collision.gameObject.name == "Ground")
+        if (collision.gameObject.name == "Ground" && collision.gameObject.tag != "test")
         {
             ABLevel addPoints = LevelList.Instance.GetCurrentLevel();
             foreach (ContactPoint2D groundPoint in collision.contacts)
             {
-                if (!addPoints.grounds.Contains(groundPoint.point.x) && groundPoint.point.x <= 5)
+                if (!addPoints.grounds.Contains(groundPoint.point.x) && groundPoint.point.x <= 14)
                 {
-                    addPoints.grounds.Add(groundPoint.point.x);
+                    if (addPoints.grounds.Count == 0) {
+                        addPoints.grounds.Add(groundPoint.point.x);
+                    } else {
+                        if (addPoints.grounds[0] + 5.0f < groundPoint.point.x && addPoints.grounds[0] - 5.0f < groundPoint.point.x) {
+                            addPoints.grounds.Add(groundPoint.point.x);
+                        }
+                    }
                 }
+
             }
         }
+
         if (collision.gameObject.tag == "Bird") {
 
             ABBird bird = collision.gameObject.GetComponent<ABBird>();

@@ -286,23 +286,33 @@ public class LevelLoader {
 
         foreach (Transform child in GameObject.Find("Blocks").transform) 
         {
-            string type = child.name;
-            float x = child.transform.position.x;
-            float y = child.transform.position.y;
-            float rotation = child.transform.rotation.eulerAngles.z;
+            //Debug.Log("name: "+child.name);
+            if (child.name !="CircleSmall(Clone)" && child.tag != "test") {
+                string type = child.name;
+                float x = child.transform.position.x;
+                float y = child.transform.position.y;
+                float rotation = child.transform.rotation.eulerAngles.z;
 
-            if (child.GetComponent<ABPig>() != null)
-            {
-                level.pigs.Add(new OBjData(type, rotation, x, y));
-            }
-            else if (child.GetComponent<ABBlock>() != null)
-            {
-                string material = child.GetComponent<ABBlock>()._material.ToString();
-                level.blocks.Add(new BlockData(type, rotation, x, y, material));
-            }
-            else if (child.GetComponent<ABTNT>() != null)
-            {
-                level.tnts.Add(new OBjData(type, rotation, x, y));
+                if (child.GetComponent<ABPig>() != null)
+                {
+                    level.pigs.Add(new OBjData(type, rotation, x, y));
+                }
+                else if (child.GetComponent<ABBlock>() != null)
+                {
+                    string material = child.GetComponent<ABBlock>()._material.ToString();
+                    level.blocks.Add(new BlockData(type, rotation, x, y, material));
+                }
+                else if (child.GetComponent<ABTNT>() != null)
+                {
+                    level.tnts.Add(new OBjData(type, rotation, x, y));
+                }
+            } else {
+                if (child.name == "TNT(Clone)") {
+                    if (child.GetComponent<ABTNT>() != null)
+                    {
+                        level.tnts.Add(new OBjData(child.name, child.transform.rotation.eulerAngles.z, child.transform.position.x, child.transform.position.y));
+                    }
+                }
             }
         }
 

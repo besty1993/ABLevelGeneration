@@ -61,6 +61,14 @@ public class LevelSimulator {
             platformCount++;
         }
 
+        foreach (OBjData gameObj in subset.tnts)
+        {
+            Vector2 pos = new Vector2(Mathf.Abs((Mathf.Abs(firstplatformX) - Mathf.Abs(gameObj.x))) + x-0.2f, (Mathf.Abs(Mathf.Abs(firstplatformY) - Mathf.Abs(gameObj.y)) + y));
+            //Debug.Log(gameObj.type + ", " + pos + ", " + gameObj.x + ", " + x + ", " + gameObj.y + ", " + y);
+            Quaternion rotation = Quaternion.Euler(0, 0, gameObj.rotation);
+            ABGameWorld.Instance.AddBlock(ABWorldAssets.TNT, pos, rotation);
+        }
+
 		foreach (OBjData gameObj in subset.pigs) {
             Vector2 pos = new Vector2(Mathf.Abs((Mathf.Abs(firstplatformX) - Mathf.Abs(gameObj.x))) + x, (Mathf.Abs(Mathf.Abs(firstplatformY) - Mathf.Abs(gameObj.y)) + y));
             //Debug.Log(gameObj.type+", "+pos+", "+gameObj.x+", "+x+", "+gameObj.y+", "+y);
@@ -77,12 +85,7 @@ public class LevelSimulator {
 			block.GetComponent<ABBlock> ().SetMaterial (material);
 		}
 
-		foreach(OBjData gameObj in subset.tnts) {
-            Vector2 pos = new Vector2(Mathf.Abs((Mathf.Abs(firstplatformX) - Mathf.Abs(gameObj.x))) + x, (Mathf.Abs(Mathf.Abs(firstplatformY) - Mathf.Abs(gameObj.y)) + y));
-            //Debug.Log(gameObj.type + ", " + pos + ", " + gameObj.x + ", " + x + ", " + gameObj.y + ", " + y);
-			Quaternion rotation = Quaternion.Euler (0, 0, gameObj.rotation);
-			ABGameWorld.Instance.AddBlock(ABWorldAssets.TNT, pos, rotation);
-		}
+
         platformCount = 0;
 	}
 
