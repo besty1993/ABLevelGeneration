@@ -120,7 +120,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
         _levelCleared = false;
         positions = new List<List<Vector2>>();
         positionSubset = new List<Vector2>();
-        selectedLevel = new int[2];
+        selectedLevel = new int[2]; // Random 3 subset on platforms
 
         for (int i = 0; i < 2;i++) {
             selectedLevel[i] = Random.Range(0, LevelList.Instance.GetAllLevel().Length);
@@ -330,15 +330,21 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
                 }
                    
                 if (isNextLevel) { // Next level
+                    print("Next Level");
                     FinishedGenerateLevel();
                 }
 
                 loopLimit++;
                 if (loopLimit == 800) { // count after generate subset
+                    print(loopLimit);
                     isNextLevel = true;
                     loopLimit = 0;
-                } else if (loopLimit == 500) {
+                } else if (loopLimit == 500 && currentLevel.isTNTExplode) {
+                    //ClearWorld();
+                    //initx();
+                    print(loopLimit);
                     GenerateAllSubsets();
+                    //GenerateAllGroundSubsets();
                 }
             }
         }
@@ -949,6 +955,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
     }
 
     public void InitSubsets() {
+        print("Init");
         initx();
         for (int i = 0; i < positions.Count; i++)
         {
@@ -969,11 +976,12 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
         initx();
         for (int i = 0; i < currentLevel.grounds.Count; i++)
         {
-            if (positions[i].Count > 0)
-            {
-                //print("GGG " + currentLevel.grounds[i]);
+            //print("positions "+positions[i]);
+            //if (positions[i].Count > 0)
+
+                print("GROUND " + currentLevel.grounds[i]);
                 GenerateSubset(new Vector2(currentLevel.grounds[i], -4.0f), Random.Range(0, LevelList.Instance.GetAllLevel().Length));
-            }
+            //}
         }
 
         AdaptCameraWidthToLevel();
@@ -985,6 +993,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
         if (isGenerateSubset && isGenerateGround)
         {
             LevelLoader.SaveLevelOnScene();
+            print("SAVE");
         }
         isGenerateSubset = false;
         isGenerateGround = false;
