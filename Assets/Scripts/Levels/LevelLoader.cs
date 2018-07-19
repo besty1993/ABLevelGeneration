@@ -177,9 +177,9 @@ public class LevelLoader {
 		StringBuilder output = new StringBuilder();
 		XmlWriterSettings ws = new XmlWriterSettings();
 		ws.Indent = true;
-
         string CombinePath = Path.Combine(path, "");
-        path = Path.Combine(CombinePath, DateTime.Now.ToString("MMddyy-HHmmss")+".xml");
+        //path = Path.Combine(CombinePath, DateTime.Now.ToString("MMddyy-HHmmss")+".xml");
+        path = Path.Combine(CombinePath, (LevelList.Instance.CurrentIndex).ToString() + ".xml");
         Debug.Log("Save XML: " + path);
 		using (XmlWriter writer = XmlWriter.Create(output, ws)) {
 			writer.WriteStartElement("Level");
@@ -320,10 +320,63 @@ public class LevelLoader {
         return level;
     }
 
-	public void SaveLevelOnScene() {
+    public ABLevel EncodeSymmetricalLevel(float platformMiddlePoint)
+    {
+        ABLevel level = new ABLevel();
+        level.width = LevelList.Instance.GetCurrentLevel().width;
+        level.camera = LevelList.Instance.GetCurrentLevel().camera;
+        level.slingshot = LevelList.Instance.GetCurrentLevel().slingshot;
+        level.birds = LevelList.Instance.GetCurrentLevel().birds;
+
+        foreach (Transform child in GameObject.Find("Blocks").transform)
+        {
+            string type = child.name;
+            float x = 2 * platformMiddlePoint - child.transform.position.x;
+            float y = child.transform.position.y;
+            float rotation = child.transform.rotation.eulerAngles.z;
+
+            if (child.GetComponent<ABPig>() != null)
+            {
+                level.pigs.Add(new OBjData(type, rotation, x, y));
+            }
+            else if (child.GetComponent<ABBlock>() != null)
+            {
+                string material = child.GetComponent<ABBlock>()._material.ToString();
+                level.blocks.Add(new BlockData(type, rotation, x, y, material));
+            }
+            else if (child.GetComponent<ABTNT>() != null)
+            {
+                level.tnts.Add(new OBjData(type, rotation, x, y));
+            }
+        }
+
+        foreach (Transform child in GameObject.Find("Platforms").transform)
+        {
+            PlatData obj = new PlatData();
+            obj.type = child.name;
+            obj.x = child.transform.position.x;
+            obj.y = child.transform.position.y;
+            obj.rotation = child.transform.rotation.eulerAngles.z;
+            obj.scaleX = child.transform.localScale.x;
+            obj.scaleY = child.transform.localScale.y;
+            level.platforms.Add(obj);
+        }
+        return level;
+    }
+    
+    public void SaveLevelOnScene() {
         //Use this code to save objs
         ABLevel level = EncodeLevel();
         //Save level to xml file
         SaveXmlLevel(level ,Application.dataPath + "/StreamingAssets/LevelGenerator");
 	}
+
+    //platformMiddlePoint is the centre of the platforms in current subsets
+    public void SymmetricalLevelSave(float platformMiddlePoint)
+    {
+        //Use this code to save Symmetrical subsets
+        ABLevel level = EncodeSymmetricalLevel(platformMiddlePoint);
+        //Save level to xml file
+        SaveXmlLevel(level, Application.dataPath + "/StreamingAssets/LevelGenerator");
+    }
 }
