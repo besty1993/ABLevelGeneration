@@ -78,13 +78,15 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
 
 
     /// /// For Subset
-    ABLevel Check = LevelList.Instance.GetCurrentLevel();
+    public ABLevel Check = LevelList.Instance.GetCurrentLevel();
     public static float platformStartPoint = 999f;
     public static float platformStartPointY;
+    public static float platformMiddlePoint;
+    public static float platformEndPoint = -999f;
     public static int bulletPositionVertical = 0;
     public static int bulletPositionHorizonal = 0;
     public int verticalTimes;
-    public static int horizontalTimes = 5;
+    public static int horizontalTimes = 10;
     public static double usefulDistance = 3;
     public static double minicircle = 1;
     public static double maxcircle = 2;
@@ -177,7 +179,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
 
         if (_isSimulation)
         {
-            Time.timeScale = 1;
+            Time.timeScale = 2;
             PlatformCount = Check.platforms.Count;
         }
     }
@@ -310,7 +312,11 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
                 platformStartPoint = gameObj.x;
                 platformStartPointY = gameObj.y;
             }
-            Vector2 pos = new Vector2(gameObj.x, gameObj.y);
+            if ((_isSimulation) && platformStartPoint < gameObj.x)
+            {
+                platformEndPoint = gameObj.x;
+            }
+                Vector2 pos = new Vector2(gameObj.x, gameObj.y);
             Quaternion rotation = Quaternion.Euler(0, 0, gameObj.rotation);
 
             AddPlatform(ABWorldAssets.PLATFORM, pos, rotation, gameObj.scaleX, gameObj.scaleY);
@@ -333,26 +339,31 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
         StartWorld();
     }
 
-    // Update is called once per frame
+    //PreLevelCheck control the pre-check of subset(1 level 1 time check)
     bool PreLevelCheck = false;
     void Update()
     {
 
         // Check if birds was trown, if it died and swap them when needed
         ManageBirds();
+        //if(Input.GetKey(KeyCode.Space))
+        //{
+           
+        //}
+
         //Evaluate Subsets
         if (!LevelSimulator.Generatelevel)
         {
             if (!PreLevelCheck)
             {
-                LevelShaking();   
+                LevelShaking();
                 if (IsLevelStable())
                 {
-                    if(CheckTNT() || Check.levelShaking)
+                    if (Check.levelShaking)
                         NextLevel();
                     PreLevelCheck = true;
                 }
-                
+
             }
             else
             {
@@ -415,15 +426,20 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
 
     public void NextLevel()
     {
-        //if (!UsefulTag)
-        //{
-        //    StreamWriter recordLevel = new StreamWriter(System.Environment.CurrentDirectory + "/Assets/StreamingAssets/Levels/levelcheck.txt", true);
-        //    recordLevel.WriteLine((LevelList.Instance.CurrentIndex).ToString());
-        //    recordLevel.Close();
-        //}
+        if (!Check.usefulLevel)
+        {
+            StreamWriter recordLevel = new StreamWriter(System.Environment.CurrentDirectory + "/Assets/StreamingAssets/Levels/levelcheck.txt", true);
+            recordLevel.WriteLine((LevelList.Instance.CurrentIndex).ToString());
+            recordLevel.Close();
+        }
+        else
+        {
+            SymmetricalLevel();
+        }
         bulletPositionHorizonal = 0;
         bulletPositionVertical = 0;
         platformStartPoint = 999f;
+        platformEndPoint = -999f;
         if (LevelList.Instance.NextLevel() == null)
 
             ABSceneManager.Instance.LoadScene("MainMenu");
@@ -805,10 +821,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
         GameplayCam.SetCameraWidth(cameraWidth);
     }
 
-
-    //////////////////////////////////////Original Code////////////////////////////
-
-
+    //start Horizontal test
     private void SubsetSimulationHorizontal()
     {
         if (!_isSimulation || !IsLevelStable())
@@ -816,11 +829,11 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
 
         if (!alreadyDropHorizontal)
         {
-            float y = bulletPositionHorizonal * 0.62f + platformStartPointY + 0.5f;
+            float y = bulletPositionHorizonal * 0.31f + platformStartPointY + 0.5f;
             float x = platformStartPoint - 0.62f;
 
             Vector2 pos = new Vector2(x, y);
-            Vector2 force = new Vector2(1, 0);
+            Vector2 force = new Vector2(2, 0);
             Quaternion rotation = Quaternion.Euler(0, 0, 0);
 
             GameObject block = AddBlock(ABWorldAssets.BLOCKS["CircleSmall"], pos, rotation);
@@ -847,6 +860,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
 
     }
 
+    //start Vertical test
     private void SubsetSimulationVertical()
     {
         if (!_isSimulation || !IsLevelStable())
@@ -886,46 +900,45 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
         //		}
 
     }
-
+    //check the subset can be used or not
     public void CheckUseful()
     {
             foreach (Transform b in _blocksTransform)
             {
-
-                if ((b.tag != "test") && (b.position.y < platformStartPointY))
+                if ((b.tag != "test") && b.position.y < platformStartPointY -0.5f)
                 {
-                    Check.horizontalCheck = true;
-                    if (Check.grounds.Count > 0)
-                    {
-                        //print("usefule one");
-                        Check.usefulLevel = true;
-                        if (IsLevelStable())
-                            NextLevel();
-                    }
+                    Check.usefulLevel = true;
+                    NextLevel();
                 }
             }
     }
 
-    public bool CheckTNT()
-    {
-        if (Check.tnts.Count != 0)
-        {
+    //public bool CheckTNT()
+    //{
+    //    if (Check.tnts.Count != 0)
+    //    {
+    //        GameObject[] tntCount = GameObject.FindGameObjectsWithTag("TNT");
+    //        if ( tntCount.Length== 0)
+    //            return false;
+    //        else
+    //        {
+    //            Check.triggerX = tntCount[0].transform.position.x;
+    //            Check.triggerY = tntCount[0].transform.position.y;
+    //            Check.usefulLevel = true;
+    //            return true;
+    //        }
+    //    }
+    //    else
+    //    {
+    //        return false;
+    //    }
+    //}
 
-            Check.triggerX = GameObject.FindGameObjectWithTag("TNT").transform.position.x;
-            Check.triggerY = GameObject.FindGameObjectWithTag("TNT").transform.position.y;
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-
+    //LevelShaking check if the generated is stable
     public void LevelShaking() {
         foreach (Transform block in _blocksTransform)
         {
-            if (block.GetComponent<Rigidbody2D>().velocity.magnitude > 0.2f)
+            if (block.GetComponent<Rigidbody2D>().velocity.magnitude > 0.3f)
             {
                 Check.levelShaking = true;
                 Check.usefulLevel = false;
@@ -951,5 +964,13 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
     //    recordLevel.WriteLine((LevelList.Instance.CurrentIndex).ToString()+":"+LevelMaxSpeed);
     //    recordLevel.Close();
     //}
+
+    //make Symmetrical subset of the current one, this function will be called in nextLevel() 
+    public void SymmetricalLevel()
+    {
+        LevelLoader SymmetricalLevelSave = new LevelLoader();
+        platformMiddlePoint = (platformStartPoint + platformEndPoint) / 2;
+        SymmetricalLevelSave.SymmetricalLevelSave(platformMiddlePoint);
+    }
 
 }
