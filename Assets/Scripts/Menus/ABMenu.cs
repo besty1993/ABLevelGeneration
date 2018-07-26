@@ -19,23 +19,56 @@
 
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+
 
 public class ABMenu : MonoBehaviour {
 	/// <summary>
 	/// This Start() is activating GameWolrd Scene directly
 	/// Always start from level 1.
 	/// </summary>
+	public static bool finished = false; //If it's true, Level Generater ends.
+	public static List<string> parameters;
+
 	void Start() {
-		if (UnityEngine.SceneManagement.SceneManager.GetActiveScene ().name != "GameWorld" && !LevelSimulator.Generatelevel) {
-			try {
-				LevelList.Instance.SetLevel (1);
-				LoadNextScene ("GameWorld", false, null);
-			} catch {
+		if (finished) {
+			Application.Quit ();
+			return;
+		}
+
+		SwitchSubsetAndLevel ();
+
+	}
+
+	public void SwitchSubsetAndLevel () {
+		if (UnityEngine.SceneManagement.SceneManager.GetActiveScene ().name != "GameWorld") {
+			if (!LevelSimulator.Generatelevel) {
+				UnityEditor.FileUtil.DeleteFileOrDirectory (Application.streamingAssetsPath + "/Subsets/*.xml");
+				UnityEditor.FileUtil.DeleteFileOrDirectory (Application.streamingAssetsPath + "/Subsets/parameters.txt");
+				UnityEditor.FileUtil.DeleteFileOrDirectory (Application.streamingAssetsPath + "/EvaluatedSubsets/*.xml");
+
+				StreamReader sr = new StreamReader (System.Environment.CurrentDirectory + "/parameters.txt", true);
+				string temp = sr.ReadToEnd ();
+				parameters = new List<string> (temp.Split ('\n'));
+				sr.Close ();
+
+				StreamWriter sw = new StreamWriter (Application.streamingAssetsPath + "/Subsets/parameters.txt", true);
+				sw.WriteLine (parameters [0]);
+				sw.WriteLine (parameters [1]);
+				sw.WriteLine (parameters [2]);
+				sw.Close ();
+
+				parameters.RemoveRange (0, 3);
+
+				LevelSimulator.RunSubsetGenerator ();
+				LoadNextScene ("LevelSelectMenu", false, null);
+			} else {
 				LoadNextScene ("LevelSelectMenu", false, null);
 			}
 		}
-
 	}
+
 
 	public void LoadNextScene(string sceneName) {
 

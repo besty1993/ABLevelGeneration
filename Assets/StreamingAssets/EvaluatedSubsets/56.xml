@@ -2,26 +2,22 @@
 <Level width="2">
   <Camera x="0" y="2" minWidth="20" maxWidth="30" />
   <Birds>
-    <Bird type="BirdRed" />
-    <Bird type="BirdBlue" />
+    <Bird type="BirdBlack" />
+    <Bird type="BirdWhite" />
 </Birds>
   <Slingshot x="-8" y="-2.5" />
   <GameObjects>
-    <Block type="RectSmall" material="ice" x="-2.495" y="3.735" rotation="90" />
-    <Block type="RectSmall" material="wood" x="-1.865" y="3.735" rotation="90" />
-    <Block type="RectSmall" material="stone" x="-1.035" y="3.735" rotation="90" />
-    <Block type="RectSmall" material="stone" x="-0.405" y="3.735" rotation="90" />
-    <Block type="RectSmall" material="ice" x="-2.18" y="4.27" rotation="0" />
-    <Block type="RectSmall" material="ice" x="-0.72" y="4.27" rotation="0" />
-    <Block type="RectMedium" material="wood" x="-1.45" y="4.49" rotation="0" />
-    <Block type="CircleSmall" material="ice" x="-2.01" y="4.825" rotation="0" />
-    <Block type="CircleSmall" material="wood" x="-0.89" y="4.825" rotation="0" />
-    <TNT type="TNT" x="-1.45" y="4.85" rotation="0" />
+    <Block type="RectFat" material="ice" x="-2.49" y="3.525" rotation="0" />
+    <Block type="RectFat" material="wood" x="-1.03" y="3.525" rotation="0" />
+    <Block type="RectMedium" material="stone" x="-1.76" y="3.85" rotation="0" />
+    <Block type="RectTiny" material="ice" x="-2.09" y="4.175" rotation="90" />
+    <Block type="RectTiny" material="wood" x="-1.76" y="4.175" rotation="90" />
+    <Block type="RectTiny" material="wood" x="-1.43" y="4.175" rotation="90" />
+    <Block type="Circle" material="wood" x="-1.76" y="4.79" rotation="0" />
     <Platform type="Platform" x="-2.69" y="3" rotation="0" scaleX="1" scaleY="1" />
     <Platform type="Platform" x="-2.07" y="3" rotation="0" scaleX="1" scaleY="1" />
     <Platform type="Platform" x="-1.45" y="3" rotation="0" scaleX="1" scaleY="1" />
     <Platform type="Platform" x="-0.83" y="3" rotation="0" scaleX="1" scaleY="1" />
-    <Platform type="Platform" x="-0.21" y="3" rotation="0" scaleX="1" scaleY="1" />
-    <Trigger type="Trigger" x="0" y="0" />
+    <Trigger type="Trigger" x="-2.868914" y="3.597226" />
 </GameObjects>
 </Level>

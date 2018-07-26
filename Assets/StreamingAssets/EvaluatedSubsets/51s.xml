@@ -2,19 +2,33 @@
 <Level width="2">
   <Camera x="0" y="2" minWidth="20" maxWidth="30" />
   <Birds>
-    <Bird type="BirdBlue" />
+    <Bird type="BirdYellow" />
     <Bird type="BirdRed" />
+    <Bird type="BirdYellow" />
 </Birds>
   <Slingshot x="-8" y="-2.5" />
   <GameObjects>
+    <Block type="RectFat" material="ice" x="1.025" y="3.525" rotation="0" />
     <Block type="RectFat" material="wood" x="0" y="3.525" rotation="0" />
-    <Block type="RectFat" material="wood" x="0" y="3.955" rotation="0" />
-    <Block type="SquareSmall" material="stone" x="0" y="4.385" rotation="0" />
-    <Pig type="BasicSmall" x="0" y="4.85" rotation="0" />
+    <Block type="RectFat" material="ice" x="-1.025" y="3.525" rotation="0" />
+    <Block type="SquareSmall" material="stone" x="0.9199998" y="3.955" rotation="0" />
+    <Block type="SquareSmall" material="stone" x="-0.9200001" y="3.955" rotation="0" />
+    <Block type="RectBig" material="ice" x="0" y="4.28" rotation="0" />
+    <Block type="RectTiny" material="ice" x="0.525" y="4.5" rotation="0" />
+    <Block type="RectTiny" material="wood" x="-0.525" y="4.5" rotation="0" />
+    <Pig type="BasicSmall" x="-0.525" y="4.86" rotation="0" />
+    <Pig type="BasicSmall" x="0" y="4.64" rotation="0" />
+    <TNT type="TNT" x="0.525" y="4.86" rotation="0" />
     <Platform type="Platform" x="-2.69" y="3" rotation="0" scaleX="1" scaleY="1" />
     <Platform type="Platform" x="-2.07" y="3" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="-1.45" y="3" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="-0.83" y="3" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="-0.21" y="3" rotation="0" scaleX="1" scaleY="1" />
     <Platform type="Platform" x="-2.69" y="3" rotation="0" scaleX="1" scaleY="1" />
     <Platform type="Platform" x="-2.07" y="3" rotation="0" scaleX="1" scaleY="1" />
-    <Trigger type="Trigger" x="-2.38" y="0" />
+    <Platform type="Platform" x="-1.45" y="3" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="-0.83" y="3" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="-0.21" y="3" rotation="0" scaleX="1" scaleY="1" />
+    <Trigger type="Trigger" x="1.412989" y="3.597215" />
 </GameObjects>
 </Level>

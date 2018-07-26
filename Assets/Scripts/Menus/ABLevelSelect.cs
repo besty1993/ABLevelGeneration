@@ -113,6 +113,9 @@ public class ABLevelSelect : ABMenu {
 		if (!LevelSimulator.Generatelevel) {
 			LevelList.Instance.SetLevel (1);
 			LoadNextScene ("GameWorld", false, null);
+		} else {
+			LevelList.Instance.SetLevel(Random.Range (0, allXmlFiles.Length));
+			LoadNextScene ("GameWorld", false, null);
 		}
 			
 		

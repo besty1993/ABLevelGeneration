@@ -2,28 +2,18 @@
 <Level width="2">
   <Camera x="0" y="2" minWidth="20" maxWidth="30" />
   <Birds>
-    <Bird type="BirdYellow" />
+    <Bird type="BirdRed" />
     <Bird type="BirdBlue" />
 </Birds>
   <Slingshot x="-8" y="-2.5" />
   <GameObjects>
-    <Block type="RectMedium" material="ice" x="0" y="3.42" rotation="0" />
-    <Block type="RectFat" material="stone" x="0.5" y="3.955" rotation="90" />
-    <Block type="RectFat" material="ice" x="0" y="3.955" rotation="90" />
-    <Block type="RectFat" material="wood" x="-0.5" y="3.955" rotation="90" />
-    <Block type="RectTiny" material="ice" x="0.5" y="4.595" rotation="90" />
-    <Block type="RectTiny" material="wood" x="0" y="4.595" rotation="90" />
-    <Block type="RectTiny" material="ice" x="-0.5" y="4.595" rotation="90" />
-    <Block type="TriangleHole" material="stone" x="-0.5" y="5.22" rotation="0" />
-    <TNT type="TNT" x="0.5" y="5.06" rotation="0" />
+    <Block type="SquareSmall" material="ice" x="-0.05563235" y="3.525" rotation="0" />
+    <Pig type="BasicSmall" x="-0.05563235" y="3.99" rotation="0" />
+    <TNT type="TNT" x="0.4399998" y="3.67" rotation="0" />
     <Platform type="Platform" x="-2.69" y="3" rotation="0" scaleX="1" scaleY="1" />
     <Platform type="Platform" x="-2.07" y="3" rotation="0" scaleX="1" scaleY="1" />
-    <Platform type="Platform" x="-1.45" y="3" rotation="0" scaleX="1" scaleY="1" />
-    <Platform type="Platform" x="-0.83" y="3" rotation="0" scaleX="1" scaleY="1" />
     <Platform type="Platform" x="-2.69" y="3" rotation="0" scaleX="1" scaleY="1" />
     <Platform type="Platform" x="-2.07" y="3" rotation="0" scaleX="1" scaleY="1" />
-    <Platform type="Platform" x="-1.45" y="3" rotation="0" scaleX="1" scaleY="1" />
-    <Platform type="Platform" x="-0.83" y="3" rotation="0" scaleX="1" scaleY="1" />
-    <Trigger type="Trigger" x="-1.76" y="0" />
+    <Trigger type="Trigger" x="-2.38" y="0" />
 </GameObjects>
 </Level>

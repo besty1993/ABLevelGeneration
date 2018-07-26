@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-16"?>
+<Level width="2">
+  <Camera x="0" y="2" minWidth="20" maxWidth="30" />
+  <Birds>
+    <Bird type="BirdRed" />
+    <Bird type="BirdBlue" />
+</Birds>
+  <Slingshot x="-8" y="-2.5" />
+  <GameObjects>
+    <Block type="SquareSmall" material="ice" x="1.86" y="3.525" rotation="0" />
+    <Block type="SquareSmall" material="ice" x="0.4" y="3.525" rotation="0" />
+    <Block type="SquareSmall" material="stone" x="-0.4" y="3.525" rotation="0" />
+    <Block type="SquareSmall" material="ice" x="-1.86" y="3.525" rotation="0" />
+    <Block type="RectTiny" material="stone" x="1.86" y="3.85" rotation="0" />
+    <Block type="RectTiny" material="stone" x="0.4" y="3.85" rotation="0" />
+    <Block type="RectTiny" material="wood" x="-0.4" y="3.85" rotation="0" />
+    <Block type="RectTiny" material="wood" x="-1.86" y="3.85" rotation="0" />
+    <Block type="RectMedium" material="stone" x="1.13" y="4.07" rotation="0" />
+    <Block type="RectMedium" material="wood" x="-1.13" y="4.07" rotation="0" />
+    <Block type="SquareTiny" material="stone" x="1.13" y="4.29" rotation="0" />
+    <Block type="SquareTiny" material="stone" x="0.51" y="4.29" rotation="0" />
+    <Block type="SquareTiny" material="stone" x="-0.5100001" y="4.29" rotation="0" />
+    <Block type="SquareTiny" material="ice" x="-1.13" y="4.29" rotation="0" />
+    <Block type="Triangle" material="wood" x="1.69" y="4.59" rotation="0" />
+    <Block type="Circle" material="stone" x="0.51" y="4.8" rotation="0" />
+    <Pig type="BasicSmall" x="-0.5100001" y="4.65" rotation="0" />
+    <TNT type="TNT" x="-1.13" y="4.65" rotation="0" />
+    <TNT type="TNT" x="-1.69" y="4.43" rotation="0" />
+    <TNT type="TNT" x="1.05" y="3.56" rotation="0" />
+    <Platform type="Platform" x="-2.69" y="3" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="-2.07" y="3" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="-1.45" y="3" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="-0.83" y="3" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="-0.21" y="3" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="0.41" y="3" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="1.03" y="3" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="-2.69" y="3" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="-2.07" y="3" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="-1.45" y="3" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="-0.83" y="3" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="-0.21" y="3" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="0.41" y="3" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="1.03" y="3" rotation="0" scaleX="1" scaleY="1" />
+    <Trigger type="Trigger" x="2.033546" y="3.597202" />
+</GameObjects>
+</Level>

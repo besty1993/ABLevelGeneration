@@ -440,6 +440,12 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
 		if (LevelList.Instance.NextLevel() == null) {
 			if (!LevelSimulator.Generatelevel)
 				LevelSimulator.Generatelevel = true;
+			else {
+				LevelSimulator.Generatelevel = false;
+				if (ABMenu.parameters.Count < 3)
+					ABMenu.finished = true;
+			}
+				
             ABSceneManager.Instance.LoadScene("MainMenu");
 		}
         else

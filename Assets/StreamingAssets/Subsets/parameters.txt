@@ -1,15 +1,3 @@
-5
-wood RectMedium,wood SquareTiny,ice CircleSmall
-8,10
-
-5
-stone SquareHole,wood SquareHole,ice SquareHole
-5,8
-
-5
-wood Triangle,stone Circle
-1,2
-
-5
-
+5
+
 3,3
