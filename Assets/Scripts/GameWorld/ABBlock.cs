@@ -97,24 +97,26 @@ public class ABBlock : ABGameObject {
             }
            
         }
-        if (collision.gameObject.name == "Ground" && collision.gameObject.tag != "test")
-        {
-            ABLevel addPoints = LevelList.Instance.GetCurrentLevel();
-            foreach (ContactPoint2D groundPoint in collision.contacts)
-            {
-                if (!addPoints.grounds.Contains(groundPoint.point.x) && groundPoint.point.x <= 14)
-                {
-                    if (addPoints.grounds.Count == 0) {
-                        addPoints.grounds.Add(groundPoint.point.x);
-                    } else {
-                        if (addPoints.grounds[0] + 5.0f < groundPoint.point.x && addPoints.grounds[0] - 5.0f < groundPoint.point.x) {
-                            addPoints.grounds.Add(groundPoint.point.x);
-                        }
-                    }
-                }
-
-            }
-        }
+        //if (collision.gameObject.name == "Ground" && collision.gameObject.tag != "test")
+        //{
+        //    ABLevel addPoints = LevelList.Instance.GetCurrentLevel();
+        //    foreach (ContactPoint2D groundPoint in collision.contacts)
+        //    {
+        //        print("size "+ addPoints.grounds.Count);
+        //        if (!addPoints.grounds.Contains(groundPoint.point.x) && groundPoint.point.x <= 14)
+        //        {
+        //            if (addPoints.grounds.Count == 0) {
+        //                print("Count equal 0");
+        //                addPoints.grounds.Add(groundPoint.point.x);
+        //            } else {
+        //                if (addPoints.grounds[0] + 5.0f > groundPoint.point.x && addPoints.grounds[0] - 5.0f < groundPoint.point.x) {
+        //                    print("Count not equal 0 "+addPoints.grounds[0]+" , "+groundPoint.point.x);
+        //                    addPoints.grounds.Add(groundPoint.point.x);
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
 
         if (collision.gameObject.tag == "Bird") {
 

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-16"?>
+<Level width="2">
+  <Camera x="0" y="2" minWidth="20" maxWidth="30" />
+  <Birds>
+    <Bird type="BirdBlack" />
+    <Bird type="BirdBlack" />
+</Birds>
+  <Slingshot x="-8" y="-2.5" />
+  <GameObjects>
+    <Block type="RectSmall" material="stone" x="6.888425" y="-3.384622" rotation="132.3522" />
+    <Block type="RectMedium" material="wood" x="-1.715203" y="4.15" rotation="90" />
+    <Block type="RectSmall" material="ice" x="12.38115" y="4.127607" rotation="90" />
+    <Block type="RectTiny" material="stone" x="2.196936" y="-3.275" rotation="90" />
+    <Block type="RectTiny" material="wood" x="2.511936" y="-3.275" rotation="90" />
+    <Block type="RectTiny" material="stone" x="2.826936" y="-3.275" rotation="90" />
+    <Block type="RectSmall" material="stone" x="2.511936" y="-2.95" rotation="0" />
+    <Block type="RectSmall" material="ice" x="7.581875" y="-3.065" rotation="90" />
+    <Block type="RectMedium" material="wood" x="7.428352" y="-2.65" rotation="90" />
+    <Block type="RectSmall" material="ice" x="8.414572" y="-3.065" rotation="90" />
+    <Block type="RectTiny" material="wood" x="7.581499" y="-3.38" rotation="0" />
+    <Pig type="BasicSmall" x="-1.715203" y="5.24" rotation="0" />
+    <Pig type="BasicSmall" x="12.38115" y="4.802608" rotation="0" />
+    <Pig type="BasicSmall" x="2.795269" y="-2.59" rotation="0" />
+    <Pig type="BasicSmall" x="2.228603" y="-2.59" rotation="0" />
+    <Pig type="BasicSmall" x="7.581875" y="-2.39" rotation="0" />
+    <Pig type="BasicSmall" x="7.428352" y="-1.56" rotation="0" />
+    <Pig type="BasicSmall" x="8.414572" y="-2.39" rotation="0" />
+    <Pig type="BasicSmall" x="7.581499" y="-3.02" rotation="0" />
+    <TNT type="TNT" x="-2.82" y="3.67" rotation="0" />
+    <TNT type="TNT" x="11.54644" y="4.062608" rotation="0" />
+    <TNT type="TNT" x="1.029567" y="-3.13" rotation="0" />
+    <TNT type="TNT" x="6.747172" y="-3.13" rotation="0" />
+    <TNT type="TNT" x="6.383555" y="-3.13" rotation="0" />
+    <TNT type="TNT" x="7.579869" y="-3.13" rotation="0" />
+    <TNT type="TNT" x="6.818425" y="-3.13" rotation="0" />
+    <Platform type="Platform" x="-2.69" y="3" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="-2.07" y="3" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="-1.45" y="3" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="-0.83" y="3" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="11.3754" y="3.392608" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="11.9954" y="3.392608" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="12.6154" y="3.392608" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="13.2354" y="3.392608" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="1.099568" y="-3.8" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="1.719568" y="-3.8" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="2.339568" y="-3.8" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="2.959568" y="-3.8" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="6.57613" y="-3.8" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="7.196131" y="-3.8" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="7.816131" y="-3.8" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="8.436131" y="-3.8" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="6.453555" y="-3.8" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="7.073555" y="-3.8" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="7.693555" y="-3.8" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="8.313555" y="-3.8" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="7.408828" y="-3.8" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="8.028828" y="-3.8" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="8.648828" y="-3.8" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="9.268827" y="-3.8" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="-2.69" y="3" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="-2.07" y="3" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="-1.45" y="3" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="-0.83" y="3" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="11.3754" y="3.392608" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="11.9954" y="3.392608" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="12.6154" y="3.392608" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="13.2354" y="3.392608" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="1.099568" y="-3.8" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="1.719568" y="-3.8" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="2.339568" y="-3.8" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="2.959568" y="-3.8" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="6.57613" y="-3.8" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="7.196131" y="-3.8" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="7.816131" y="-3.8" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="8.436131" y="-3.8" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="6.453555" y="-3.8" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="7.073555" y="-3.8" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="7.693555" y="-3.8" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="8.313555" y="-3.8" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="7.408828" y="-3.8" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="8.028828" y="-3.8" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="8.648828" y="-3.8" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="9.268827" y="-3.8" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="6.888425" y="-3.8" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="7.508425" y="-3.8" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="8.128425" y="-3.8" rotation="0" scaleX="1" scaleY="1" />
+    <Platform type="Platform" x="8.748425" y="-3.8" rotation="0" scaleX="1" scaleY="1" />
+</GameObjects>
+</Level>

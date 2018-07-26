@@ -48,7 +48,7 @@ public class LevelLoader {
 	}
 	
 	public static ABLevel LoadXmlLevel(string xmlString) {
-
+        Debug.Log("xmlString " + xmlString);
 		ABLevel level = new ABLevel();
 
 		using (XmlReader reader = XmlReader.Create(new StringReader(xmlString)))

@@ -30,19 +30,19 @@ public class ABPig : ABCharacter {
 		base.Die(withEffect);
 	}
 
-    public override void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.gameObject.name == "Ground")
-        {
-            ABLevel addGround = LevelList.Instance.GetCurrentLevel();
-            foreach (ContactPoint2D groundPoint in collision.contacts)
-            {
-                if (!addGround.grounds.Contains(groundPoint.point.x) && groundPoint.point.x <= 5)
-                {
-                    addGround.grounds.Add(groundPoint.point.x);
-                }
+    //public override void OnCollisionEnter2D(Collision2D collision)
+    //{
+    //    if (collision.gameObject.name == "Ground" && collision.gameObject.tag != "test")
+    //    {
+    //        ABLevel addGround = LevelList.Instance.GetCurrentLevel();
+    //        foreach (ContactPoint2D groundPoint in collision.contacts)
+    //        {
+    //            if (!addGround.grounds.Contains(groundPoint.point.x) && groundPoint.point.x <= 5)
+    //            {
+    //                addGround.grounds.Add(groundPoint.point.x);
+    //            }
 
-            }
-        }
-    }
+    //        }
+    //    }
+    //}
 }
