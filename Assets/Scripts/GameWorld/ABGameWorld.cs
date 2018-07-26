@@ -78,26 +78,24 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
 
 
     /// /// For Subset
-    public ABLevel Check = LevelList.Instance.GetCurrentLevel();
-    public static float platformStartPoint = 999f;
-    public static float platformStartPointY;
-    public static float platformMiddlePoint;
-    public static float platformEndPoint = -999f;
-    public static int bulletPositionVertical = 0;
-    public static int bulletPositionHorizonal = 0;
-    public int verticalTimes;
-    public static int horizontalTimes = 10;
-    public static double usefulDistance = 3;
     public static double minicircle = 1;
     public static double maxcircle = 2;
-    public static bool alreadyDropHorizontal = false;
-    public static bool HorizontalStart = false;
-    public static bool alreadyDropVertical = false;
-    public static int blockId;
     public Vector2 blockPosition;
-    public int PlatformCount;
     public float LevelMaxSpeed = 0f;
-
+    public static float platformStartPointX = 999f;
+    public static float platformStartPointY;
+    public ABLevel CurrentLevel;
+    public ABLevel SymmetricalLevel;
+    public LevelLoader SaveLevel;
+    public static bool Generatelevel = false;
+    public static int VerticalBulletPosition = 0;
+    public static int VerticalTimes;
+    public static int HorizonalBulletPosition = 0;
+    public static int HorizontalTimes = 10;
+    public static bool AlreadyDropHorizontal = false;
+    public static bool AlreadyDropVertical = false;
+    public static int BlockId;
+    public static bool HorizontalEvaluationStart = false;
 
     void Awake()
     {
@@ -111,7 +109,6 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
 
         _levelClearedBanner = GameObject.Find("LevelClearedBanner").gameObject;
         _levelClearedBanner.gameObject.SetActive(false);
-
         GameplayCam = GameObject.Find("Camera").GetComponent<ABGameplayCamera>();
     }
 
@@ -123,6 +120,8 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
         _birdTrajectory = new List<ABParticle>();
         _levelLoader = new LevelLoader();
         _levelCleared = false;
+        CurrentLevel = LevelList.Instance.GetCurrentLevel();
+        SaveLevel = new LevelLoader();
 
 
 
@@ -146,30 +145,29 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
                 if (pig != null)
                     _pigs.Add(pig);
             }
-
-        }
+            
+		}
         else
         {
             ABLevel currentLevel = LevelList.Instance.GetCurrentLevel();
-            LevelSimulator.ChangeSubsetPosition(currentLevel, UnityEngine.Random.Range(-2, 2), UnityEngine.Random.Range(-3, 2));
+
+
+			//ABLG!!
+			//Randomize first subset position
+			if (LevelSimulator.Generatelevel)
+            	LevelSimulator.ChangeSubsetPosition(currentLevel, UnityEngine.Random.Range(-2, 2), UnityEngine.Random.Range(-3, 2));
+			//
+
+
             if (currentLevel != null)
             {
                 DecodeLevel(currentLevel);
-                /// Generate Level
-                if (LevelSimulator.Generatelevel)
-                {
-                    int round = UnityEngine.Random.Range(2, 3);
-                    for (int i = 0; i < round; i++)
-                    {
-                        //Random subset for generate level
-                        int selectedLevel = UnityEngine.Random.Range(4, 85);
-                        ABLevel nextLevelSubset = LevelList.Instance.GetLevel(selectedLevel);
-                        LevelSimulator.ChangeSubsetPosition(nextLevelSubset, UnityEngine.Random.Range(4f, 6f), UnityEngine.Random.Range(-3f, 2f));
-                        LevelSimulator.GenerateSubset(nextLevelSubset, nextLevelSubset.triggerX, nextLevelSubset.triggerY);
-                    }
-                    //Save generate level on scene to xml
-                    _levelLoader.SaveLevelOnScene();
-                }
+
+				//ABLG!!
+				//GenerateLevel
+				if (LevelSimulator.Generatelevel)
+					GenerateLevel ();
+				//
 
                 AdaptCameraWidthToLevel();
                 _levelTimesTried = 0;
@@ -179,8 +177,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
 
         if (_isSimulation)
         {
-            Time.timeScale = 2;
-            PlatformCount = Check.platforms.Count;
+            Time.timeScale = 100;
         }
     }
 
@@ -307,14 +304,10 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
 
         foreach (PlatData gameObj in currentLevel.platforms)
         {
-            if ((_isSimulation) && platformStartPoint > gameObj.x)
+            if ((_isSimulation) && platformStartPointX > gameObj.x)
             {
-                platformStartPoint = gameObj.x;
+                platformStartPointX = gameObj.x;
                 platformStartPointY = gameObj.y;
-            }
-            if ((_isSimulation) && platformStartPoint < gameObj.x)
-            {
-                platformEndPoint = gameObj.x;
             }
                 Vector2 pos = new Vector2(gameObj.x, gameObj.y);
             Quaternion rotation = Quaternion.Euler(0, 0, gameObj.rotation);
@@ -339,7 +332,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
         StartWorld();
     }
 
-    //PreLevelCheck control the pre-check of subset(1 level 1 time check)
+    //PreLevelCheck control the pre-check of subset(each level will be checked 1 time)
     bool PreLevelCheck = false;
     void Update()
     {
@@ -348,7 +341,6 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
         ManageBirds();
         //if(Input.GetKey(KeyCode.Space))
         //{
-           
         //}
 
         //Evaluate Subsets
@@ -359,15 +351,17 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
                 LevelShaking();
                 if (IsLevelStable())
                 {
-                    if (Check.levelShaking)
+                    if (CurrentLevel.levelShaking)
                         NextLevel();
                     PreLevelCheck = true;
-                }
+                    CurrentLevel = SaveLevel.EncodeLevel();
+                    SymmetricalLevel = SaveLevel.EncodeSymmetricalLevel();
+                }   
 
             }
             else
             {
-                if (!HorizontalStart)
+                if (!HorizontalEvaluationStart)
                 {
                     SubsetSimulationHorizontal();
                 }
@@ -376,7 +370,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
                     SubsetSimulationVertical();
                 }
                 //check useful levels
-                CheckUseful();
+                CheckUseful(_blocksTransform);
             }
         }
     }
@@ -426,23 +420,28 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
 
     public void NextLevel()
     {
-        if (!Check.usefulLevel)
+        if (!CurrentLevel.usefulLevel)
         {
-            StreamWriter recordLevel = new StreamWriter(System.Environment.CurrentDirectory + "/Assets/StreamingAssets/Levels/levelcheck.txt", true);
-            recordLevel.WriteLine((LevelList.Instance.CurrentIndex).ToString());
-            recordLevel.Close();
+//            StreamWriter recordLevel = new StreamWriter(System.Environment.CurrentDirectory + "/Assets/StreamingAssets/Levels/levelcheck.txt", true);
+//            recordLevel.WriteLine((LevelList.Instance.CurrentIndex).ToString());
+//            recordLevel.Close();
         }
         else
         {
-            SymmetricalLevel();
+            //make Symmetrical subset of the current one, this function will be called in nextLevel() 
+            SaveLevel.SaveLevel(CurrentLevel, false);
+            SaveLevel.SaveLevel(SymmetricalLevel, true);
+            //save the current level with adding TriggerPoint
+            //LevelSave.SaveLevelOnScene();
         }
-        bulletPositionHorizonal = 0;
-        bulletPositionVertical = 0;
-        platformStartPoint = 999f;
-        platformEndPoint = -999f;
-        if (LevelList.Instance.NextLevel() == null)
-
+        HorizonalBulletPosition = 0;
+        VerticalBulletPosition = 0;
+        platformStartPointX = 999f;
+		if (LevelList.Instance.NextLevel() == null) {
+			if (!LevelSimulator.Generatelevel)
+				LevelSimulator.Generatelevel = true;
             ABSceneManager.Instance.LoadScene("MainMenu");
+		}
         else
         {
 
@@ -762,6 +761,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
         _pigsAtStart = GetPigsAvailableAmount();
         _birdsAtStart = GetBirdsAvailableAmount();
         _blocksAtStart = GetBlocksAvailableAmount();
+        
     }
 
     public void ClearWorld()
@@ -821,16 +821,29 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
         GameplayCam.SetCameraWidth(cameraWidth);
     }
 
+
+
+
+
+
+
+
+
+	/// <summary>
+	/// ABLG!!
+	/// Functions for evaluating Subsets
+	/// </summary>
+
     //start Horizontal test
-    private void SubsetSimulationHorizontal()
+    public void SubsetSimulationHorizontal()
     {
         if (!_isSimulation || !IsLevelStable())
             return;
 
-        if (!alreadyDropHorizontal)
+        if (!AlreadyDropHorizontal)
         {
-            float y = bulletPositionHorizonal * 0.31f + platformStartPointY + 0.5f;
-            float x = platformStartPoint - 0.62f;
+            float y = HorizonalBulletPosition * 0.31f + ABGameWorld.platformStartPointY + 0.5f;
+            float x = ABGameWorld.platformStartPointX - 0.62f;
 
             Vector2 pos = new Vector2(x, y);
             Vector2 force = new Vector2(2, 0);
@@ -840,60 +853,61 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
             MATERIALS material = (MATERIALS)System.Enum.Parse(typeof(MATERIALS), "stone");
             block.GetComponent<ABBlock>().SetMaterial(material);
             block.GetComponent<Rigidbody2D>().AddForce(force, ForceMode2D.Impulse);
-            bulletPositionHorizonal++;
+            HorizonalBulletPosition++;
             block.tag = "test";
 
-            if (bulletPositionHorizonal > horizontalTimes)
+            if (HorizonalBulletPosition > HorizontalTimes)
             {
-                bulletPositionHorizonal = 0;
-                HorizontalStart = true;
+                HorizonalBulletPosition = 0;
+                HorizontalEvaluationStart = true;
                 initx();
                 return;
             }
-            alreadyDropHorizontal = true;
+            AlreadyDropHorizontal = true;
         }
         else
         {
             initx();
-            alreadyDropHorizontal = false;
+            AlreadyDropHorizontal = false;
         }
 
     }
 
     //start Vertical test
-    private void SubsetSimulationVertical()
+    public void SubsetSimulationVertical()
     {
         if (!_isSimulation || !IsLevelStable())
             return;
 
-        if (!alreadyDropVertical)
+        if (!AlreadyDropVertical)
         {
-            verticalTimes = Check.platforms.Count + 1;
-            float x = bulletPositionVertical * 0.62f + platformStartPoint - 0.32f;
-            float y = platformStartPointY + 5f;
+            VerticalTimes = CurrentLevel.platforms.Count + 1;
+            float x = VerticalBulletPosition * 0.62f + ABGameWorld.platformStartPointX - 0.32f;
+            float y = ABGameWorld.platformStartPointY + 5f;
             Vector2 pos = new Vector2(x, y);
             Vector2 force = new Vector2(0, -2f);
             Quaternion rotation = Quaternion.Euler(0, 0, 0);
             GameObject block = AddBlock(ABWorldAssets.BLOCKS["CircleSmall"], pos, rotation);
             block.tag = "test";
-			block.GetComponent<Rigidbody2D>().AddForce(force, ForceMode2D.Impulse);
+            block.GetComponent<Rigidbody2D>().AddForce(force, ForceMode2D.Impulse);
             MATERIALS material = (MATERIALS)System.Enum.Parse(typeof(MATERIALS), "stone");
             block.GetComponent<ABBlock>().SetMaterial(material);
-            bulletPositionVertical++;
-            if (bulletPositionVertical > verticalTimes)
+            VerticalBulletPosition++;
+            if (VerticalBulletPosition > VerticalTimes)
             {
-                bulletPositionVertical = 0;
-                HorizontalStart = false;
+                VerticalBulletPosition = 0;
+                HorizontalEvaluationStart = false;
+				print ("Useless Subset");
                 NextLevel();
                 return;
             }
 
-            alreadyDropVertical = true;
+            AlreadyDropVertical = true;
         }
         else
         {
             initx();
-            alreadyDropVertical = false;
+            AlreadyDropVertical = false;
         }
         //		if (IsLevelStable ()&&block.transform.position.y<5) {
         //			initx ();
@@ -901,76 +915,62 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
 
     }
     //check the subset can be used or not
-    public void CheckUseful()
+    public void CheckUseful(Transform _blocksTransform)
     {
-            foreach (Transform b in _blocksTransform)
+        foreach (Transform b in _blocksTransform)
+        {
+            if ((b.tag != "test") && b.position.y < ABGameWorld.platformStartPointY - 0.5f)
             {
-                if ((b.tag != "test") && b.position.y < platformStartPointY -0.5f)
-                {
-                    Check.usefulLevel = true;
-                    NextLevel();
-                }
+                CurrentLevel.usefulLevel = true;
+                NextLevel();
             }
+        }
     }
 
-    //public bool CheckTNT()
-    //{
-    //    if (Check.tnts.Count != 0)
-    //    {
-    //        GameObject[] tntCount = GameObject.FindGameObjectsWithTag("TNT");
-    //        if ( tntCount.Length== 0)
-    //            return false;
-    //        else
-    //        {
-    //            Check.triggerX = tntCount[0].transform.position.x;
-    //            Check.triggerY = tntCount[0].transform.position.y;
-    //            Check.usefulLevel = true;
-    //            return true;
-    //        }
-    //    }
-    //    else
-    //    {
-    //        return false;
-    //    }
-    //}
-
-    //LevelShaking check if the generated is stable
-    public void LevelShaking() {
+    public void LevelShaking()
+    {
+        if (_blocksTransform.childCount == 0)
+            return;
         foreach (Transform block in _blocksTransform)
         {
             if (block.GetComponent<Rigidbody2D>().velocity.magnitude > 0.3f)
             {
-                Check.levelShaking = true;
-                Check.usefulLevel = false;
+                CurrentLevel.levelShaking = true;
+                SaveLevel.SaveLevel(CurrentLevel, false);
+                CurrentLevel.usefulLevel = false;
             }
-                
+
         }
     }
 
 
 
-    //CheckShaking();
-    //if (IsLevelStable())
-    //{
-    //    NextLevel();
-    //}
-    //public void CheckShaking()
-    //{
-    //    foreach (Transform block in _blocksTransform) {
-    //        if (block.GetComponent<Rigidbody2D>().velocity.magnitude > LevelMaxSpeed)
-    //            LevelMaxSpeed = block.GetComponent<Rigidbody2D>().velocity.magnitude;
-    //    }
-    //    StreamWriter recordLevel = new StreamWriter(System.Environment.CurrentDirectory + "/Assets/StreamingAssets/Levels/levelcheck.txt", true);
-    //    recordLevel.WriteLine((LevelList.Instance.CurrentIndex).ToString()+":"+LevelMaxSpeed);
-    //    recordLevel.Close();
-    //}
 
-    //make Symmetrical subset of the current one, this function will be called in nextLevel() 
-    public void SymmetricalLevel()
-    {
-        LevelLoader SymmetricalLevelSave = new LevelLoader();
-        platformMiddlePoint = (platformStartPoint + platformEndPoint) / 2;
-        SymmetricalLevelSave.SymmetricalLevelSave(platformMiddlePoint);
-    }
 
+
+
+
+	/// <summary>
+	/// ABLG!!
+	/// Functions for Generating Levels
+	/// </summary>
+
+
+	public void GenerateLevel () {
+		/// Generate Level
+		if (LevelSimulator.Generatelevel)
+		{
+			int round = UnityEngine.Random.Range(2, 3);
+			for (int i = 0; i < round; i++)
+			{
+				//Random subset for generate level
+				int selectedLevel = UnityEngine.Random.Range(4, 85);
+				ABLevel nextLevelSubset = LevelList.Instance.GetLevel(selectedLevel);
+				LevelSimulator.ChangeSubsetPosition(nextLevelSubset, UnityEngine.Random.Range(4f, 6f), UnityEngine.Random.Range(-3f, 2f));
+				LevelSimulator.GenerateSubset(nextLevelSubset, nextLevelSubset.triggerX, nextLevelSubset.triggerY);
+			}
+			//Save generate level on scene to xml
+			_levelLoader.SaveLevelOnScene();
+		}
+	}
 }

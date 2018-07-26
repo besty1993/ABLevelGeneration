@@ -37,7 +37,7 @@ public class ABLevelSelect : ABMenu {
 
 	// Use this for initialization
 	void Start () {
-		print ("start");
+//		print ("start");
 		// Load levels in the resources folder
 		TextAsset []levelsData = Resources.LoadAll<TextAsset>(ABConstants.DEFAULT_LEVELS_FOLDER);
 
@@ -56,7 +56,16 @@ public class ABLevelSelect : ABMenu {
 
 #else
 		// Load levels in the streaming folder
-		string   levelsPath = Application.dataPath + ABConstants.CUSTOM_LEVELS_FOLDER;
+		//ABLG!!
+		string levelsPath;
+		if (!LevelSimulator.Generatelevel) {
+			levelsPath = Application.dataPath + ABConstants.SUBSETS_FOLDER;
+		} else
+			levelsPath = Application.dataPath + ABConstants.EVALUATED_SUBSETS_FOLDER;
+		//
+
+
+
 		string[] levelFiles = Directory.GetFiles (levelsPath, "*.xml");
 
 		string[] streamingXml = new string[levelFiles.Length];
@@ -100,9 +109,12 @@ public class ABLevelSelect : ABMenu {
 		}
 
 
-
-
-		LevelList.Instance.SetLevel(1);
-		LoadNextScene("GameWorld",false,null);
+		//ABLG!!
+		if (!LevelSimulator.Generatelevel) {
+			LevelList.Instance.SetLevel (1);
+			LoadNextScene ("GameWorld", false, null);
+		}
+			
+		
 	}
 }

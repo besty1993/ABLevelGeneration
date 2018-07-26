@@ -25,6 +25,7 @@ using System.Text;
 using System.Collections.Generic;
 
 public class LevelLoader {
+    public static float PlatformMiddle;
 	
 	public static string ReadXmlLevel(string path) {
 	
@@ -91,8 +92,7 @@ public class LevelLoader {
 				level.birds.Add (new BirdData (type));
 				reader.Read ();
 			}
-
-			reader.ReadToFollowing("Slingshot");
+            reader.ReadToFollowing("Slingshot");
 
 			reader.MoveToAttribute("x");
 			level.slingshot.x = (float)Convert.ToDouble (reader.Value);
@@ -132,55 +132,78 @@ public class LevelLoader {
 					rotation = (float)Convert.ToDouble (reader.Value);
 				}
 
-				if (nodeName == "Block") {
+                if (nodeName == "Block")
+                {
 
-					level.blocks.Add (new BlockData (type, rotation, x, y, material));
-					reader.Read ();
-				} 
-				else if (nodeName == "Pig") {
+                    level.blocks.Add(new BlockData(type, rotation, x, y, material));
+                    reader.Read();
+                }
+                else if (nodeName == "Pig")
+                {
 
-					level.pigs.Add (new OBjData (type, rotation, x, y));
-					reader.Read ();
-				}
-				else if (nodeName == "TNT") {
+                    level.pigs.Add(new OBjData(type, rotation, x, y));
+                    reader.Read();
+                }
+                else if (nodeName == "TNT")
+                {
 
-					level.tnts.Add (new OBjData (type, rotation, x, y));
-					reader.Read ();
-				}
-				else if (nodeName == "Platform") {
+                    level.tnts.Add(new OBjData(type, rotation, x, y));
+                    reader.Read();
+                }
+                else if (nodeName == "Platform")
+                {
 
-					float scaleX = 1f;
-					if (reader.GetAttribute ("scaleX") != null) {
+                    float scaleX = 1f;
+                    if (reader.GetAttribute("scaleX") != null)
+                    {
 
-						reader.MoveToAttribute ("scaleX");
-						scaleX = (float)Convert.ToDouble (reader.Value);
-					}
+                        reader.MoveToAttribute("scaleX");
+                        scaleX = (float)Convert.ToDouble(reader.Value);
+                    }
 
-					float scaleY = 1f;
-					if (reader.GetAttribute ("scaleY") != null) {
+                    float scaleY = 1f;
+                    if (reader.GetAttribute("scaleY") != null)
+                    {
 
-						reader.MoveToAttribute ("scaleY");
-						scaleY = (float)Convert.ToDouble (reader.Value);
-					}
+                        reader.MoveToAttribute("scaleY");
+                        scaleY = (float)Convert.ToDouble(reader.Value);
+                    }
 
-					level.platforms.Add (new PlatData (type, rotation, x, y, scaleX, scaleY));
-					reader.Read ();
-				}
+                    level.platforms.Add(new PlatData(type, rotation, x, y, scaleX, scaleY));
+                    reader.Read();
+                }
+                else if (nodeName == "Trigger")
+                {
+                    if (reader.GetAttribute("x") != null)
+                    {
+                        reader.MoveToAttribute("x");
+                        level.triggerX = (float)Convert.ToDouble(reader.Value);
+                    }
+                    if (reader.GetAttribute("y") != null)
+                    {
+                        reader.MoveToAttribute("y");
+                        level.triggerY = (float)Convert.ToDouble(reader.Value);
+                    }
+                    reader.Read();
+                }
 			}
 		}
 
 		return level;
 	}
 
-	public static void SaveXmlLevel(ABLevel level, string path) 
+	public static void SaveXmlLevel(ABLevel level, string path,bool SymModel) 
     {
 		StringBuilder output = new StringBuilder();
 		XmlWriterSettings ws = new XmlWriterSettings();
 		ws.Indent = true;
         string CombinePath = Path.Combine(path, "");
-        //path = Path.Combine(CombinePath, DateTime.Now.ToString("MMddyy-HHmmss")+".xml");
-        path = Path.Combine(CombinePath, (LevelList.Instance.CurrentIndex).ToString() + ".xml");
-        Debug.Log("Save XML: " + path);
+        if(SymModel)
+            //path = Path.Combine(CombinePath, DateTime.Now.ToString("MMddyy-HHmmss")+".xml");
+            path = Path.Combine(CombinePath, (LevelList.Instance.CurrentIndex).ToString() + "s.xml");
+        else
+            path = Path.Combine(CombinePath, (LevelList.Instance.CurrentIndex).ToString() + ".xml");
+//        Debug.Log("Save XML: " + path);
 		using (XmlWriter writer = XmlWriter.Create(output, ws)) {
 			writer.WriteStartElement("Level");
 			writer.WriteAttributeString("width", level.width.ToString());
@@ -201,7 +224,12 @@ public class LevelLoader {
             writer.WriteString("\n");
             writer.WriteEndElement();
 
-			writer.WriteStartElement("Slingshot");
+            //writer.WriteStartElement("TriggerPoint");
+            //writer.WriteAttributeString("x", level.triggerX.ToString());
+            //writer.WriteAttributeString("y", level.triggerY.ToString());
+            //writer.WriteEndElement();
+
+            writer.WriteStartElement("Slingshot");
 			writer.WriteAttributeString("x", level.slingshot.x.ToString());
 			writer.WriteAttributeString("y", level.slingshot.y.ToString());
 			writer.WriteEndElement();
@@ -252,6 +280,25 @@ public class LevelLoader {
 				writer.WriteAttributeString("scaleY", abObj.scaleY.ToString());
 				writer.WriteEndElement();
 			}
+            ABLevel CurrentLevel = LevelList.Instance.GetCurrentLevel();
+            if (!SymModel)
+            {
+                writer.WriteStartElement("Trigger");
+                writer.WriteAttributeString("type", "Trigger");
+                writer.WriteAttributeString("x", CurrentLevel.triggerX.ToString());
+                writer.WriteAttributeString("y", CurrentLevel.triggerY.ToString());
+                writer.WriteEndElement();
+
+            }
+            else
+            {
+                writer.WriteStartElement("Trigger");
+                writer.WriteAttributeString("type", "Trigger");
+                writer.WriteAttributeString("x", (2*PlatformMiddle - CurrentLevel.triggerX).ToString());
+                writer.WriteAttributeString("y", CurrentLevel.triggerY.ToString());
+                writer.WriteEndElement();
+            }
+
             writer.WriteString("\n");
             writer.WriteEndElement();
 		}
@@ -320,14 +367,29 @@ public class LevelLoader {
         return level;
     }
 
-    public ABLevel EncodeSymmetricalLevel(float platformMiddlePoint)
+    public ABLevel EncodeSymmetricalLevel()
     {
+        float platformMiddlePoint = 0;
         ABLevel level = new ABLevel();
         level.width = LevelList.Instance.GetCurrentLevel().width;
         level.camera = LevelList.Instance.GetCurrentLevel().camera;
         level.slingshot = LevelList.Instance.GetCurrentLevel().slingshot;
         level.birds = LevelList.Instance.GetCurrentLevel().birds;
-
+        level.platforms = LevelList.Instance.GetCurrentLevel().platforms;
+        foreach (Transform child in GameObject.Find("Platforms").transform)
+        {
+            PlatData obj = new PlatData();
+            obj.type = child.name;
+            obj.x = child.transform.position.x;
+            obj.y = child.transform.position.y;
+            obj.rotation = child.transform.rotation.eulerAngles.z;
+            obj.scaleX = child.transform.localScale.x;
+            obj.scaleY = child.transform.localScale.y;
+            platformMiddlePoint += child.transform.position.x;
+            level.platforms.Add(obj);
+        }
+        platformMiddlePoint /= level.platforms.Count;
+        PlatformMiddle = platformMiddlePoint;
         foreach (Transform child in GameObject.Find("Blocks").transform)
         {
             string type = child.name;
@@ -350,17 +412,7 @@ public class LevelLoader {
             }
         }
 
-        foreach (Transform child in GameObject.Find("Platforms").transform)
-        {
-            PlatData obj = new PlatData();
-            obj.type = child.name;
-            obj.x = child.transform.position.x;
-            obj.y = child.transform.position.y;
-            obj.rotation = child.transform.rotation.eulerAngles.z;
-            obj.scaleX = child.transform.localScale.x;
-            obj.scaleY = child.transform.localScale.y;
-            level.platforms.Add(obj);
-        }
+        
         return level;
     }
     
@@ -368,15 +420,13 @@ public class LevelLoader {
         //Use this code to save objs
         ABLevel level = EncodeLevel();
         //Save level to xml file
-        SaveXmlLevel(level ,Application.dataPath + "/StreamingAssets/LevelGenerator");
+		SaveXmlLevel(level ,Application.dataPath + ABConstants.EVALUATED_SUBSETS_FOLDER,false);
 	}
 
     //platformMiddlePoint is the centre of the platforms in current subsets
-    public void SymmetricalLevelSave(float platformMiddlePoint)
+    public void SaveLevel(ABLevel level,bool SymModel)
     {
-        //Use this code to save Symmetrical subsets
-        ABLevel level = EncodeSymmetricalLevel(platformMiddlePoint);
         //Save level to xml file
-        SaveXmlLevel(level, Application.dataPath + "/StreamingAssets/LevelGenerator");
+		SaveXmlLevel(level, Application.dataPath + ABConstants.EVALUATED_SUBSETS_FOLDER, SymModel);
     }
 }

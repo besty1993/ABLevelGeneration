@@ -26,7 +26,7 @@ public class ABMenu : MonoBehaviour {
 	/// Always start from level 1.
 	/// </summary>
 	void Start() {
-		if (UnityEngine.SceneManagement.SceneManager.GetActiveScene ().name != "GameWorld") {
+		if (UnityEngine.SceneManagement.SceneManager.GetActiveScene ().name != "GameWorld" && !LevelSimulator.Generatelevel) {
 			try {
 				LevelList.Instance.SetLevel (1);
 				LoadNextScene ("GameWorld", false, null);

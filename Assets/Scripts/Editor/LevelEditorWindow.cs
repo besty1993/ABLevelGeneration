@@ -214,7 +214,7 @@ class LevelEditor : EditorWindow {
 
 		if (path != "") {
 
-			LevelLoader.SaveXmlLevel (EncodeLevel (), path);
+			LevelLoader.SaveXmlLevel (EncodeLevel (), path,false);
 		}
 	}
 
