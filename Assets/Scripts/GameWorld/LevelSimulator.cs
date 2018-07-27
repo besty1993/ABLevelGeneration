@@ -111,114 +111,114 @@ public class LevelSimulator {
             Object.DestroyImmediate(obj.gameObj, true);
 		}
 	}
-
-    //start Horizontal test
-    public void SubsetSimulationHorizontal(bool _isSimulation)
-    {
-        if (!_isSimulation || !CurrentGameWorld.IsLevelStable())
-            return;
-
-        if (!AlreadyDropHorizontal)
-        {
-            float y = HorizonalBulletPosition * 0.31f + ABGameWorld.platformStartPointY + 0.5f;
-            float x = ABGameWorld.platformStartPointX - 0.62f;
-
-            Vector2 pos = new Vector2(x, y);
-            Vector2 force = new Vector2(2, 0);
-            Quaternion rotation = Quaternion.Euler(0, 0, 0);
-
-            GameObject block = CurrentGameWorld.AddBlock(ABWorldAssets.BLOCKS["CircleSmall"], pos, rotation);
-            MATERIALS material = (MATERIALS)System.Enum.Parse(typeof(MATERIALS), "stone");
-            block.GetComponent<ABBlock>().SetMaterial(material);
-            block.GetComponent<Rigidbody2D>().AddForce(force, ForceMode2D.Impulse);
-            HorizonalBulletPosition++;
-            block.tag = "test";
-
-            if (HorizonalBulletPosition > HorizontalTimes)
-            {
-                HorizonalBulletPosition = 0;
-                HorizontalEvaluationStart = true;
-                CurrentGameWorld.initx();
-                return;
-            }
-            AlreadyDropHorizontal = true;
-        }
-        else
-        {
-            CurrentGameWorld.initx();
-            AlreadyDropHorizontal = false;
-        }
-
-    }
-
-    //start Vertical test
-    public void SubsetSimulationVertical()
-    {
-        if (!CurrentGameWorld._isSimulation || !CurrentGameWorld.IsLevelStable())
-            return;
-
-        if (!AlreadyDropVertical)
-        {
-            VerticalTimes = CurrentLevel.platforms.Count + 1;
-            float x = VerticalBulletPosition * 0.62f + ABGameWorld.platformStartPointX - 0.32f;
-            float y = ABGameWorld.platformStartPointY + 5f;
-            Vector2 pos = new Vector2(x, y);
-            Vector2 force = new Vector2(0, -2f);
-            Quaternion rotation = Quaternion.Euler(0, 0, 0);
-            GameObject block = CurrentGameWorld.AddBlock(ABWorldAssets.BLOCKS["CircleSmall"], pos, rotation);
-            block.tag = "test";
-            block.GetComponent<Rigidbody2D>().AddForce(force, ForceMode2D.Impulse);
-            MATERIALS material = (MATERIALS)System.Enum.Parse(typeof(MATERIALS), "stone");
-            block.GetComponent<ABBlock>().SetMaterial(material);
-            VerticalBulletPosition++;
-            if (VerticalBulletPosition > VerticalTimes)
-            {
-                VerticalBulletPosition = 0;
-                HorizontalEvaluationStart = false;
-                CurrentGameWorld.NextLevel();
-                return;
-            }
-
-            AlreadyDropVertical = true;
-        }
-        else
-        {
-            CurrentGameWorld.initx();
-            AlreadyDropVertical = false;
-        }
-        //		if (IsLevelStable ()&&block.transform.position.y<5) {
-        //			initx ();
-        //		}
-
-    }
-    //check the subset can be used or not
-    public void CheckUseful(Transform _blocksTransform)
-    {
-        foreach (Transform b in _blocksTransform)
-        {
-            if ((b.tag != "test") && b.position.y < ABGameWorld.platformStartPointY - 0.5f)
-            {
-                CurrentLevel.usefulLevel = true;
-                CurrentGameWorld.NextLevel();
-            }
-        }
-    }
-
-    public void LevelShaking(Transform _blocksTransform)
-    {
-        if (_blocksTransform.childCount == 0)
-            return;
-        foreach (Transform block in _blocksTransform)
-        {   
-            if (block.GetComponent<Rigidbody2D>().velocity.magnitude > 0.3f)
-            {
-                CurrentLevel.levelShaking = true;
-                SaveLevel.SaveLevel(CurrentLevel, false);
-                CurrentLevel.usefulLevel = false;
-            }
-
-        }
-    }
+//
+//    //start Horizontal test
+//    public void SubsetSimulationHorizontal(bool _isSimulation)
+//    {
+//        if (!_isSimulation || !CurrentGameWorld.IsLevelStable())
+//            return;
+//
+//        if (!AlreadyDropHorizontal)
+//        {
+//            float y = HorizonalBulletPosition * 0.31f + ABGameWorld.platformStartPointY + 0.5f;
+//            float x = ABGameWorld.platformStartPointX - 0.62f;
+//
+//            Vector2 pos = new Vector2(x, y);
+//            Vector2 force = new Vector2(2, 0);
+//            Quaternion rotation = Quaternion.Euler(0, 0, 0);
+//
+//            GameObject block = CurrentGameWorld.AddBlock(ABWorldAssets.BLOCKS["CircleSmall"], pos, rotation);
+//            MATERIALS material = (MATERIALS)System.Enum.Parse(typeof(MATERIALS), "stone");
+//            block.GetComponent<ABBlock>().SetMaterial(material);
+//            block.GetComponent<Rigidbody2D>().AddForce(force, ForceMode2D.Impulse);
+//            HorizonalBulletPosition++;
+//            block.tag = "test";
+//
+//            if (HorizonalBulletPosition > HorizontalTimes)
+//            {
+//                HorizonalBulletPosition = 0;
+//                HorizontalEvaluationStart = true;
+//                CurrentGameWorld.initx();
+//                return;
+//            }
+//            AlreadyDropHorizontal = true;
+//        }
+//        else
+//        {
+//            CurrentGameWorld.initx();
+//            AlreadyDropHorizontal = false;
+//        }
+//
+//    }
+//
+//    //start Vertical test
+//    public void SubsetSimulationVertical()
+//    {
+//        if (!CurrentGameWorld._isSimulation || !CurrentGameWorld.IsLevelStable())
+//            return;
+//
+//        if (!AlreadyDropVertical)
+//        {
+//            VerticalTimes = CurrentLevel.platforms.Count + 1;
+//            float x = VerticalBulletPosition * 0.62f + ABGameWorld.platformStartPointX - 0.32f;
+//            float y = ABGameWorld.platformStartPointY + 5f;
+//            Vector2 pos = new Vector2(x, y);
+//            Vector2 force = new Vector2(0, -2f);
+//            Quaternion rotation = Quaternion.Euler(0, 0, 0);
+//            GameObject block = CurrentGameWorld.AddBlock(ABWorldAssets.BLOCKS["CircleSmall"], pos, rotation);
+//            block.tag = "test";
+//            block.GetComponent<Rigidbody2D>().AddForce(force, ForceMode2D.Impulse);
+//            MATERIALS material = (MATERIALS)System.Enum.Parse(typeof(MATERIALS), "stone");
+//            block.GetComponent<ABBlock>().SetMaterial(material);
+//            VerticalBulletPosition++;
+//            if (VerticalBulletPosition > VerticalTimes)
+//            {
+//                VerticalBulletPosition = 0;
+//                HorizontalEvaluationStart = false;
+//                CurrentGameWorld.NextLevel();
+//                return;
+//            }
+//
+//            AlreadyDropVertical = true;
+//        }
+//        else
+//        {
+//            CurrentGameWorld.initx();
+//            AlreadyDropVertical = false;
+//        }
+//        //		if (IsLevelStable ()&&block.transform.position.y<5) {
+//        //			initx ();
+//        //		}
+//
+//    }
+//    //check the subset can be used or not
+//    public void CheckUseful(Transform _blocksTransform)
+//    {
+//        foreach (Transform b in _blocksTransform)
+//        {
+//            if ((b.tag != "test") && b.position.y < ABGameWorld.platformStartPointY - 0.5f)
+//            {
+//                CurrentLevel.usefulLevel = true;
+//                CurrentGameWorld.NextLevel();
+//            }
+//        }
+//    }
+//
+//    public void LevelShaking(Transform _blocksTransform)
+//    {
+//        if (_blocksTransform.childCount == 0)
+//            return;
+//        foreach (Transform block in _blocksTransform)
+//        {   
+//            if (block.GetComponent<Rigidbody2D>().velocity.magnitude > 0.3f)
+//            {
+//                CurrentLevel.levelShaking = true;
+//                SaveLevel.SaveLevel(CurrentLevel, false);
+//                CurrentLevel.usefulLevel = false;
+//            }
+//
+//        }
+//    }
 
     //public bool CheckTNT()
     //{
@@ -285,6 +285,7 @@ public class LevelSimulator {
 //
 	public static void RunSubsetGenerator() {
 		// using System.Diagnostics;
+		#if UNITY_STANDALONE_OSX
 		Process p = new Process();
 		p.StartInfo.FileName = "python";
 		p.StartInfo.Arguments = "subset_generator.py";    
@@ -299,8 +300,27 @@ public class LevelSimulator {
 
 		p.Start();
 		// Read the output - this will show is a single entry in the console - you could get  fancy and make it log for each line - but thats not why we're here
-//		UnityEngine.Debug.Log( p.StandardOutput.ReadToEnd() );
+		//		UnityEngine.Debug.Log( p.StandardOutput.ReadToEnd() );
 		p.WaitForExit();
 		p.Close();
+		#elif UNITY_STANDALONE_WIN
+		Process p = new Process();
+		p.StartInfo.FileName = "python";
+		p.StartInfo.Arguments = "subset_generator.py";    
+		// Pipe the output to itself - we will catch this later
+		p.StartInfo.RedirectStandardError=true;
+		p.StartInfo.RedirectStandardOutput=true;
+		p.StartInfo.CreateNoWindow = true;
+
+		// Where the script lives
+		p.StartInfo.WorkingDirectory = Application.streamingAssetsPath+"/Subsets/"; 
+		p.StartInfo.UseShellExecute = false;
+
+		p.Start();
+		// Read the output - this will show is a single entry in the console - you could get  fancy and make it log for each line - but thats not why we're here
+		//		UnityEngine.Debug.Log( p.StandardOutput.ReadToEnd() );
+		p.WaitForExit();
+		p.Close();
+		#endif
 	}
 }

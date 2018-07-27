@@ -86,7 +86,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
     public static float platformStartPointY;
     public ABLevel CurrentLevel;
     public ABLevel SymmetricalLevel;
-    public LevelLoader SaveLevel;
+    public LevelLoader levelLoader;
     public static bool Generatelevel = false;
     public static int VerticalBulletPosition = 0;
     public static int VerticalTimes;
@@ -121,7 +121,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
         _levelLoader = new LevelLoader();
         _levelCleared = false;
         CurrentLevel = LevelList.Instance.GetCurrentLevel();
-        SaveLevel = new LevelLoader();
+        levelLoader = new LevelLoader();
 
 
 
@@ -344,6 +344,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
         //}
 
         //Evaluate Subsets
+
         if (!LevelSimulator.Generatelevel)
         {
             if (!PreLevelCheck)
@@ -354,8 +355,8 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
                     if (CurrentLevel.levelShaking)
                         NextLevel();
                     PreLevelCheck = true;
-                    CurrentLevel = SaveLevel.EncodeLevel();
-                    SymmetricalLevel = SaveLevel.EncodeSymmetricalLevel();
+                    CurrentLevel = levelLoader.EncodeLevel();
+					SymmetricalLevel = levelLoader.EncodeSymmetricalLevel();
                 }   
 
             }
@@ -421,6 +422,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
     public void NextLevel()
     {
         if (!CurrentLevel.usefulLevel)
+//		if (!CurrentLevel.usefulLevel||CurrentLevel.triggerX==0)
         {
 //            StreamWriter recordLevel = new StreamWriter(System.Environment.CurrentDirectory + "/Assets/StreamingAssets/Levels/levelcheck.txt", true);
 //            recordLevel.WriteLine((LevelList.Instance.CurrentIndex).ToString());
@@ -429,8 +431,8 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
         else
         {
             //make Symmetrical subset of the current one, this function will be called in nextLevel() 
-            SaveLevel.SaveLevel(CurrentLevel, false);
-            SaveLevel.SaveLevel(SymmetricalLevel, true);
+			levelLoader.SaveLevel(CurrentLevel, false);
+			levelLoader.SaveLevel(SymmetricalLevel, true);
             //save the current level with adding TriggerPoint
             //LevelSave.SaveLevelOnScene();
         }
@@ -852,15 +854,17 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
             float x = ABGameWorld.platformStartPointX - 0.62f;
 
             Vector2 pos = new Vector2(x, y);
-            Vector2 force = new Vector2(2, 0);
+//            Vector2 force = new Vector2(2, 0);
             Quaternion rotation = Quaternion.Euler(0, 0, 0);
 
             GameObject block = AddBlock(ABWorldAssets.BLOCKS["CircleSmall"], pos, rotation);
+			block.tag = "test";
             MATERIALS material = (MATERIALS)System.Enum.Parse(typeof(MATERIALS), "stone");
             block.GetComponent<ABBlock>().SetMaterial(material);
-            block.GetComponent<Rigidbody2D>().AddForce(force, ForceMode2D.Impulse);
+			block.GetComponent<Rigidbody2D> ().velocity = new Vector2 (4f, 0);
+//            block.GetComponent<Rigidbody2D>().AddForce(force, ForceMode2D.Impulse);
             HorizonalBulletPosition++;
-            block.tag = "test";
+            
 
             if (HorizonalBulletPosition > HorizontalTimes)
             {
@@ -891,11 +895,12 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
             float x = VerticalBulletPosition * 0.62f + ABGameWorld.platformStartPointX - 0.32f;
             float y = ABGameWorld.platformStartPointY + 5f;
             Vector2 pos = new Vector2(x, y);
-            Vector2 force = new Vector2(0, -2f);
+//            Vector2 force = new Vector2(0, -2f);
             Quaternion rotation = Quaternion.Euler(0, 0, 0);
             GameObject block = AddBlock(ABWorldAssets.BLOCKS["CircleSmall"], pos, rotation);
             block.tag = "test";
-            block.GetComponent<Rigidbody2D>().AddForce(force, ForceMode2D.Impulse);
+//            block.GetComponent<Rigidbody2D>().AddForce(force, ForceMode2D.Impulse);
+			block.GetComponent<Rigidbody2D> ().velocity = new Vector2 (0, -4f);
             MATERIALS material = (MATERIALS)System.Enum.Parse(typeof(MATERIALS), "stone");
             block.GetComponent<ABBlock>().SetMaterial(material);
             VerticalBulletPosition++;
@@ -925,10 +930,17 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
     {
         foreach (Transform b in _blocksTransform)
         {
+//			if (b.tag == "test") {
+//				collisionPoint = b.GetComponent<Collision2D> ().contacts [0].point;
+//				CurrentLevel.triggerX = collisionPoint.x;
+//				CurrentLevel.triggerY = collisionPoint.y;
+//				print ("asdfasdf");
+//			}
             if ((b.tag != "test") && b.position.y < ABGameWorld.platformStartPointY - 0.5f)
             {
-                CurrentLevel.usefulLevel = true;
-                NextLevel();
+                
+				CurrentLevel.usefulLevel = true;
+				NextLevel();
             }
         }
     }
@@ -942,7 +954,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
             if (block.GetComponent<Rigidbody2D>().velocity.magnitude > 0.3f)
             {
                 CurrentLevel.levelShaking = true;
-                SaveLevel.SaveLevel(CurrentLevel, false);
+				levelLoader.SaveLevel(CurrentLevel, false);
                 CurrentLevel.usefulLevel = false;
             }
 

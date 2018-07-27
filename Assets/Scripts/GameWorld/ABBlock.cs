@@ -82,19 +82,23 @@ public class ABBlock : ABGameObject {
     
     public override void OnCollisionEnter2D(Collision2D collision)
     {
-        
-        if (collision.gameObject.tag == "test")
-        {
-            ABLevel addPoints = LevelList.Instance.GetCurrentLevel();
-            foreach (ContactPoint2D striggerPoint in collision.contacts) {
-                addPoints.triggerX = striggerPoint.point.x;
-                addPoints.triggerY = striggerPoint.point.y;
-            }
+		ABLevel addPoints = LevelList.Instance.GetCurrentLevel ();
+		if (collision.gameObject.tag == "test" && collision.otherCollider.gameObject.name != "Platform(Clone)" && collision.otherCollider.gameObject.name != "Ground") {
+			addPoints.triggerX = collision.contacts [0].point.x;
+			addPoints.triggerY = collision.contacts [0].point.y;
+//            foreach (ContactPoint2D striggerPoint in collision.contacts) {
+//                addPoints.triggerX = striggerPoint.point.x;
+//                addPoints.triggerY = striggerPoint.point.y;
+//            }
+//			Debug.Log (collision.contacts [0].point);
            
-        }
+		} else if (collision.gameObject.name != "Platform(Clone)" && collision.gameObject.name != "Ground" && collision.otherCollider.gameObject.tag == "test") {
+			addPoints.triggerX = collision.contacts [0].point.x;
+			addPoints.triggerY = collision.contacts [0].point.y;
+//			Debug.Log (collision.contacts [0].point);
+		}
         if (collision.gameObject.name =="Ground")
         {
-            ABLevel addPoints = LevelList.Instance.GetCurrentLevel();
             foreach (ContactPoint2D groundPoint in collision.contacts) {
                 if (!addPoints.grounds.Contains(groundPoint.point.x)&& groundPoint.point.x<=5) {
                     addPoints.grounds.Add(groundPoint.point.x);

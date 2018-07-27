@@ -79,23 +79,23 @@ public class ABMenu : MonoBehaviour {
 	}
 
 	public void DeleteSubsets () {
-		#if UNITY_EDITOR
-		UnityEditor.FileUtil.DeleteFileOrDirectory (Application.streamingAssetsPath + "/Subsets/parameters.txt");
-		UnityEditor.FileUtil.DeleteFileOrDirectory (Application.streamingAssetsPath + "/EvaluatedSubsets/*.xml");
-		UnityEditor.FileUtil.DeleteFileOrDirectory (Application.streamingAssetsPath + "/Subsets/*.xml");
-		print("Unity Editor 32");
-		#elif UNITY_EDITOR_64
-		UnityEditor.FileUtil.DeleteFileOrDirectory (Application.streamingAssetsPath + "/Subsets/parameters.txt");
-		UnityEditor.FileUtil.DeleteFileOrDirectory (Application.streamingAssetsPath + "/EvaluatedSubsets/*.xml");
-		UnityEditor.FileUtil.DeleteFileOrDirectory (Application.streamingAssetsPath + "/Subsets/*.xml");
-		print("Unity Editor 64");
-		#else
+//		#if UNITY_EDITOR
+//		UnityEditor.FileUtil.DeleteFileOrDirectory (Application.streamingAssetsPath + "/Subsets/parameters.txt");
+//		UnityEditor.FileUtil.DeleteFileOrDirectory (Application.streamingAssetsPath + "/EvaluatedSubsets/*.xml");
+//		UnityEditor.FileUtil.DeleteFileOrDirectory (Application.streamingAssetsPath + "/Subsets/*.xml");
+//		print("Unity Editor 32");
+//		#elif UNITY_EDITOR_64
+//		UnityEditor.FileUtil.DeleteFileOrDirectory (Application.streamingAssetsPath + "/Subsets/parameters.txt");
+//		UnityEditor.FileUtil.DeleteFileOrDirectory (Application.streamingAssetsPath + "/EvaluatedSubsets/*.xml");
+//		UnityEditor.FileUtil.DeleteFileOrDirectory (Application.streamingAssetsPath + "/Subsets/*.xml");
+//		print("Unity Editor 64");
+//		#else
 		foreach (string file in Directory.GetFiles(Application.streamingAssetsPath+"/Subsets/","*.xml",SearchOption.AllDirectories))
 			File.Delete (file);
 		foreach (string file in Directory.GetFiles(Application.streamingAssetsPath+"/EvaluatedSubsets/","*.xml",SearchOption.AllDirectories))
 			File.Delete (file);
 		File.Delete (Application.streamingAssetsPath + "/Subsets/parameters.txt");
 		print("No Unity Editor");
-		#endif
+//		#endif
 	}
 }

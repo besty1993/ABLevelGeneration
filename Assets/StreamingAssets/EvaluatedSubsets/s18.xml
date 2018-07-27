@@ -8,15 +8,15 @@
 </Birds>
   <Slingshot x="-8" y="-2.5" />
   <GameObjects>
-    <Block type="RectTiny" material="stone" x="-2.695" y="3.42" rotation="0" />
     <Block type="RectTiny" material="stone" x="-2.065" y="3.42" rotation="0" />
-    <Block type="RectFat" material="wood" x="-2.695" y="3.955" rotation="90" />
+    <Block type="RectTiny" material="stone" x="-2.695" y="3.42" rotation="0" />
     <Block type="RectFat" material="wood" x="-2.065" y="3.955" rotation="90" />
+    <Block type="RectFat" material="wood" x="-2.695" y="3.955" rotation="90" />
     <Block type="RectSmall" material="ice" x="-2.38" y="4.49" rotation="0" />
+    <Pig type="BasicSmall" x="-2.663334" y="4.85" rotation="0" />
     <Pig type="BasicSmall" x="-2.096667" y="4.85" rotation="0" />
-    <Pig type="BasicSmall" x="-2.663333" y="4.85" rotation="0" />
     <Platform type="Platform" x="-2.69" y="3" />
     <Platform type="Platform" x="-2.07" y="3" />
-    <Trigger type="Trigger" x="-2.912077" y="4.414845" />
+    <Trigger type="Trigger" x="-1.847924" y="4.414845" />
 </GameObjects>
 </Level>

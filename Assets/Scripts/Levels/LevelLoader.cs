@@ -200,7 +200,7 @@ public class LevelLoader {
         string CombinePath = Path.Combine(path, "");
         if(SymModel)
             //path = Path.Combine(CombinePath, DateTime.Now.ToString("MMddyy-HHmmss")+".xml");
-            path = Path.Combine(CombinePath, (LevelList.Instance.CurrentIndex).ToString() + "s.xml");
+            path = Path.Combine(CombinePath, ("s"+LevelList.Instance.CurrentIndex).ToString() + ".xml");
         else
             path = Path.Combine(CombinePath, (LevelList.Instance.CurrentIndex).ToString() + ".xml");
 //        Debug.Log("Save XML: " + path);
@@ -275,12 +275,12 @@ public class LevelLoader {
                 writer.WriteAttributeString("type", indexType[0]);
 				writer.WriteAttributeString("x", abObj.x.ToString());
 				writer.WriteAttributeString("y", abObj.y.ToString());
-				writer.WriteAttributeString("rotation", abObj.rotation.ToString());
-				writer.WriteAttributeString("scaleX", abObj.scaleX.ToString());
-				writer.WriteAttributeString("scaleY", abObj.scaleY.ToString());
 				writer.WriteEndElement();
 			}
             ABLevel CurrentLevel = LevelList.Instance.GetCurrentLevel();
+			if (CurrentLevel.triggerX == 0)
+				return;
+			/////If there is no trigger point, consider subset as useless.
             if (!SymModel)
             {
                 writer.WriteStartElement("Trigger");
@@ -386,14 +386,15 @@ public class LevelLoader {
             obj.scaleX = child.transform.localScale.x;
             obj.scaleY = child.transform.localScale.y;
             platformMiddlePoint += child.transform.position.x;
-            level.platforms.Add(obj);
+//            level.platforms.Add(obj);
         }
         platformMiddlePoint /= level.platforms.Count;
         PlatformMiddle = platformMiddlePoint;
         foreach (Transform child in GameObject.Find("Blocks").transform)
         {
             string type = child.name;
-            float x = 2 * platformMiddlePoint - child.transform.position.x;
+			float x = 2 * platformMiddlePoint;
+			x = x - child.transform.position.x;
             float y = child.transform.position.y;
             float rotation = child.transform.rotation.eulerAngles.z;
 
