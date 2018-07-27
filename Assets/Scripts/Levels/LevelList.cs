@@ -46,8 +46,9 @@ public class LevelList : ABSingleton<LevelList> {
 		if(shuffle)
 			ABArrayUtils.Shuffle(levelSource);
 
-		for(int i = 0; i < levelSource.Length; i++)
-			_levels[i] = LevelLoader.LoadXmlLevel(levelSource[i]);
+        for(int i = 0; i < levelSource.Length; i++) {
+            _levels[i] = LevelLoader.LoadXmlLevel(levelSource[i]);
+        }
 	}
 
 	// Use this for initialization

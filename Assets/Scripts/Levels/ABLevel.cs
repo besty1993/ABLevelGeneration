@@ -111,28 +111,21 @@ public struct SlingData {
 public class ABLevel 
 {
 	public int width;
-
 	public CameraData camera;
 	public SlingData slingshot;
-
 	public List<OBjData>   pigs;
 	public List<OBjData>   tnts;
 	public List<BirdData>  birds;
 	public List<BlockData> blocks;
 	public List<PlatData>  platforms;
-    public List<Vector2> triggers;
-    //public List<float> grounds;
     public float triggerX, triggerY;
     public bool isTNTExplode;
     public int countTNT;
     public bool isTestTriggerPoint = false;
-
-   
-
+    public Vector2 platformStartPoint;
 	public static readonly int BIRDS_MAX_AMOUNT = 5;
 
 	public ABLevel() {
-
 		width = 1;
         countTNT = 0;
         isTNTExplode = false;
@@ -141,8 +134,6 @@ public class ABLevel
 		blocks    = new List<BlockData>();
 		birds     = new List<BirdData>();
 		platforms = new List<PlatData>();
-        triggers = new List<Vector2>();
-        //grounds = new List<float>();
 	}
 
 }

@@ -192,16 +192,14 @@ class LevelEditor : EditorWindow {
 	void LoadLevel() {
 
 		string path = EditorUtility.OpenFilePanel("Select level to open", "Assets/Resources/Levels/", "");
-
 		if (path != "") {
 
 			CleanLevel ();
 
-			Debug.Log (path);
-
 //			TextAsset levelFile = (TextAsset)Resources.Load (finalPath);
 			string levelText = LevelLoader.ReadXmlLevel (path);
-			Debug.Log (levelText);
+
+
 			ABLevel level = LevelLoader.LoadXmlLevel (levelText);
 
 			DecodeLevel (level);
@@ -214,7 +212,7 @@ class LevelEditor : EditorWindow {
 
 		if (path != "") {
 
-			LevelLoader.SaveXmlLevel (EncodeLevel (), path);
+            LevelLoader.SaveXmlLevel (EncodeLevel (), path, 2);
 		}
 	}
 

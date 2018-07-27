@@ -17,183 +17,217 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>
 //
 
-﻿using UnityEngine;
+using UnityEngine;
 using System;
 using System.IO;
 using System.Xml;
 using System.Text;
 using System.Collections.Generic;
 
-public class LevelLoader {
-	
-	public static string ReadXmlLevel(string path) {
-	
-		string xmlText = "";
+public class LevelLoader
+{
+    public static float PlatformMiddle;
 
-		if (path.Contains ("StreamingAssets")) {
-
-			xmlText = File.ReadAllText (path);
-		} 
-		else {
-
-			string[] stringSeparators = new string[] {"Levels/"};
-			string[] arrayPath = path.Split (stringSeparators, StringSplitOptions.None);
-			string finalPath = arrayPath [1].Split ('.') [0];
-
-			TextAsset levelData = Resources.Load<TextAsset>("Levels/" + finalPath);
-			xmlText = levelData.text;
-		}
-
-		return xmlText;
-	}
-	
-	public static ABLevel LoadXmlLevel(string xmlString) {
-        Debug.Log("xmlString " + xmlString);
-		ABLevel level = new ABLevel();
-
-		using (XmlReader reader = XmlReader.Create(new StringReader(xmlString)))
-		{
-			reader.ReadToFollowing("Level");
-
-			level.width = 1;
-			if (reader.GetAttribute ("width") != null) {
-
-				reader.MoveToAttribute("width");
-				level.width = (int)Convert.ToInt32 (reader.Value);
-			}
-
-			reader.ReadToFollowing("Camera");
-
-			reader.MoveToAttribute("x");
-			level.camera.x = (float)Convert.ToDouble (reader.Value);
-
-			reader.MoveToAttribute("y");
-			level.camera.y = (float)Convert.ToDouble (reader.Value);
-
-			reader.MoveToAttribute("minWidth");
-			level.camera.minWidth = (float)Convert.ToDouble (reader.Value);
-
-			reader.MoveToAttribute("maxWidth");
-			level.camera.maxWidth = (float)Convert.ToDouble (reader.Value);
-				
-			reader.ReadToFollowing("Birds");
-			reader.Read ();
-
-			while (reader.Read ()) {
-
-				string nodeName = reader.LocalName;
-				if (nodeName == "Birds")
-					break;
-
-				reader.MoveToAttribute("type");
-				string type = reader.Value;
-
-				level.birds.Add (new BirdData (type));
-				reader.Read ();
-			}
-
-			reader.ReadToFollowing("Slingshot");
-
-			reader.MoveToAttribute("x");
-			level.slingshot.x = (float)Convert.ToDouble (reader.Value);
-
-			reader.MoveToAttribute("y");
-			level.slingshot.y = (float)Convert.ToDouble (reader.Value);
-
-			reader.ReadToFollowing("GameObjects");
-			reader.Read ();
-
-			while (reader.Read())
-			{
-				string nodeName = reader.LocalName;
-				if (nodeName == "GameObjects")
-					break;
-
-				reader.MoveToAttribute("type");
-				string type = reader.Value;
-
-				string material = "";
-				if (reader.GetAttribute ("material") != null) {
-
-					reader.MoveToAttribute("material");
-					material = reader.Value;
-				}
-					
-				reader.MoveToAttribute("x");
-				float x = (float)Convert.ToDouble(reader.Value);
-
-				reader.MoveToAttribute("y");
-				float y = (float)Convert.ToDouble(reader.Value);
-
-				float rotation = 0f;
-				if (reader.GetAttribute ("rotation") != null) {
-				
-					reader.MoveToAttribute ("rotation");
-					rotation = (float)Convert.ToDouble (reader.Value);
-				}
-
-				if (nodeName == "Block") {
-
-					level.blocks.Add (new BlockData (type, rotation, x, y, material));
-					reader.Read ();
-				} 
-				else if (nodeName == "Pig") {
-
-					level.pigs.Add (new OBjData (type, rotation, x, y));
-					reader.Read ();
-				}
-				else if (nodeName == "TNT") {
-
-					level.tnts.Add (new OBjData (type, rotation, x, y));
-					reader.Read ();
-				}
-				else if (nodeName == "Platform") {
-
-					float scaleX = 1f;
-					if (reader.GetAttribute ("scaleX") != null) {
-
-						reader.MoveToAttribute ("scaleX");
-						scaleX = (float)Convert.ToDouble (reader.Value);
-					}
-
-					float scaleY = 1f;
-					if (reader.GetAttribute ("scaleY") != null) {
-
-						reader.MoveToAttribute ("scaleY");
-						scaleY = (float)Convert.ToDouble (reader.Value);
-					}
-
-					level.platforms.Add (new PlatData (type, rotation, x, y, scaleX, scaleY));
-					reader.Read ();
-				}
-			}
-		}
-
-		return level;
-	}
-
-	public static void SaveXmlLevel(ABLevel level, string path) 
+    public static string ReadXmlLevel(string path)
     {
-		StringBuilder output = new StringBuilder();
-		XmlWriterSettings ws = new XmlWriterSettings();
-		ws.Indent = true;
 
+        string xmlText = "";
+
+        if (path.Contains("StreamingAssets"))
+        {
+
+            xmlText = File.ReadAllText(path);
+        }
+        else
+        {
+
+            string[] stringSeparators = new string[] { "Levels/" };
+            string[] arrayPath = path.Split(stringSeparators, StringSplitOptions.None);
+            string finalPath = arrayPath[1].Split('.')[0];
+
+            TextAsset levelData = Resources.Load<TextAsset>("Levels/" + finalPath);
+            xmlText = levelData.text;
+        }
+
+
+        return xmlText;
+    }
+
+    public static ABLevel LoadXmlLevel(string xmlString)
+    {
+        ABLevel level = new ABLevel();
+        using (XmlReader reader = XmlReader.Create(new StringReader(xmlString)))
+        {
+            reader.ReadToFollowing("Level");
+
+            level.width = 1;
+            if (reader.GetAttribute("width") != null)
+            {
+
+                reader.MoveToAttribute("width");
+                level.width = (int)Convert.ToInt32(reader.Value);
+            }
+
+            reader.ReadToFollowing("Camera");
+
+            reader.MoveToAttribute("x");
+            level.camera.x = (float)Convert.ToDouble(reader.Value);
+
+            reader.MoveToAttribute("y");
+            level.camera.y = (float)Convert.ToDouble(reader.Value);
+
+            reader.MoveToAttribute("minWidth");
+            level.camera.minWidth = (float)Convert.ToDouble(reader.Value);
+
+            reader.MoveToAttribute("maxWidth");
+            level.camera.maxWidth = (float)Convert.ToDouble(reader.Value);
+
+            reader.ReadToFollowing("Birds");
+            reader.Read();
+
+            while (reader.Read())
+            {
+
+                string nodeName = reader.LocalName;
+                if (nodeName == "Birds")
+                    break;
+
+                reader.MoveToAttribute("type");
+                string type = reader.Value;
+
+                level.birds.Add(new BirdData(type));
+                reader.Read();
+            }
+            reader.ReadToFollowing("Slingshot");
+
+            reader.MoveToAttribute("x");
+            level.slingshot.x = (float)Convert.ToDouble(reader.Value);
+
+            reader.MoveToAttribute("y");
+            level.slingshot.y = (float)Convert.ToDouble(reader.Value);
+
+            reader.ReadToFollowing("GameObjects");
+            reader.Read();
+
+            while (reader.Read())
+            {
+                string nodeName = reader.LocalName;
+                if (nodeName == "GameObjects")
+                    break;
+
+                reader.MoveToAttribute("type");
+                string type = reader.Value;
+
+                string material = "";
+                if (reader.GetAttribute("material") != null)
+                {
+
+                    reader.MoveToAttribute("material");
+                    material = reader.Value;
+                }
+
+                reader.MoveToAttribute("x");
+                float x = (float)Convert.ToDouble(reader.Value);
+
+                reader.MoveToAttribute("y");
+                float y = (float)Convert.ToDouble(reader.Value);
+
+                float rotation = 0f;
+                if (reader.GetAttribute("rotation") != null)
+                {
+
+                    reader.MoveToAttribute("rotation");
+                    rotation = (float)Convert.ToDouble(reader.Value);
+                }
+
+                if (nodeName == "Block")
+                {
+
+                    level.blocks.Add(new BlockData(type, rotation, x, y, material));
+                    reader.Read();
+                }
+                else if (nodeName == "Pig")
+                {
+
+                    level.pigs.Add(new OBjData(type, rotation, x, y));
+                    reader.Read();
+                }
+                else if (nodeName == "TNT")
+                {
+
+                    level.tnts.Add(new OBjData(type, rotation, x, y));
+                    reader.Read();
+                }
+                else if (nodeName == "Platform")
+                {
+
+                    float scaleX = 1f;
+                    if (reader.GetAttribute("scaleX") != null)
+                    {
+
+                        reader.MoveToAttribute("scaleX");
+                        scaleX = (float)Convert.ToDouble(reader.Value);
+                    }
+
+                    float scaleY = 1f;
+                    if (reader.GetAttribute("scaleY") != null)
+                    {
+
+                        reader.MoveToAttribute("scaleY");
+                        scaleY = (float)Convert.ToDouble(reader.Value);
+                    }
+                    level.platforms.Add(new PlatData(type, rotation, x, y, scaleX, scaleY));
+                    reader.Read();
+                }
+                else if (nodeName == "Trigger")
+                {
+                    if (reader.GetAttribute("x") != null)
+                    {
+                        reader.MoveToAttribute("x");
+                        level.triggerX = (float)Convert.ToDouble(reader.Value);
+                    }
+                    if (reader.GetAttribute("y") != null)
+                    {
+                        reader.MoveToAttribute("y");
+                        level.triggerY = (float)Convert.ToDouble(reader.Value);
+                    }
+                    reader.Read();
+                }
+            }
+        }
+
+        return level;
+    }
+
+    public static void SaveXmlLevel(ABLevel level, string path, int optional)
+    {
+        StringBuilder output = new StringBuilder();
+        XmlWriterSettings ws = new XmlWriterSettings();
+        ws.Indent = true;
         string CombinePath = Path.Combine(path, "");
-        path = Path.Combine(CombinePath, DateTime.Now.ToString("MMddyy-HHmmss")+".xml");
+        if (optional == 0)
+            path = Path.Combine(CombinePath, (LevelList.Instance.CurrentIndex).ToString() + "s.xml");
+        else if (optional == 1) {
+            path = Path.Combine(CombinePath, (LevelList.Instance.CurrentIndex).ToString() + ".xml");
+        } else if (optional == 2) {
+            path = Path.Combine(CombinePath, DateTime.Now.ToString("MMddyy-HHmmss")+".xml");
+        }
         Debug.Log("Save XML: " + path);
-		using (XmlWriter writer = XmlWriter.Create(output, ws)) {
-			writer.WriteStartElement("Level");
-			writer.WriteAttributeString("width", level.width.ToString());
+        using (XmlWriter writer = XmlWriter.Create(output, ws))
+        {
+            writer.WriteStartElement("Level");
+            writer.WriteAttributeString("width", level.width.ToString());
 
-			writer.WriteStartElement("Camera");
-			writer.WriteAttributeString("x", level.camera.x.ToString());
-			writer.WriteAttributeString("y", level.camera.y.ToString());
-			writer.WriteAttributeString("minWidth", level.camera.minWidth.ToString());
-			writer.WriteAttributeString("maxWidth", level.camera.maxWidth.ToString());
-			writer.WriteEndElement();
+            writer.WriteStartElement("Camera");
+            writer.WriteAttributeString("x", level.camera.x.ToString());
+            writer.WriteAttributeString("y", level.camera.y.ToString());
+            writer.WriteAttributeString("minWidth", level.camera.minWidth.ToString());
+            writer.WriteAttributeString("maxWidth", level.camera.maxWidth.ToString());
+            writer.WriteEndElement();
 
-			writer.WriteStartElement("Birds");
-            foreach (BirdData abBird in level.birds) {
+            writer.WriteStartElement("Birds");
+            foreach (BirdData abBird in level.birds)
+            {
                 writer.WriteStartElement("Bird");
                 writer.WriteAttributeString("type", abBird.type.ToString());
                 writer.WriteEndElement();
@@ -201,122 +235,141 @@ public class LevelLoader {
             writer.WriteString("\n");
             writer.WriteEndElement();
 
-			writer.WriteStartElement("Slingshot");
-			writer.WriteAttributeString("x", level.slingshot.x.ToString());
-			writer.WriteAttributeString("y", level.slingshot.y.ToString());
-			writer.WriteEndElement();
+            //writer.WriteStartElement("TriggerPoint");
+            //writer.WriteAttributeString("x", level.triggerX.ToString());
+            //writer.WriteAttributeString("y", level.triggerY.ToString());
+            //writer.WriteEndElement();
 
-			writer.WriteStartElement("GameObjects");
+            writer.WriteStartElement("Slingshot");
+            writer.WriteAttributeString("x", level.slingshot.x.ToString());
+            writer.WriteAttributeString("y", level.slingshot.y.ToString());
+            writer.WriteEndElement();
 
-			foreach(BlockData abObj in level.blocks) {
-				writer.WriteStartElement("Block");
+            writer.WriteStartElement("GameObjects");
+
+            foreach (BlockData abObj in level.blocks)
+            {
+                writer.WriteStartElement("Block");
                 String[] indexType = abObj.type.ToString().Split('(');
                 writer.WriteAttributeString("type", indexType[0]);
-				writer.WriteAttributeString("material", abObj.material.ToString());
-				writer.WriteAttributeString("x", abObj.x.ToString());
-				writer.WriteAttributeString("y", abObj.y.ToString());
-				writer.WriteAttributeString("rotation", abObj.rotation.ToString());
-				writer.WriteEndElement();
-			}
+                writer.WriteAttributeString("material", abObj.material.ToString());
+                writer.WriteAttributeString("x", abObj.x.ToString());
+                writer.WriteAttributeString("y", abObj.y.ToString());
+                writer.WriteAttributeString("rotation", abObj.rotation.ToString());
+                writer.WriteEndElement();
+            }
 
-			foreach(OBjData abObj in level.pigs) {
-				writer.WriteStartElement("Pig");
+            foreach (OBjData abObj in level.pigs)
+            {
+                writer.WriteStartElement("Pig");
                 String[] indexType = abObj.type.ToString().Split('(');
                 writer.WriteAttributeString("type", indexType[0]);
-				writer.WriteAttributeString("x", abObj.x.ToString());
-				writer.WriteAttributeString("y", abObj.y.ToString());
-				writer.WriteAttributeString("rotation", abObj.rotation.ToString());
-				writer.WriteEndElement();
-			}
+                writer.WriteAttributeString("x", abObj.x.ToString());
+                writer.WriteAttributeString("y", abObj.y.ToString());
+                writer.WriteAttributeString("rotation", abObj.rotation.ToString());
+                writer.WriteEndElement();
+            }
 
-			foreach(OBjData abObj in level.tnts)
-			{
-				writer.WriteStartElement("TNT");
+            foreach (OBjData abObj in level.tnts)
+            {
+                writer.WriteStartElement("TNT");
                 String[] indexType = abObj.type.ToString().Split('(');
                 writer.WriteAttributeString("type", indexType[0]);
-				writer.WriteAttributeString("x", abObj.x.ToString());
-				writer.WriteAttributeString("y", abObj.y.ToString());
-				writer.WriteAttributeString("rotation", abObj.rotation.ToString());
-				writer.WriteEndElement();
-			}
+                writer.WriteAttributeString("x", abObj.x.ToString());
+                writer.WriteAttributeString("y", abObj.y.ToString());
+                writer.WriteAttributeString("rotation", abObj.rotation.ToString());
+                writer.WriteEndElement();
+            }
 
-			foreach(PlatData abObj in level.platforms)
-			{
-				writer.WriteStartElement("Platform");
+            foreach (PlatData abObj in level.platforms)
+            {
+                writer.WriteStartElement("Platform");
                 String[] indexType = abObj.type.ToString().Split('(');
                 writer.WriteAttributeString("type", indexType[0]);
-				writer.WriteAttributeString("x", abObj.x.ToString());
-				writer.WriteAttributeString("y", abObj.y.ToString());
-				writer.WriteAttributeString("rotation", abObj.rotation.ToString());
-				writer.WriteAttributeString("scaleX", abObj.scaleX.ToString());
-				writer.WriteAttributeString("scaleY", abObj.scaleY.ToString());
-				writer.WriteEndElement();
-			}
+                writer.WriteAttributeString("x", abObj.x.ToString());
+                writer.WriteAttributeString("y", abObj.y.ToString());
+                writer.WriteAttributeString("rotation", abObj.rotation.ToString());
+                writer.WriteAttributeString("scaleX", abObj.scaleX.ToString());
+                writer.WriteAttributeString("scaleY", abObj.scaleY.ToString());
+                writer.WriteEndElement();
+            }
+            ABLevel CurrentLevel = LevelList.Instance.GetCurrentLevel();
+            if (optional == 0)
+            {
+                writer.WriteStartElement("Trigger");
+                writer.WriteAttributeString("type", "Trigger");
+                writer.WriteAttributeString("x", CurrentLevel.triggerX.ToString());
+                writer.WriteAttributeString("y", CurrentLevel.triggerY.ToString());
+                writer.WriteEndElement();
+
+            }
+            else if (optional == 1)
+            {
+                writer.WriteStartElement("Trigger");
+                writer.WriteAttributeString("type", "Trigger");
+                writer.WriteAttributeString("x", (2 * PlatformMiddle - CurrentLevel.triggerX).ToString());
+                writer.WriteAttributeString("y", CurrentLevel.triggerY.ToString());
+                writer.WriteEndElement();
+            }
+
             writer.WriteString("\n");
             writer.WriteEndElement();
-		}
-		
-		StreamWriter streamWriter = new StreamWriter(path);
-		streamWriter.WriteLine(output.ToString());
-		streamWriter.Close();
-	}
-		
-	public static Dictionary<string, GameObject> LoadABResource(string path) {
+        }
 
-		// Load block templates and cast them to game objects
-		UnityEngine.Object[] objs = Resources.LoadAll(path);
+        StreamWriter streamWriter = new StreamWriter(path);
+        streamWriter.WriteLine(output.ToString());
+        streamWriter.Close();
+    }
 
-		Dictionary<string, GameObject> resources = new Dictionary<string, GameObject>();
+    public static Dictionary<string, GameObject> LoadABResource(string path)
+    {
 
-		for (int i = 0; i < objs.Length; i++) {
+        // Load block templates and cast them to game objects
+        UnityEngine.Object[] objs = Resources.LoadAll(path);
 
-			GameObject abGameObject = (GameObject)objs[i];
-			resources [abGameObject.name] = abGameObject;
-		}
+        Dictionary<string, GameObject> resources = new Dictionary<string, GameObject>();
 
-		return resources;
-	}
+        for (int i = 0; i < objs.Length; i++)
+        {
 
-    public static ABLevel EncodeLevel() {
+            GameObject abGameObject = (GameObject)objs[i];
+            resources[abGameObject.name] = abGameObject;
+        }
+
+        return resources;
+    }
+
+    public static ABLevel EncodeLevel()
+    {
         ABLevel level = new ABLevel();
         level.width = LevelList.Instance.GetCurrentLevel().width;
         level.camera = LevelList.Instance.GetCurrentLevel().camera;
         level.slingshot = LevelList.Instance.GetCurrentLevel().slingshot;
         level.birds = LevelList.Instance.GetCurrentLevel().birds;
 
-        foreach (Transform child in GameObject.Find("Blocks").transform) 
+        foreach (Transform child in GameObject.Find("Blocks").transform)
         {
-            //Debug.Log("name: "+child.name);
-            if (child.name !="CircleSmall(Clone)" && child.tag != "test") {
-                string type = child.name;
-                float x = child.transform.position.x;
-                float y = child.transform.position.y;
-                float rotation = child.transform.rotation.eulerAngles.z;
+            string type = child.name;
+            float x = child.transform.position.x;
+            float y = child.transform.position.y;
+            float rotation = child.transform.rotation.eulerAngles.z;
 
-                if (child.GetComponent<ABPig>() != null)
-                {
-                    level.pigs.Add(new OBjData(type, rotation, x, y));
-                }
-                else if (child.GetComponent<ABBlock>() != null)
-                {
-                    string material = child.GetComponent<ABBlock>()._material.ToString();
-                    level.blocks.Add(new BlockData(type, rotation, x, y, material));
-                }
-                else if (child.GetComponent<ABTNT>() != null)
-                {
-                    level.tnts.Add(new OBjData(type, rotation, x, y));
-                }
-            } else {
-                if (child.name == "TNT(Clone)") {
-                    if (child.GetComponent<ABTNT>() != null)
-                    {
-                        level.tnts.Add(new OBjData(child.name, child.transform.rotation.eulerAngles.z, child.transform.position.x, child.transform.position.y));
-                    }
-                }
+            if (child.GetComponent<ABPig>() != null)
+            {
+                level.pigs.Add(new OBjData(type, rotation, x, y));
+            }
+            else if (child.GetComponent<ABBlock>() != null)
+            {
+                string material = child.GetComponent<ABBlock>()._material.ToString();
+                level.blocks.Add(new BlockData(type, rotation, x, y, material));
+            }
+            else if (child.GetComponent<ABTNT>() != null)
+            {
+                level.tnts.Add(new OBjData(type, rotation, x, y));
             }
         }
 
-        foreach (Transform child in GameObject.Find("Platforms").transform) 
+        foreach (Transform child in GameObject.Find("Platforms").transform)
         {
             PlatData obj = new PlatData();
             obj.type = child.name;
@@ -330,10 +383,68 @@ public class LevelLoader {
         return level;
     }
 
-	public static void SaveLevelOnScene() {
+    public ABLevel EncodeSymmetricalLevel()
+    {
+        float platformMiddlePoint = 0;
+        ABLevel level = new ABLevel();
+        level.width = LevelList.Instance.GetCurrentLevel().width;
+        level.camera = LevelList.Instance.GetCurrentLevel().camera;
+        level.slingshot = LevelList.Instance.GetCurrentLevel().slingshot;
+        level.birds = LevelList.Instance.GetCurrentLevel().birds;
+        level.platforms = LevelList.Instance.GetCurrentLevel().platforms;
+        foreach (Transform child in GameObject.Find("Platforms").transform)
+        {
+            PlatData obj = new PlatData();
+            obj.type = child.name;
+            obj.x = child.transform.position.x;
+            obj.y = child.transform.position.y;
+            obj.rotation = child.transform.rotation.eulerAngles.z;
+            obj.scaleX = child.transform.localScale.x;
+            obj.scaleY = child.transform.localScale.y;
+            platformMiddlePoint += child.transform.position.x;
+            level.platforms.Add(obj);
+        }
+        platformMiddlePoint /= level.platforms.Count;
+        PlatformMiddle = platformMiddlePoint;
+        foreach (Transform child in GameObject.Find("Blocks").transform)
+        {
+            string type = child.name;
+            float x = 2 * platformMiddlePoint - child.transform.position.x;
+            float y = child.transform.position.y;
+            float rotation = child.transform.rotation.eulerAngles.z;
+
+            if (child.GetComponent<ABPig>() != null)
+            {
+                level.pigs.Add(new OBjData(type, rotation, x, y));
+            }
+            else if (child.GetComponent<ABBlock>() != null)
+            {
+                string material = child.GetComponent<ABBlock>()._material.ToString();
+                level.blocks.Add(new BlockData(type, rotation, x, y, material));
+            }
+            else if (child.GetComponent<ABTNT>() != null)
+            {
+                level.tnts.Add(new OBjData(type, rotation, x, y));
+            }
+        }
+
+
+        return level;
+    }
+
+    public static void SaveLevel(int optional)
+    {
         //Use this code to save objs
         ABLevel level = EncodeLevel();
         //Save level to xml file
-        SaveXmlLevel(level ,Application.dataPath + "/StreamingAssets/LevelGenerator");
-	}
+        SaveXmlLevel(level, Application.dataPath + "/StreamingAssets/LevelGenerator", optional);
+    }
+
+    //platformMiddlePoint is the centre of the platforms in current subsets
+    public static void SaveLevelSymModel(ABLevel level, int SymModel)
+    {
+        //Save level to xml file
+        SaveXmlLevel(level, Application.dataPath + "/StreamingAssets/LevelGenerator", SymModel);
+    }
+
 }
