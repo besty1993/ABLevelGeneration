@@ -7,7 +7,6 @@ public class ABTNT : ABGameObject {
 	public float _explosionPower = 1f;
 	public float _explosionDamage = 1f;
 	private bool _exploded = false;
-    private static int _countExplode = 0;
 
 	public override void Die(bool withEffect = true)
 	{		
@@ -19,10 +18,6 @@ public class ABTNT : ABGameObject {
 
 		base.Die (withEffect);
 	}
-
-    public static void ResetCountExplode() {
-        _countExplode = 0;
-    }
 
 	public static void Explode(Vector2 position, float explosionArea, float explosionPower, float explosionDamage, GameObject explosive) {
 		Collider2D[] colliders = Physics2D.OverlapCircleAll (position, explosionArea);
@@ -40,22 +35,12 @@ public class ABTNT : ABGameObject {
 				coll.attachedRigidbody.AddForce (direction * (explosionPower / (distance * 2f)), ForceMode2D.Impulse);
 			}
 
-            ABLevel abLevel = LevelList.Instance.GetCurrentLevel();
+            //ABLevel abLevel = LevelList.Instance.GetCurrentLevel();
 
-            if (coll.gameObject.name == "TNT(Clone)" && coll.gameObject.tag=="Untagged" && abLevel.isTestTriggerPoint)
-            {
-                
-                _countExplode++;
-
-                print("Check outloop TNT Explode " + abLevel.countTNT + " , " + _countExplode);
-                if (abLevel.countTNT == _countExplode) {
-                    abLevel.isTNTExplode = true;
-                    print("----");
-                    print("Check inloop TNT Explode " + abLevel.countTNT + " , " + _countExplode);
-                    print("TNT Explode True");
-                    _countExplode = 0;
-                }
-            }
+            //if (coll.gameObject.name == "TNT(Clone)" && coll.gameObject.tag=="Untagged")
+            //{
+            //    print("TNT Explode");
+            //}
 		}
 	}
 }

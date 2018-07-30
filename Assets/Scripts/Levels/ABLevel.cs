@@ -119,21 +119,17 @@ public class ABLevel
 	public List<BlockData> blocks;
 	public List<PlatData>  platforms;
     public float triggerX, triggerY;
-    public bool isTNTExplode;
-    public int countTNT;
-    public bool isTestTriggerPoint = false;
-    public Vector2 platformStartPoint;
+    public List<float> grounds;
 	public static readonly int BIRDS_MAX_AMOUNT = 5;
 
 	public ABLevel() {
 		width = 1;
-        countTNT = 0;
-        isTNTExplode = false;
 		pigs      = new List<OBjData>();
 		tnts      = new List<OBjData>();
 		blocks    = new List<BlockData>();
 		birds     = new List<BirdData>();
 		platforms = new List<PlatData>();
+        grounds = new List<float>();
 	}
 
 }

@@ -8,47 +8,37 @@ public class LevelSimulator {
 
     public static bool GenerateLevel = true;
     public static float platformSize = 0.62f;
-
+    public static Vector2 platformStartPoint;
     public static Vector2 rangeTriggerPoint;
 	// False : Evaluate Subset	True : Generate Level
 
 	public static void SetSubsetTrigger (ABLevel subset, float x, float y) {
-		subset.triggerX = x;
-		subset.triggerY = y;
+        subset.triggerX = subset.triggerX + x;
+        subset.triggerY = subset.triggerY + y;
 	}
 
 	//Change Subset's position into different position.
 	public static void ChangeSubsetPosition (ABLevel subset, float x, float y) {
-        int platformCount = 0;
-
-        if (platformCount == 0)
-        {
-            subset.platformStartPoint.x = subset.triggerX;
-            subset.platformStartPoint.y = subset.triggerY;
-        }
-
         foreach (PlatData gameObj in subset.platforms)
         {
-            gameObj.x = (subset.platformStartPoint.x + gameObj.x) + x;
-            gameObj.y = (subset.platformStartPoint.y + gameObj.y) + y;
-            platformCount++;
+            gameObj.x = (gameObj.x) + x;
+            gameObj.y = (gameObj.y) + y;
         }
 
 		foreach (OBjData gameObj in subset.pigs) {
-            gameObj.x = (subset.platformStartPoint.x + gameObj.x) + x;
-            gameObj.y = (subset.platformStartPoint.y + gameObj.y) + y;
+            gameObj.x = (gameObj.x) + x;
+            gameObj.y = (gameObj.y) + y;
 		}
 
 		foreach(BlockData gameObj in subset.blocks) {
-            gameObj.x = (subset.platformStartPoint.x + gameObj.x) + x;
-            gameObj.y = (subset.platformStartPoint.y + gameObj.y) + y;
+            gameObj.x = (gameObj.x) + x;
+            gameObj.y = (gameObj.y) + y;
 		}
 
 		foreach(OBjData gameObj in subset.tnts) {
-            gameObj.x = (subset.platformStartPoint.x + gameObj.x) + x;
-            gameObj.y = (subset.platformStartPoint.y + gameObj.y) + y;
+            gameObj.x = (gameObj.x) + x;
+            gameObj.y = (gameObj.y) + y;
 		}
-        platformCount = 0;
 	}
 
     public static void GenerateSubset (ABLevel subset, float x, float y) {
@@ -57,33 +47,35 @@ public class LevelSimulator {
         {
             if (platformCount == 0)
             {
-                subset.platformStartPoint.x = gameObj.x;
-                subset.platformStartPoint.y = gameObj.y;
-                //rangeTriggerPoint.x = (Mathf.Abs(subset.platformStartPoint.x) - Mathf.Abs(subset.triggerX)) + 0.5F;
-                //rangeTriggerPoint.y = (Mathf.Abs(subset.platformStartPoint.y) - Mathf.Abs(subset.triggerY)) + 0.5F;
+                platformStartPoint.x = gameObj.x;
+                platformStartPoint.y = gameObj.y;
+                rangeTriggerPoint.x = (Mathf.Abs(platformStartPoint.x) - Mathf.Abs(subset.triggerX));
+                rangeTriggerPoint.y = (Mathf.Abs(platformStartPoint.y) - Mathf.Abs(subset.triggerY));
                 //Debug.Log("rangeTriggerPoint "+rangeTriggerPoint);
             }
-            Vector2 pos = new Vector2((Mathf.Abs((Mathf.Abs(subset.platformStartPoint.x) - Mathf.Abs(gameObj.x))) + x) - rangeTriggerPoint.x, (Mathf.Abs(Mathf.Abs(subset.platformStartPoint.y) - Mathf.Abs(gameObj.y)) + y) - rangeTriggerPoint.y);
+            //Debug.Log("gameObj.x pos " + Mathf.Abs(gameObj.x));
+            Vector2 pos = new Vector2((Mathf.Abs((Mathf.Abs(platformStartPoint.x) - Mathf.Abs(gameObj.x))) + x) - rangeTriggerPoint.x, (Mathf.Abs(Mathf.Abs(platformStartPoint.y) - Mathf.Abs(gameObj.y)) + y) - rangeTriggerPoint.y);
             Quaternion rotation = Quaternion.Euler(0, 0, gameObj.rotation);
             ABGameWorld.Instance.AddPlatform(ABWorldAssets.PLATFORM, pos, rotation, gameObj.scaleX, gameObj.scaleY);
             platformCount++;
+            //Debug.Log("platform pos "+pos);
         }
 
         foreach (OBjData gameObj in subset.tnts)
         {
-            Vector2 pos = new Vector2((Mathf.Abs((Mathf.Abs(subset.platformStartPoint.x) - Mathf.Abs(gameObj.x))) + x) - rangeTriggerPoint.x, (Mathf.Abs(Mathf.Abs(subset.platformStartPoint.y) - Mathf.Abs(gameObj.y)) + y) - rangeTriggerPoint.y);
+            Vector2 pos = new Vector2((Mathf.Abs((Mathf.Abs(platformStartPoint.x) - Mathf.Abs(gameObj.x))) + x) - rangeTriggerPoint.x, (Mathf.Abs(Mathf.Abs(platformStartPoint.y) - Mathf.Abs(gameObj.y)) + y) - rangeTriggerPoint.y);
             Quaternion rotation = Quaternion.Euler(0, 0, gameObj.rotation);
             ABGameWorld.Instance.AddBlock(ABWorldAssets.TNT, pos, rotation);
         }
 
 		foreach (OBjData gameObj in subset.pigs) {
-            Vector2 pos = new Vector2((Mathf.Abs((Mathf.Abs(subset.platformStartPoint.x) - Mathf.Abs(gameObj.x))) + x) - rangeTriggerPoint.x, (Mathf.Abs(Mathf.Abs(subset.platformStartPoint.y) - Mathf.Abs(gameObj.y)) + y) - rangeTriggerPoint.y);
+            Vector2 pos = new Vector2((Mathf.Abs((Mathf.Abs(platformStartPoint.x) - Mathf.Abs(gameObj.x))) + x) - rangeTriggerPoint.x, (Mathf.Abs(Mathf.Abs(platformStartPoint.y) - Mathf.Abs(gameObj.y)) + y) - rangeTriggerPoint.y);
 			Quaternion rotation = Quaternion.Euler (0, 0, gameObj.rotation);
 			ABGameWorld.Instance.AddPig(ABWorldAssets.PIGS[gameObj.type], pos, rotation);
 		}
 
 		foreach(BlockData gameObj in subset.blocks) {
-            Vector2 pos = new Vector2((Mathf.Abs((Mathf.Abs(subset.platformStartPoint.x) - Mathf.Abs(gameObj.x))) + x) - rangeTriggerPoint.x, (Mathf.Abs(Mathf.Abs(subset.platformStartPoint.y) - Mathf.Abs(gameObj.y)) + y) - rangeTriggerPoint.y);
+            Vector2 pos = new Vector2((Mathf.Abs((Mathf.Abs(platformStartPoint.x) - Mathf.Abs(gameObj.x))) + x) - rangeTriggerPoint.x, (Mathf.Abs(Mathf.Abs(platformStartPoint.y) - Mathf.Abs(gameObj.y)) + y) - rangeTriggerPoint.y);
 			Quaternion rotation = Quaternion.Euler (0, 0, gameObj.rotation);
 			GameObject block = ABGameWorld.Instance.AddBlock(ABWorldAssets.BLOCKS[gameObj.type], pos,  rotation);
 			MATERIALS material = (MATERIALS)System.Enum.Parse(typeof(MATERIALS), gameObj.material);

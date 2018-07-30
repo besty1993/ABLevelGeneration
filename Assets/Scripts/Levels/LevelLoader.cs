@@ -439,12 +439,4 @@ public class LevelLoader
         //Save level to xml file
         SaveXmlLevel(level, Application.dataPath + "/StreamingAssets/LevelGenerator", optional);
     }
-
-    //platformMiddlePoint is the centre of the platforms in current subsets
-    public static void SaveLevelSymModel(ABLevel level, int SymModel)
-    {
-        //Save level to xml file
-        SaveXmlLevel(level, Application.dataPath + "/StreamingAssets/LevelGenerator", SymModel);
-    }
-
 }

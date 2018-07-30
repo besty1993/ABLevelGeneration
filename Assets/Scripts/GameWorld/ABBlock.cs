@@ -20,74 +20,81 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class ABBlock : ABGameObject {
+public class ABBlock : ABGameObject
+{
 
-	public MATERIALS _material;
+    public MATERIALS _material;
 
-	public uint  _points;
+    public uint _points;
 
-	public Sprite []_woodSprites;
-	public Sprite []_stoneSprites;
-	public Sprite []_iceSprites;
+    public Sprite[] _woodSprites;
+    public Sprite[] _stoneSprites;
+    public Sprite[] _iceSprites;
+    public static float xLeft = 0;
+    public static float xRight = 0;
 
 
-	protected override void Awake() {
+    protected override void Awake()
+    {
 
-		base.Awake();
-		SetMaterial (_material);
-	}
-	
-	public override void Die(bool withEffect = true)
-	{
-		if(!ABGameWorld.Instance._isSimulation)
-			ScoreHud.Instance.SpawnScorePoint(_points, transform.position);
+        base.Awake();
+        SetMaterial(_material);
+    }
 
-		base.Die();
-	}
+    public override void Die(bool withEffect = true)
+    {
+        if (!ABGameWorld.Instance._isSimulation)
+            ScoreHud.Instance.SpawnScorePoint(_points, transform.position);
 
-	public void SetMaterial(MATERIALS material) {
+        base.Die();
+    }
 
-		_material = material;
+    public void SetMaterial(MATERIALS material)
+    {
 
-		switch (material) {
+        _material = material;
 
-		case MATERIALS.wood:
-			_clips = ABWorldAssets.WOOD_DAMAGE_CLIP;
-			_sprites = _woodSprites;
-			_destroyEffect._particleSprites = ABWorldAssets.WOOD_DESTRUCTION_EFFECT;
-			_collider.sharedMaterial = ABWorldAssets.WOOD_MATERIAL;
-			_life *= 1f;
-			break;
+        switch (material)
+        {
 
-		case MATERIALS.stone:
-			_clips = ABWorldAssets.STONE_DAMAGE_CLIP;
-			_sprites = _stoneSprites;
-			_destroyEffect._particleSprites = ABWorldAssets.STONE_DESTRUCTION_EFFECT;
-			_collider.sharedMaterial = ABWorldAssets.STONE_MATERIAL;
+            case MATERIALS.wood:
+                _clips = ABWorldAssets.WOOD_DAMAGE_CLIP;
+                _sprites = _woodSprites;
+                _destroyEffect._particleSprites = ABWorldAssets.WOOD_DESTRUCTION_EFFECT;
+                _collider.sharedMaterial = ABWorldAssets.WOOD_MATERIAL;
+                _life *= 1f;
+                break;
 
-			_life *= 2f;
-			break;
+            case MATERIALS.stone:
+                _clips = ABWorldAssets.STONE_DAMAGE_CLIP;
+                _sprites = _stoneSprites;
+                _destroyEffect._particleSprites = ABWorldAssets.STONE_DESTRUCTION_EFFECT;
+                _collider.sharedMaterial = ABWorldAssets.STONE_MATERIAL;
 
-		case MATERIALS.ice:
-			_clips = ABWorldAssets.ICE_DAMAGE_CLIP;
-			_sprites = _iceSprites;
-			_destroyEffect._particleSprites = ABWorldAssets.ICE_DESTRUCTION_EFFECT;
-			_collider.sharedMaterial = ABWorldAssets.ICE_MATERIAL;
+                _life *= 2f;
+                break;
 
-			_life *= 0.5f;
-			break;
-		}
+            case MATERIALS.ice:
+                _clips = ABWorldAssets.ICE_DAMAGE_CLIP;
+                _sprites = _iceSprites;
+                _destroyEffect._particleSprites = ABWorldAssets.ICE_DESTRUCTION_EFFECT;
+                _collider.sharedMaterial = ABWorldAssets.ICE_MATERIAL;
 
-		_spriteRenderer.sprite = _sprites [0];
-	}
+                _life *= 0.5f;
+                break;
+        }
 
-	public override void OnCollisionEnter2D(Collision2D collision)
+        _spriteRenderer.sprite = _sprites[0];
+    }
+
+    public override void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.tag == "test")
         {
             //print("Test: ");
             ABLevel addStriggerXY = LevelList.Instance.GetCurrentLevel();
-            foreach (ContactPoint2D striggerPoint in collision.contacts) {
+            foreach (ContactPoint2D striggerPoint in collision.contacts)
+            {
                 addStriggerXY.triggerX = striggerPoint.point.x;
                 addStriggerXY.triggerY = striggerPoint.point.y;
                 //if (!addStrigger.triggers.Contains(striggerPoint.point))
@@ -95,37 +102,40 @@ public class ABBlock : ABGameObject {
                 //    addStrigger.triggers.Add(striggerPoint.point);
                 //}
             }
-           
+
         }
-        //if (collision.gameObject.name == "Ground" && collision.gameObject.tag != "test")
-        //{
-        //    ABLevel addPoints = LevelList.Instance.GetCurrentLevel();
-        //    foreach (ContactPoint2D groundPoint in collision.contacts)
-        //    {
-        //        print("size "+ addPoints.grounds.Count);
-        //        if (!addPoints.grounds.Contains(groundPoint.point.x) && groundPoint.point.x <= 14)
-        //        {
-        //            if (addPoints.grounds.Count == 0) {
-        //                print("Count equal 0");
-        //                addPoints.grounds.Add(groundPoint.point.x);
-        //            } else {
-        //                if (addPoints.grounds[0] + 5.0f > groundPoint.point.x && addPoints.grounds[0] - 5.0f < groundPoint.point.x) {
-        //                    print("Count not equal 0 "+addPoints.grounds[0]+" , "+groundPoint.point.x);
-        //                    addPoints.grounds.Add(groundPoint.point.x);
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
 
-        if (collision.gameObject.tag == "Bird") {
+        if (collision.gameObject.name == "Ground" && collision.gameObject.tag != "test")
+        {
+            ABLevel addPoints = LevelList.Instance.GetCurrentLevel();
+            foreach (ContactPoint2D groundPoint in collision.contacts)
+            {
+                if ((groundPoint.point.x < xLeft) && (groundPoint.point.x > xRight) && (groundPoint.point.x <= 14))
+                {
+                    if (addPoints.grounds.Count == 0)
+                    {
+                        print("ADD Ground " + groundPoint.point.x);
+                        addPoints.grounds.Add(groundPoint.point.x);
+                        xLeft = groundPoint.point.x - 5f;
+                        xRight = groundPoint.point.x + 5f;
+                    }
+                } else if (xLeft == 0 && xRight == 0 ) {
+                    print("ADD Ground zero " + groundPoint.point.x);
+                    addPoints.grounds.Add(groundPoint.point.x);
+                    xLeft = groundPoint.point.x - 5f;
+                    xRight = groundPoint.point.x + 5f;
+                }
+            }
+        }
 
+        if (collision.gameObject.tag == "Bird")
+        {
             ABBird bird = collision.gameObject.GetComponent<ABBird>();
             float collisionMagnitude = collision.relativeVelocity.magnitude;
             float birdDamage = 1f;
 
-            switch (_material) {
-
+            switch (_material)
+            {
                 case MATERIALS.wood:
                     birdDamage = bird._woodDamage;
                     break;
@@ -138,12 +148,22 @@ public class ABBlock : ABGameObject {
                     birdDamage = bird._iceDamage;
                     break;
             }
-
             DealDamage(collisionMagnitude * birdDamage);
         }
-        else {
+        else
+        {
 
             base.OnCollisionEnter2D(collision);
         }
-	}
+    }
+
 }
+
+//else {
+//    if (addPoints.grounds.Count < 2) {
+//        if ((addPoints.grounds[0] - 5f > groundPoint.point.x) || (addPoints.grounds[0] + 5f < groundPoint.point.x)) { //  
+//            print(addPoints.grounds.Count + " Ground Sec " + addPoints.grounds[0] + " , " + groundPoint.point.x);
+//            addPoints.grounds.Add(groundPoint.point.x);
+//        }
+//    }
+//}
