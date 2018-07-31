@@ -49,8 +49,10 @@ public class LevelSimulator {
             {
                 platformStartPoint.x = gameObj.x;
                 platformStartPoint.y = gameObj.y;
-                rangeTriggerPoint.x = (Mathf.Abs(platformStartPoint.x) - Mathf.Abs(subset.triggerX));
-                rangeTriggerPoint.y = (Mathf.Abs(platformStartPoint.y) - Mathf.Abs(subset.triggerY));
+                //rangeTriggerPoint.x = (Mathf.Abs(platformStartPoint.x) - Mathf.Abs(subset.triggerX));
+                //rangeTriggerPoint.y = (Mathf.Abs(platformStartPoint.y) - Mathf.Abs(subset.triggerY));
+                rangeTriggerPoint.x = 0;
+                rangeTriggerPoint.y = 0;
                 //Debug.Log("rangeTriggerPoint "+rangeTriggerPoint);
             }
             //Debug.Log("gameObj.x pos " + Mathf.Abs(gameObj.x));

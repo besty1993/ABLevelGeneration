@@ -32,7 +32,7 @@ public class ABBlock : ABGameObject
     public Sprite[] _iceSprites;
     public static float xLeft = 0;
     public static float xRight = 0;
-
+    public static int countGround = 0;
 
     protected override void Awake()
     {
@@ -110,21 +110,30 @@ public class ABBlock : ABGameObject
             ABLevel addPoints = LevelList.Instance.GetCurrentLevel();
             foreach (ContactPoint2D groundPoint in collision.contacts)
             {
-                if ((groundPoint.point.x < xLeft) && (groundPoint.point.x > xRight) && (groundPoint.point.x <= 14))
-                {
-                    if (addPoints.grounds.Count == 0)
+                //print("G "+ xLeft +" "+xRight);
+                if (countGround < 2) {
+                    if ((groundPoint.point.x < xLeft) || (groundPoint.point.x > xRight) && (groundPoint.point.x <= 14))
                     {
-                        print("ADD Ground " + groundPoint.point.x);
+                        //print("POOM");
+                        if (addPoints.grounds.Count == 0)
+                        {
+                            print("ADD Ground " + groundPoint.point.x);
+                            addPoints.grounds.Add(groundPoint.point.x);
+                            countGround++;
+                            xLeft = groundPoint.point.x - 5f;
+                            xRight = groundPoint.point.x + 5f;
+                        }
+                    }
+                    else if (xLeft == 0 && xRight == 0)
+                    {
+                        print("ADD Ground zero " + groundPoint.point.x);
                         addPoints.grounds.Add(groundPoint.point.x);
                         xLeft = groundPoint.point.x - 5f;
                         xRight = groundPoint.point.x + 5f;
+                        countGround++;
                     }
-                } else if (xLeft == 0 && xRight == 0 ) {
-                    print("ADD Ground zero " + groundPoint.point.x);
-                    addPoints.grounds.Add(groundPoint.point.x);
-                    xLeft = groundPoint.point.x - 5f;
-                    xRight = groundPoint.point.x + 5f;
                 }
+
             }
         }
 

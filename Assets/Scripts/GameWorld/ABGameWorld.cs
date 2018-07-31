@@ -72,9 +72,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
 
     public AudioClip[] _clips;
 
-    /// /// For Subset
-    public static float platformStartPoint;
-    public static float platformStartPointY;
+    /// For Subset
     public static int bulletPositionVertical = 0;
     public static int bulletPositionHorizonal = 0;
     public static int verticalTimes = 5;
@@ -87,30 +85,34 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
     public static int blockId;
     public static float velocityLimitationX = 0;
     public static float velocityLimitationY = 0;
-    public static List<Vector2> positions;
-    public static float subsetStartPointX;
-    public static float subsetStartPointY;
+
+
 
     // For Generate
+    public static List<Vector2> positionSubsets;
+    public static List<int> levelSubsets;
+    public static int tempPosition;
+
+    public static int SubsetSimulationNumber; // 0 is Horizontal,1 is Vertical.
     public static bool isGenerateGround = false;
     public static bool isGenerateSubset = false;
-    public static bool isSaveLevel = false;
-    public static List<Vector2> positionSubsets;
-    public static int tempPosition;
-    public static List<int> levelSubsets;
-    public static int countCheckPosition = 0;
-    public static int SubsetSimulationNumber; // 0 is Horizontal,1 is Vertical.
-    public static List<int> groundIndex;
-    public static int subsetCount = 0;
+
     public static int randomLevel;
-    public static int countTNT;
-    public static int bulletPositionVerticalTest = 0;
-    public static int bulletPositionHorizonalTest = 0;
-    public static int countNotExplode = 0;
-    public static bool isCheckPosition = false;
+    public static int subsetCount = 0;
+    public static int countCheckPosition = 0;
+
+    public bool isCheckPosition = false;
     public static bool isShootHorizontalTriggerPoint = false;
     public static bool isShootVerticalTriggerPoint = false;
     public Vector2 triggerPointSubset;
+
+    public static List<Vector2> positions;
+    public static float platformStartPoint;
+    public static float platformStartPointY;
+    public static float subsetStartPointX;
+    public static float subsetStartPointY;
+
+    public static bool isSaveLevel = false;
 
     void Awake()
     {
@@ -136,7 +138,6 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
         positions = new List<Vector2>();
         positionSubsets = new List<Vector2>();
         levelSubsets = new List<int>();
-        groundIndex = new List<int>();
 
         if (!_isSimulation)
         {
@@ -340,8 +341,18 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
                 UpdateEveryNFrames(10);
                 countCheckPosition++;
 
-                //print(countCheckPosition);
-                if (countCheckPosition > 300)
+                if (isSaveLevel)
+                {
+                    print("Save.");
+
+                    isShootHorizontalTriggerPoint = false;
+                    isShootVerticalTriggerPoint = false;
+                    LevelLoader.SaveLevel(2);
+                    isSaveLevel = false;
+                    countCheckPosition = 0;
+                }
+
+                if (countCheckPosition > 200)
                 {
                     if (positions.Count > 0) {
                         isCheckPosition = true;
@@ -351,13 +362,15 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
                     }
                     countCheckPosition = 0;
                 }
+
             } else {
+                
                 if (!isGenerateSubset && positions.Count > 0) {
                     isGenerateSubset = true;
                     initx();
 
-
                     randomLevel = Random.Range(1, LevelList.Instance.GetAllLevel().Length);
+                    print("Level Subset: "+randomLevel);
                     for (int i = 1; i < positionSubsets.Count; i++)
                     {
                         GenerateSubset(positionSubsets[i], levelSubsets[i]);
@@ -366,13 +379,12 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
                     GenerateSubset(positions[tempPosition], randomLevel);
                     positionSubsets.Add(positions[tempPosition]);
                     levelSubsets.Add(randomLevel);
-                    AdaptCameraWidthToLevel();
+                    subsetCount++;
 
-                    print("Generate Subset: " + positions[tempPosition].x);
+                    print("Generate Subset: " + positions[tempPosition]);
 
-
+                    countCheckPosition = 0;
                     positions.Clear();
-                    currentLevel.grounds.Clear();
                     isShootHorizontalTriggerPoint = false;
                     isShootVerticalTriggerPoint = false;
                     isCheckPosition = false;
@@ -383,41 +395,23 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
                     isGenerateGround = true;
                     initx();
 
-                    print("Generate Ground" + currentLevel.grounds.Count);
-
                     foreach (float groundX in currentLevel.grounds)
                     {
                         randomLevel = Random.Range(1, LevelList.Instance.GetAllLevel().Length);
+                        print("Generate Ground" + currentLevel.grounds.Count);
                         GenerateSubset(new Vector2(groundX, -4f), randomLevel);
                         positionSubsets.Add(new Vector2(groundX, -4f));
                         levelSubsets.Add(randomLevel);
+                        subsetCount++;
                     }
 
-                    positions.Clear();
+                    countCheckPosition = 0;
                     currentLevel.grounds.Clear();
                     isShootHorizontalTriggerPoint = false;
                     isShootVerticalTriggerPoint = false;
                     isCheckPosition = false;
                     isGenerateGround = false;
                 }
-
-                //else {
-                //    NextLevel();
-                //}
-
-
-                //if ( == 100) {
-                //    print("TEST: " + SubsetSimulationNumber);
-                //    if (SubsetSimulationNumber == 0) // Simulate again
-                //    {
-                //        TestHorizontalTriggerPoint();
-                //    }
-                //    if (SubsetSimulationNumber == 1)
-                //    {
-                //        TestVerticalTriggerPoint();
-                //    }
-                //    print("FINISH TEST");
-                //}
             }
         }
         else
@@ -978,11 +972,12 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
             //print("objPos "+ objPos);
             if ((objPos.x < 14.0f) && (objPos.y <  5.0f) && (objPos.y > -2.0f)) {
                 for (int i = 0; i < positionSubsets.Count; i++) {
-                    if (objPos.x < positionSubsets[i].x - 5f || objPos.x > positionSubsets[i].x + 5f) { //
-                        print("Not Generate");
+                    if (objPos.x < positionSubsets[i].x - 6f || objPos.x > positionSubsets[i].x + 6f) { //
+                        //print("Not Generate");
                         if (i == positionSubsets.Count - 1) {
                             print("ADD POS " + objPos);
                             positions.Add(objPos);
+                            //isCheckPosition = true;
                         }
                     } else {
                         return;
@@ -996,22 +991,6 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
     {
         ABLevel generateSubset = LevelList.Instance.GetLevel(level);
         LevelSimulator.GenerateSubset(generateSubset, position.x, position.y);
-        countTNT = generateSubset.tnts.Count;
-    }
-
-    public void SaveGenerateLevel()
-    {
-        if (subsetCount > 1)
-        {
-            LevelLoader.SaveLevel(2);
-            print("Save");
-        }
-        else
-        {
-            print("Not Save");
-        }
-        subsetCount = 0;
-        NextLevel();
     }
 
     public void ShootHorizontalTriggerPoint()
@@ -1027,19 +1006,32 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
             float y = triggerPointSubset.y ;
             //print("Shoot H "+triggerPointSubset.x+" "+triggerPointSubset.y);
             print("Shoot H " + bulletPositionHorizonal);
+            if (bulletPositionHorizonal < 5)
+            {
+                //print("BUTT" + bulletPositionHorizonal);
 
-            GameObject block = AddBlock(ABWorldAssets.BLOCKS["CircleSmall"], new Vector2(x, y), Quaternion.Euler(0, 0, 0));
-            MATERIALS material = (MATERIALS)System.Enum.Parse(typeof(MATERIALS), "stone");
-            block.GetComponent<ABBlock>().SetMaterial(material);
-            block.GetComponent<Rigidbody2D>().AddForce(new Vector2(2, 0), ForceMode2D.Impulse);
-            block.tag = "test";
-            SubsetSimulationNumber = 0;
+                GameObject block = AddBlock(ABWorldAssets.BLOCKS["CircleSmall"], new Vector2(x, y), Quaternion.Euler(0, 0, 0));
+                MATERIALS material = (MATERIALS)System.Enum.Parse(typeof(MATERIALS), "stone");
+                block.GetComponent<ABBlock>().SetMaterial(material);
+                block.tag = "test";
+                SubsetSimulationNumber = 0;
+                block.GetComponent<Rigidbody2D>().AddForce(new Vector2(2, 0), ForceMode2D.Impulse);
+
+            }
             bulletPositionHorizonal++;
             if (bulletPositionHorizonal > 5)
             {
-                initx();
+                Destroy(GameObject.FindGameObjectWithTag("test"));
+                //initx();
+                print("FINISH H " + subsetCount);
                 isShootHorizontalTriggerPoint = true;
-                print("FINISH H");
+                if (subsetCount > 2)
+                {
+                    subsetCount = 0;
+                    isShootVerticalTriggerPoint = true;
+                    isSaveLevel = true;
+                    NextLevel();
+                }
             }
             alreadyDropHorizontal = true;
         }
@@ -1066,18 +1058,30 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
             print("Shoot V " + bulletPositionVertical);
             float x = triggerPointSubset.x;
             float y = triggerPointSubset.y + 4f;
-            GameObject block = AddBlock(ABWorldAssets.BLOCKS["CircleSmall"], new Vector2(x, y), Quaternion.Euler(0, 0, 0));
-            MATERIALS material = (MATERIALS)System.Enum.Parse(typeof(MATERIALS), "stone");
-            block.GetComponent<ABBlock>().SetMaterial(material);
-            block.GetComponent<Rigidbody2D>().AddForce(new Vector2(0, -0.5f), ForceMode2D.Impulse);
-            block.tag = "test";
-            SubsetSimulationNumber = 1;
+
+            if (bulletPositionVertical < 5)
+            {
+                //print("BUTT" + bulletPositionVertical);
+
+                GameObject block = AddBlock(ABWorldAssets.BLOCKS["CircleSmall"], new Vector2(x, y), Quaternion.Euler(0, 0, 0));
+                MATERIALS material = (MATERIALS)System.Enum.Parse(typeof(MATERIALS), "stone");
+                block.GetComponent<ABBlock>().SetMaterial(material);
+                block.GetComponent<Rigidbody2D>().AddForce(new Vector2(0, -0.5f), ForceMode2D.Impulse);
+                block.tag = "test";
+
+            }
             bulletPositionVertical++;
+            SubsetSimulationNumber = 1;
             if (bulletPositionVertical > 5)
             {
-                print("FINISH V");
-                initx();
+                Destroy(GameObject.FindGameObjectWithTag("test"));
+                //initx();
+                print("FINISH V "+ subsetCount);
                 isShootHorizontalTriggerPoint = false;
+                if (subsetCount > 2) {
+                    subsetCount = 0;
+                    isSaveLevel = true;
+                }
                 NextLevel();
             }
             alreadyDrop = true;
@@ -1091,38 +1095,6 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
             }
             alreadyDrop = false;
         }
-    }
-
-    public void TestHorizontalTriggerPoint()
-    {
-        if (!_isSimulation || !IsLevelStable())
-        {
-            return;
-        }
-        print("TEST H");
-        float y = triggerPointSubset.y + 0.4f;
-        float x = triggerPointSubset.x - 2f;
-        GameObject block = AddBlock(ABWorldAssets.BLOCKS["CircleSmall"], new Vector2(x, y), Quaternion.Euler(0, 0, 0));
-        MATERIALS material = (MATERIALS)System.Enum.Parse(typeof(MATERIALS), "stone");
-        block.GetComponent<ABBlock>().SetMaterial(material);
-        block.GetComponent<Rigidbody2D>().AddForce(new Vector2(1, 0), ForceMode2D.Impulse);
-        block.tag = "test";
-    }
-
-    public void TestVerticalTriggerPoint()
-    {
-        if (!_isSimulation || !IsLevelStable())
-        {
-            return;
-        }
-        print("TEST V");
-        float x = triggerPointSubset.x - 2f;
-        float y = triggerPointSubset.y + 4f;
-        GameObject block = AddBlock(ABWorldAssets.BLOCKS["CircleSmall"], new Vector2(x, y), Quaternion.Euler(0, 0, 0));
-        MATERIALS material = (MATERIALS)System.Enum.Parse(typeof(MATERIALS), "stone");
-        block.GetComponent<ABBlock>().SetMaterial(material);
-        block.GetComponent<Rigidbody2D>().AddForce(new Vector2(0, -0.5f), ForceMode2D.Impulse);
-        block.tag = "test";
     }
 
 }
