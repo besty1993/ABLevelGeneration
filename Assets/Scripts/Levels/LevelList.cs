@@ -34,6 +34,8 @@ public class LevelList : ABSingleton<LevelList> {
 		if(CurrentIndex > _levels.Length - 1)
 			return null;
 
+//		Debug.Log(_levels[CurrentIndex].triggerX);
+
 		return _levels [CurrentIndex]; 
 	}
 

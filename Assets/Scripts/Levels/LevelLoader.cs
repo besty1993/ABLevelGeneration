@@ -174,18 +174,20 @@ public class LevelLoader {
                 }
                 else if (nodeName == "Trigger")
                 {
-                    if (reader.GetAttribute("x") != null)
-                    {
-                        reader.MoveToAttribute("x");
-                        level.triggerX = (float)Convert.ToDouble(reader.Value);
-                    }
-                    if (reader.GetAttribute("y") != null)
-                    {
-                        reader.MoveToAttribute("y");
-                        level.triggerY = (float)Convert.ToDouble(reader.Value);
-                    }
+                        level.triggerX = (float)Convert.ToDouble(x);
+                        level.triggerY = (float)Convert.ToDouble(y);
+                    
                     reader.Read();
                 }
+				else if (nodeName == "Horizontal")
+				{
+					if (reader.GetAttribute("bool") != null)
+					{
+						reader.MoveToAttribute("bool");
+						level.horizontal = (bool)Convert.ToBoolean(reader.Value);
+					}
+					reader.Read();
+				}
 			}
 		}
 
@@ -203,6 +205,8 @@ public class LevelLoader {
             path = Path.Combine(CombinePath, ("s"+LevelList.Instance.CurrentIndex).ToString() + ".xml");
         else
             path = Path.Combine(CombinePath, (LevelList.Instance.CurrentIndex).ToString() + ".xml");
+		if (LevelSimulator.generateLevel)
+			path = Path.Combine(CombinePath,DateTime.Now.ToString("MMddyy-HHmmss") + ".xml");
 //        Debug.Log("Save XML: " + path);
 		using (XmlWriter writer = XmlWriter.Create(output, ws)) {
 			writer.WriteStartElement("Level");
@@ -277,16 +281,16 @@ public class LevelLoader {
 				writer.WriteAttributeString("y", abObj.y.ToString());
 				writer.WriteEndElement();
 			}
-            ABLevel CurrentLevel = LevelList.Instance.GetCurrentLevel();
-			if (CurrentLevel.triggerX == 0)
+            ABLevel currentLevel = LevelList.Instance.GetCurrentLevel();
+			if (currentLevel.triggerX == 0)
 				return;
 			/////If there is no trigger point, consider subset as useless.
             if (!SymModel)
             {
                 writer.WriteStartElement("Trigger");
                 writer.WriteAttributeString("type", "Trigger");
-                writer.WriteAttributeString("x", CurrentLevel.triggerX.ToString());
-                writer.WriteAttributeString("y", CurrentLevel.triggerY.ToString());
+                writer.WriteAttributeString("x", currentLevel.triggerX.ToString());
+                writer.WriteAttributeString("y", currentLevel.triggerY.ToString());
                 writer.WriteEndElement();
 
             }
@@ -294,10 +298,18 @@ public class LevelLoader {
             {
                 writer.WriteStartElement("Trigger");
                 writer.WriteAttributeString("type", "Trigger");
-                writer.WriteAttributeString("x", (2*PlatformMiddle - CurrentLevel.triggerX).ToString());
-                writer.WriteAttributeString("y", CurrentLevel.triggerY.ToString());
+                writer.WriteAttributeString("x", (2*PlatformMiddle - currentLevel.triggerX).ToString());
+                writer.WriteAttributeString("y", currentLevel.triggerY.ToString());
                 writer.WriteEndElement();
             }
+			writer.WriteStartElement("Horizontal");
+			writer.WriteAttributeString("type", "Horizontal");
+			writer.WriteAttributeString("x", "0");
+			writer.WriteAttributeString("y", "0");
+			writer.WriteAttributeString("bool", currentLevel.horizontal.ToString());
+			writer.WriteEndElement();
+
+
 
             writer.WriteString("\n");
             writer.WriteEndElement();
@@ -330,6 +342,7 @@ public class LevelLoader {
         level.camera = LevelList.Instance.GetCurrentLevel().camera;
         level.slingshot = LevelList.Instance.GetCurrentLevel().slingshot;
         level.birds = LevelList.Instance.GetCurrentLevel().birds;
+		level.horizontal = LevelList.Instance.GetCurrentLevel().horizontal;
 
         foreach (Transform child in GameObject.Find("Blocks").transform) 
         {
@@ -376,6 +389,8 @@ public class LevelLoader {
         level.slingshot = LevelList.Instance.GetCurrentLevel().slingshot;
         level.birds = LevelList.Instance.GetCurrentLevel().birds;
         level.platforms = LevelList.Instance.GetCurrentLevel().platforms;
+		level.horizontal = LevelList.Instance.GetCurrentLevel().horizontal;
+
         foreach (Transform child in GameObject.Find("Platforms").transform)
         {
             PlatData obj = new PlatData();

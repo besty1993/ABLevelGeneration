@@ -27,7 +27,7 @@ GameObject:
   - component: {fileID: 114000013902093382}
   m_Layer: 10
   m_Name: TNT
-  m_TagString: Untagged
+  m_TagString: 1
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -209,13 +209,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _sprites: []
   _clips:
-  - {fileID: 8300000, guid: 9d3fe5163accd49ddbbdca40362c019e, type: 3}
-  - {fileID: 8300000, guid: 9d3fe5163accd49ddbbdca40362c019e, type: 3}
-  _life: 1
+  - {fileID: 0}
+  - {fileID: 0}
+  _life: 2
   _timeToDie: 0
-  _explosionArea: 4
-  _explosionPower: 4
-  _explosionDamage: 2
+  _explosionArea: 2
+  _explosionPower: 3
+  _explosionDamage: 3
 --- !u!212 &212000013692935820
 SpriteRenderer:
   m_ObjectHideFlags: 1

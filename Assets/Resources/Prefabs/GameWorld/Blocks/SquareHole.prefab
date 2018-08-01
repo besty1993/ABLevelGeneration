@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 8275068}
   m_Layer: 10
   m_Name: SquareHole
-  m_TagString: Rect
+  m_TagString: 3
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -198,7 +198,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _sprites: []
   _clips: []
-  _life: 11
+  _life: 5
   _timeToDie: 0
   _material: 0
   _points: 25

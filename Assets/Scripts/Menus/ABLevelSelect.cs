@@ -58,7 +58,7 @@ public class ABLevelSelect : ABMenu {
 		// Load levels in the streaming folder
 		//ABLG!!
 		string levelsPath;
-		if (!LevelSimulator.Generatelevel) {
+		if (!LevelSimulator.generateLevel) {
 			levelsPath = Application.dataPath + ABConstants.SUBSETS_FOLDER;
 		} else
 			levelsPath = Application.dataPath + ABConstants.EVALUATED_SUBSETS_FOLDER;
@@ -66,11 +66,13 @@ public class ABLevelSelect : ABMenu {
 
 
 
-		string[] levelFiles = Directory.GetFiles (levelsPath, "*.xml");
+		string[] levelFiles = Directory.GetFiles (levelsPath, "*.xml").OrderBy(f => f).ToArray();
 
 		string[] streamingXml = new string[levelFiles.Length];
-		for (int i = 0; i < levelFiles.Length; i++)
+		for (int i = 0; i < levelFiles.Length; i++) {
 			streamingXml [i] = File.ReadAllText (levelFiles [i]);
+//			print (levelFiles[i]);
+		}
 
 #endif
 
@@ -110,11 +112,13 @@ public class ABLevelSelect : ABMenu {
 
 
 		//ABLG!!
-		if (!LevelSimulator.Generatelevel) {
+		if (!LevelSimulator.generateLevel) {
 			LevelList.Instance.SetLevel (1);
 			LoadNextScene ("GameWorld", false, null);
 		} else {
-			LevelList.Instance.SetLevel(Random.Range (0, allXmlFiles.Length));
+			int temp = Random.Range (0, allXmlFiles.Length / 2);
+
+			LevelList.Instance.SetLevel(temp);
 			LoadNextScene ("GameWorld", false, null);
 		}
 			

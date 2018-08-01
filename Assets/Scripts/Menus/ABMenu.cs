@@ -30,6 +30,8 @@ public class ABMenu : MonoBehaviour {
 	/// </summary>
 	public static bool finished = false; //If it's true, Level Generater ends.
 	public static List<string> parameters;
+	public static int[] pigRange;
+	public static int lvlNumberToGenerate = 0;
 
 	void Start() {
 		if (finished) {
@@ -43,19 +45,24 @@ public class ABMenu : MonoBehaviour {
 
 	public void SwitchSubsetAndLevel () {
 		if (UnityEngine.SceneManagement.SceneManager.GetActiveScene ().name != "GameWorld") {
-			if (!LevelSimulator.Generatelevel) {
-				DeleteSubsets ();
+			if (!LevelSimulator.generateLevel) {
+				DeleteSubsetFiles ();
 
-				StreamReader sr = new StreamReader (System.Environment.CurrentDirectory + "/parameters.txt", true);
-				string temp = sr.ReadToEnd ();
-				parameters = new List<string> (temp.Split ('\n'));
-				sr.Close ();
+				if (parameters.Count == 0) {
+					StreamReader sr = new StreamReader (System.Environment.CurrentDirectory + "/parameters.txt", true);
+					string temp = sr.ReadToEnd ();
+					parameters = new List<string> (temp.Split ('\n'));
+					sr.Close ();
+				}
 
 				StreamWriter sw = new StreamWriter (Application.streamingAssetsPath + "/Subsets/parameters.txt", true);
 				sw.WriteLine (parameters [0]);
 				sw.WriteLine (parameters [1]);
 				sw.WriteLine (parameters [2]);
 				sw.Close ();
+
+				lvlNumberToGenerate = int.Parse (parameters [0]);
+				pigRange = System.Array.ConvertAll(parameters [2].Split (','),int.Parse);
 
 				parameters.RemoveRange (0, 3);
 
@@ -78,7 +85,7 @@ public class ABMenu : MonoBehaviour {
 		ABSceneManager.Instance.LoadScene(sceneName, loadTransition, action);
 	}
 
-	public void DeleteSubsets () {
+	public void DeleteSubsetFiles () {
 //		#if UNITY_EDITOR
 //		UnityEditor.FileUtil.DeleteFileOrDirectory (Application.streamingAssetsPath + "/Subsets/parameters.txt");
 //		UnityEditor.FileUtil.DeleteFileOrDirectory (Application.streamingAssetsPath + "/EvaluatedSubsets/*.xml");

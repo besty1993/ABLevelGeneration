@@ -123,7 +123,7 @@ public class ABLevel
     public List<float> grounds;
     public float triggerX, triggerY;
     public bool usefulLevel;
-    public bool horizontalCheck;
+    public bool horizontal;
     public bool levelShaking;
    
 
@@ -132,7 +132,6 @@ public class ABLevel
 	public ABLevel() {
 
 		width = 1;
-        horizontalCheck = false;
         levelShaking = false;
         usefulLevel = false;
         pigs      = new List<OBjData>();
