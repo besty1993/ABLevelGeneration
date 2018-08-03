@@ -29,7 +29,7 @@ public class ABMenu : MonoBehaviour {
 	/// Always start from level 1.
 	/// </summary>
 	public static bool finished = false; //If it's true, Level Generater ends.
-	public static List<string> parameters;
+	public static List<string> parameters = new List<string>();
 	public static int[] pigRange;
 	public static int lvlNumberToGenerate = 0;
 

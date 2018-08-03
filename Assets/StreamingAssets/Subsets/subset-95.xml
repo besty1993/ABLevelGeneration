@@ -3,15 +3,15 @@
 <Camera x="0" y="2" minWidth="20" maxWidth="30">
 <Birds>
 <Bird type="BirdYellow"/>
-<Bird type="BirdYellow"/>
+<Bird type="BirdBlue"/>
 </Birds>
 <Slingshot x="-8" y="-2.5">
 <GameObjects>
-<Block type="RectTiny" material="stone" x="-2.01607564" y="3.525" rotation="90" />
-<Block type="RectTiny" material="ice" x="-2.01607564002" y="3.955" rotation="90" />
-<Pig type="BasicSmall" material="" x="-2.01607564" y="4.42" rotation="0" />
+<Block type="RectMedium" material="stone" x="-1.959339292" y="4.15" rotation="90" />
+<Block type="RectTiny" material="stone" x="-1.95933929197" y="5.205" rotation="90" />
+<Pig type="BasicSmall" material="" x="-1.959339292" y="5.67" rotation="0" />
 <Platform type="Platform" material="" x="-2.69" y="3" />
 <Platform type="Platform" material="" x="-2.07" y="3" />
-<TNT type="" material="" x="-2.61071504754" y="3.67" rotation="0" />
+<TNT type="" material="" x="-2.35124531035" y="3.67" rotation="0" />
 </GameObjects>
 </Level>

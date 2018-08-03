@@ -1,4 +1,4 @@
-20
+100
 wood RectMedium,wood SquareTiny,ice CircleSmall
 8,10
 

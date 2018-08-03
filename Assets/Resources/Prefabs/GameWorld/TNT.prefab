@@ -27,7 +27,7 @@ GameObject:
   - component: {fileID: 114000013902093382}
   m_Layer: 10
   m_Name: TNT
-  m_TagString: 1
+  m_TagString: 4
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

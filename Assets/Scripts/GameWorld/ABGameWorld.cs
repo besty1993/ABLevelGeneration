@@ -200,7 +200,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
 
         if (_isSimulation)
         {
-            Time.timeScale = 1;
+            Time.timeScale = 100;
         }
 
     }

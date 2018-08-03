@@ -7,9 +7,10 @@
 </Birds>
 <Slingshot x="-8" y="-2.5">
 <GameObjects>
-<Block type="RectFat" material="wood" x="-2.38" y="3.735" rotation="90" />
-<Block type="CircleSmall" material="wood" x="-2.38" y="4.385" rotation="0" />
+<Block type="RectMedium" material="stone" x="-2.03404597607" y="4.15" rotation="90" />
+<Pig type="BasicSmall" material="" x="-2.0340459761" y="5.24" rotation="0" />
 <Platform type="Platform" material="" x="-2.69" y="3" />
 <Platform type="Platform" material="" x="-2.07" y="3" />
+<TNT type="" material="" x="-2.5759901618" y="3.67" rotation="0" />
 </GameObjects>
 </Level>
