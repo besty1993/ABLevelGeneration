@@ -281,40 +281,122 @@ public class LevelLoader {
 				writer.WriteAttributeString("y", abObj.y.ToString());
 				writer.WriteEndElement();
 			}
-            ABLevel currentLevel = LevelList.Instance.GetCurrentLevel();
-			if (currentLevel.triggerX == 0)
-				return;
-			/////If there is no trigger point, consider subset as useless.
-            if (!SymModel)
-            {
-                writer.WriteStartElement("Trigger");
-                writer.WriteAttributeString("type", "Trigger");
-                writer.WriteAttributeString("x", currentLevel.triggerX.ToString());
-                writer.WriteAttributeString("y", currentLevel.triggerY.ToString());
-                writer.WriteEndElement();
+			if (!LevelSimulator.generateLevel) {
+				ABLevel currentLevel = LevelList.Instance.GetCurrentLevel ();
+				if (currentLevel.triggerX == 0)
+					return;
+				/////If there is no trigger point, consider subset as useless.
+				if (!SymModel) {
+					writer.WriteStartElement ("Trigger");
+					writer.WriteAttributeString ("type", "Trigger");
+					writer.WriteAttributeString ("x", currentLevel.triggerX.ToString ());
+					writer.WriteAttributeString ("y", currentLevel.triggerY.ToString ());
+					writer.WriteEndElement ();
 
-            }
-            else
-            {
-                writer.WriteStartElement("Trigger");
-                writer.WriteAttributeString("type", "Trigger");
-                writer.WriteAttributeString("x", (2*PlatformMiddle - currentLevel.triggerX).ToString());
-                writer.WriteAttributeString("y", currentLevel.triggerY.ToString());
-                writer.WriteEndElement();
-            }
-			writer.WriteStartElement("Horizontal");
-			writer.WriteAttributeString("type", "Horizontal");
-			writer.WriteAttributeString("x", "0");
-			writer.WriteAttributeString("y", "0");
-			writer.WriteAttributeString("bool", currentLevel.horizontal.ToString());
-			writer.WriteEndElement();
-
+				} else {
+					writer.WriteStartElement ("Trigger");
+					writer.WriteAttributeString ("type", "Trigger");
+					writer.WriteAttributeString ("x", (2 * PlatformMiddle - currentLevel.triggerX).ToString ());
+					writer.WriteAttributeString ("y", currentLevel.triggerY.ToString ());
+					writer.WriteEndElement ();
+				}
+				writer.WriteStartElement ("Horizontal");
+				writer.WriteAttributeString ("type", "Horizontal");
+				writer.WriteAttributeString ("x", "0");
+				writer.WriteAttributeString ("y", "0");
+				writer.WriteAttributeString ("bool", currentLevel.horizontal.ToString ());
+				writer.WriteEndElement ();
+			}
 
 
             writer.WriteString("\n");
             writer.WriteEndElement();
 		}
 		
+		StreamWriter streamWriter = new StreamWriter(path);
+		streamWriter.WriteLine(output.ToString());
+		streamWriter.Close();
+	}
+
+	public static void SaveXmlLevel(ABLevel level, string path) {
+
+		StringBuilder output = new StringBuilder();
+		XmlWriterSettings ws = new XmlWriterSettings();
+		ws.Indent = true;
+		path = Path.Combine(path,DateTime.Now.ToString("MMddyy-HHmmss") + ".xml");
+
+		using (XmlWriter writer = XmlWriter.Create(output, ws))
+		{
+			writer.WriteStartElement("Level");
+			writer.WriteAttributeString("width", level.width.ToString());
+
+			writer.WriteStartElement("Camera");
+			writer.WriteAttributeString("x", level.camera.x.ToString());
+			writer.WriteAttributeString("y", level.camera.y.ToString());
+			writer.WriteAttributeString("minWidth", level.camera.minWidth.ToString());
+			writer.WriteAttributeString("maxWidth", level.camera.maxWidth.ToString());
+			writer.WriteEndElement();
+
+			writer.WriteStartElement("Birds");
+			foreach (BirdData abBird in level.birds) {
+				writer.WriteStartElement("Bird");
+				writer.WriteAttributeString("type", abBird.type.ToString());
+				writer.WriteEndElement();
+			}
+			writer.WriteString("\n");
+			writer.WriteEndElement();
+
+			writer.WriteStartElement("Slingshot");
+			writer.WriteAttributeString("x", level.slingshot.x.ToString());
+			writer.WriteAttributeString("y", level.slingshot.y.ToString());
+			writer.WriteEndElement();
+
+			writer.WriteStartElement("GameObjects");
+
+			foreach(BlockData abObj in level.blocks) {
+				writer.WriteStartElement("Block");
+				String[] indexType = abObj.type.ToString().Split('(');
+				writer.WriteAttributeString("type", indexType[0]);
+				writer.WriteAttributeString("material", abObj.material.ToString());
+				writer.WriteAttributeString("x", abObj.x.ToString());
+				writer.WriteAttributeString("y", abObj.y.ToString());
+				writer.WriteAttributeString("rotation", abObj.rotation.ToString());
+				writer.WriteEndElement();
+			}
+
+			foreach(OBjData abObj in level.pigs)
+			{
+				writer.WriteStartElement("Pig");
+				writer.WriteAttributeString("type", abObj.type.ToString());
+				writer.WriteAttributeString("x", abObj.x.ToString());
+				writer.WriteAttributeString("y", abObj.y.ToString());
+				writer.WriteAttributeString("rotation", abObj.rotation.ToString());
+				writer.WriteEndElement();
+			}
+
+			foreach(OBjData abObj in level.tnts)
+			{
+				writer.WriteStartElement("TNT");
+				writer.WriteAttributeString("type", abObj.type.ToString());
+				writer.WriteAttributeString("x", abObj.x.ToString());
+				writer.WriteAttributeString("y", abObj.y.ToString());
+				writer.WriteAttributeString("rotation", abObj.rotation.ToString());
+				writer.WriteEndElement();
+			}
+
+			foreach(PlatData abObj in level.platforms)
+			{
+				writer.WriteStartElement("Platform");
+				writer.WriteAttributeString("type", abObj.type.ToString());
+				writer.WriteAttributeString("x", abObj.x.ToString());
+				writer.WriteAttributeString("y", abObj.y.ToString());
+				writer.WriteAttributeString("rotation", abObj.rotation.ToString());
+				writer.WriteAttributeString("scaleX", abObj.scaleX.ToString());
+				writer.WriteAttributeString("scaleY", abObj.scaleY.ToString());
+				writer.WriteEndElement();
+			}
+		}
+
 		StreamWriter streamWriter = new StreamWriter(path);
 		streamWriter.WriteLine(output.ToString());
 		streamWriter.Close();
@@ -436,7 +518,7 @@ public class LevelLoader {
         //Use this code to save objs
         ABLevel level = EncodeLevel();
         //Save level to xml file
-		SaveXmlLevel(level ,Application.dataPath + ABConstants.EVALUATED_SUBSETS_FOLDER,false);
+		SaveXmlLevel(level ,Application.dataPath + ABConstants.CUSTOM_LEVELS_FOLDER, false);
 	}
 
     //platformMiddlePoint is the centre of the platforms in current subsets

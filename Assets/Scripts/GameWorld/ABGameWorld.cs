@@ -108,7 +108,6 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
     public static float platformStartPointY;
     public ABLevel CurrentLevel;
     public ABLevel SymmetricalLevel;
-    public static bool Generatelevel = false;
     public static int VerticalBulletPosition = 0;
     public static int VerticalTimes;
     public static int HorizonalBulletPosition = 0;
@@ -121,6 +120,23 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
 	public bool initiate = true;
 	public List<ObjTrack> trajectory;
 	public List<SubsetInfo> subsetList= new List<SubsetInfo> ();
+
+	private Dictionary<string,Vector2> blockSize = new Dictionary<string,Vector2> () {
+		{"SquareHole",new Vector2(0.84f,0.84f)},
+		{"RectFat",new Vector2(0.84f,0.84f)},
+		{"RectFat",new Vector2(0.84f,0.84f)},
+		{"SquareSmall",new Vector2(0.84f,0.84f)},
+		{"SquareHole",new Vector2(0.84f,0.84f)},
+		{"SquareHole",new Vector2(0.84f,0.84f)},
+		{"SquareHole",new Vector2(0.84f,0.84f)},
+		{"SquareHole",new Vector2(0.84f,0.84f)},
+		{"SquareHole",new Vector2(0.84f,0.84f)},
+		{"SquareHole",new Vector2(0.84f,0.84f)},
+		{"SquareHole",new Vector2(0.84f,0.84f)},
+		{"SquareHole",new Vector2(0.84f,0.84f)},
+		{"SquareHole",new Vector2(0.84f,0.84f)},
+		{"SquareHole",new Vector2(0.84f,0.84f)},
+	}
 
 
     void Awake()
@@ -200,7 +216,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
 
         if (_isSimulation)
         {
-            Time.timeScale = 100;
+            Time.timeScale = 2;
         }
 
     }
@@ -392,6 +408,8 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
 		} else 
 			//Generate Levels
 		{
+
+			CheckOverlap ();
 			
 			if (initiate) {
 				trajectory = new List<ObjTrack> ();
@@ -403,15 +421,18 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
 //			else (!initiate && IsLevelStable ()) {
 			else {
 //				DeleteStaticSubsetFromList ();
+				SaveCurrentLevel ();
 				int levelID = UnityEngine.Random.Range (0, LevelList.Instance.GetAllLevel ().Length);
 				if (trajectory.Count == 0) {
+					
 					LevelList.Instance.CurrentIndex = UnityEngine.Random.Range (0, levelID);
 					ABSceneManager.Instance.LoadScene (SceneManager.GetActiveScene ().name);
+					subsetList= new List<SubsetInfo> ();
 					print ("Finding different initial subset...");
 					return;
 				}
 
-				Vector2 subsetPos = trajectory [UnityEngine.Random.Range (0, trajectory.Count)].pos;
+				Vector2 subsetPos = trajectory [UnityEngine.Random.Range (trajectory.Count/2, trajectory.Count)].pos;
 				ABLevel lvl = LevelList.Instance.GetLevel (levelID);
 				AddSubsetIntoList (levelID, lvl, subsetPos);
 				initiate = true;
@@ -1036,7 +1057,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
 	public void GenerateSubset(Vector2 position,int tag,int level) {
 		ABLevel generateSubset = LevelList.Instance.GetLevel(level);
 		LevelSimulator.GenerateSubset(generateSubset, tag, position.x, position.y);
-		Debug.Log ("pos : " + position.ToString () + ", trigger : " + generateSubset.triggerX.ToString () + generateSubset.triggerY.ToString ());
+//		Debug.Log ("pos : " + position.ToString () + ", trigger : " + generateSubset.triggerX.ToString () + generateSubset.triggerY.ToString ());
 		//		countTNT = generateSubset.tnts.Count;
 	}
 
@@ -1082,9 +1103,9 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
 //			GameObject obj = track.obj;
 //		}
 		GetSubsetMovement();
-		if (Time.renderedFrameCount % 100 != 0 && Time.timeScale != 100) 
+		if (Time.renderedFrameCount % 100 != 0 && Time.timeScale == 1) 
 			return;
-		print ("recordTrajectory");
+//		print ("recordTrajectory");
 		foreach (Transform trans in GameObject.Find("Blocks").transform) {
 			if (trans.GetComponent<Rigidbody2D> ().velocity.magnitude > 2.5f && trans.tag !="test" && trans.GetComponent<Rigidbody2D> ().velocity.y <0.5f) {
 				ObjTrack track = new ObjTrack {
@@ -1095,7 +1116,7 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
 					trajectory.Add (track);
 				}
 				foreach (SubsetInfo info in subsetList) {
-					if (Vector2.Distance(info.triggerPoint,trans.position)<3f) {
+					if (Vector2.Distance(info.triggerPoint,trans.position)<2f) {
 						trajectory.Remove (track);
 						break;
 					}
@@ -1105,11 +1126,15 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
 		}
 	}
 
-//	public void DeleteSubset
+	public void DeleteSubset () {
+		subsetList.RemoveAt (subsetList.Count - 1);
+	}
 
 	public void GetSubsetMovement()
 	{
-		foreach(SubsetInfo subset in subsetList) {
+//		foreach(SubsetInfo subset in subsetList) {
+		for (int i = 0; i<subsetList.Count-1;i++) {
+			SubsetInfo subset = subsetList [i];
 			List<Rigidbody2D> bodies = new List<Rigidbody2D>();
 			foreach (Transform trans in GameObject.Find("Blocks").transform) {
 				if (Vector2.Distance(trans.position,subset.center)<2.12f)
@@ -1118,8 +1143,11 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
 			}
 			foreach (Rigidbody2D body in bodies) {
 
-				if (!IsObjectOutOfWorld (body.transform, body.GetComponent<Collider2D> ()))
+				if (!IsObjectOutOfWorld (body.transform, body.GetComponent<Collider2D> ())) {
 					subset.movement += body.velocity.magnitude;
+//					if (i != 0 )
+//						print ("subset.movement : " + subset.movement.ToString()+", tag : "+i.ToString());
+				}
 			}
 		}
 
@@ -1161,4 +1189,60 @@ public class ABGameWorld : ABSingleton<ABGameWorld>
 			return false;
 	}
 
+	private void IsSubsetStable () {
+//		for(int i =0;i<subsetList.Count-1;)
+	}
+
+	private void CheckOverlap () {
+		foreach (Transform trans in GameObject.Find("Blocks").transform) {
+			float temp = trans.GetComponent<Rigidbody2D> ().velocity.magnitude;
+			if (temp > 20f) {
+				subsetList.RemoveAt (subsetList.Count - 1);
+				initx ();
+				initiate = true;
+				print ("Overlapped");
+				return;
+			}
+		}
+	}
+
+	private void SaveCurrentLevel () {
+		if (subsetList.Count > 1) {
+			initx ();
+			for (int i = 1; i < subsetList.Count; i++)
+			{ // generate old subset
+				GenerateSubset(subsetList[i].triggerPoint,i, subsetList[i].id);
+//				print ("id : " + subsetList [i].id.ToString () + ", trigger : " + subsetList [i].triggerPoint.ToString ());
+			}
+			_levelLoader.SaveLevelOnScene ();
+			print ("Level Saved!");
+		}
+	}
+
+	public void AddPigIntoSubset (ABLevel level) {
+		if (level.tnts.Count != 0) {
+			//string[] types = new string[3]{"BasicBig","BasicMedium","BasicSmall"};
+			//string type = types[UnityEngine.Random.Range(0,types.Length)];
+			string type = "BasicSmall";
+			int randomTNT = UnityEngine.Random.Range (0, level.tnts.Count); // find tnt
+			OBjData tnt = level.tnts[randomTNT];
+			level.pigs.Add(new OBjData (type, 0, tnt.x, tnt.y + 0.5f)); // add pig
+		}
+	}
+
+	public void ChangePigIntoBlock(ABLevel level) {
+		if (level.pigs.Count != 0) {
+			string[] types = new string[2]{"CircleSmall","RectTiny"};
+			string type = types[UnityEngine.Random.Range(0,types.Length)]; //random block type
+
+			string[] materials = new string[3]{"wood","ice","stone"};
+			string material = materials[UnityEngine.Random.Range(0,materials.Length)]; //random block material
+
+			int randomPig = UnityEngine.Random.Range (0, level.pigs.Count); // find pig
+			OBjData pig = level.pigs [randomPig]; //Get pig`
+
+			level.blocks.Add(new BlockData(type, pig.rotation, pig.x, pig.y, material)); // add block
+			level.pigs.RemoveAt (randomPig); // remove pig
+		}
+	}
 }
